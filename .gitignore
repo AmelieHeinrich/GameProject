@@ -1,0 +1,9 @@
+# Build directories
+
+build
+
+# IDE directories
+
+.vs
+.vscode
+.xmake
