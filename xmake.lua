@@ -4,4 +4,4 @@ target("Game Project")
     add_files("sp/**.cpp")
     add_headerfiles("sp/**.hpp")
     add_includedirs("sp", { public = true })
-    -- TODO: Platform detection
+    add_syslinks("user32")
