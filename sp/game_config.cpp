@@ -6,6 +6,7 @@
  */
 
 #include "game_config.hpp"
+#include "log_system.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -18,7 +19,8 @@ void GameConfigLoad(const std::string& Path, game_config_file *File)
     std::ifstream FileStream(Path);
     if (!FileStream.is_open()) 
     {
-        // TODO(amelie.h): Error handling
+        LogFatal("Failed to find config file at path %s\n", Path.c_str());
+        exit(-1);
     }
 
     std::vector<std::string> Lines;
@@ -29,4 +31,6 @@ void GameConfigLoad(const std::string& Path, game_config_file *File)
     File->Width = std::atoi(Lines[0].c_str());
     File->Height = std::atoi(Lines[1].c_str());
     File->AssetPath = Lines[2];
+
+    FileStream.close();
 }
