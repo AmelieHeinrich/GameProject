@@ -7,6 +7,8 @@
 
 #include <Windows.h>
 
+#include "game_config.hpp"
+
 #define GAME_DEFAULT_WIDTH 1920
 #define GAME_DEFAULT_HEIGHT 1080
 
@@ -24,6 +26,9 @@ LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LPa
 
 int main(int argc, char *argv[])
 {
+    game_config_file ConfigFile;
+    GameConfigLoad("gameconfig.cfg", &ConfigFile);
+    
     win32_platform_state State = {};
     State.Instance = GetModuleHandle(NULL);
 
@@ -35,7 +40,7 @@ int main(int argc, char *argv[])
     State.WindowClass.hbrBackground = (HBRUSH)GRAY_BRUSH;
     RegisterClassA(&State.WindowClass);
 
-    State.Window = CreateWindowA(State.WindowClass.lpszClassName, "Game Project | <DirectX 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, GAME_DEFAULT_WIDTH, GAME_DEFAULT_HEIGHT, NULL, NULL, State.Instance, NULL);
+    State.Window = CreateWindowA(State.WindowClass.lpszClassName, "Game Project | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, ConfigFile.Width, ConfigFile.Height, NULL, NULL, State.Instance, NULL);
     ShowWindow(State.Window, SW_SHOW);
     UpdateWindow(State.Window);
 
