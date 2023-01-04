@@ -8,9 +8,8 @@
 #include <Windows.h>
 
 #include "game_config.hpp"
-
-#define GAME_DEFAULT_WIDTH 1920
-#define GAME_DEFAULT_HEIGHT 1080
+#include "timer.h"
+#include "log_system.hpp"
 
 struct win32_platform_state
 {

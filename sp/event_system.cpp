@@ -46,7 +46,7 @@ void EventSystemRegister(event_type Type, void *Listener, PFN_OnEvent Callback)
     {
         if (EventSystem.Registered[Type].Events[RegisterIndex].Listener == Listener) 
         {
-            LogWarn("Trying to register an eventthat is already registered!\n");
+            LogWarn("Trying to register an eventthat is already registered!");
             return;
         }
     }
@@ -61,7 +61,7 @@ void EventSystemUnregister(event_type Type, void *Listener, PFN_OnEvent Callback
 {
     if (EventSystem.Registered[Type].Events.empty())
     {
-        LogWarn("Trying to unregister an event listener that isn't registered!\n");
+        LogWarn("Trying to unregister an event listener that isn't registered!");
         return;
     }
 

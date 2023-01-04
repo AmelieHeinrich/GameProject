@@ -19,7 +19,7 @@ void GameConfigLoad(const std::string& Path, game_config_file *File)
     std::ifstream FileStream(Path);
     if (!FileStream.is_open()) 
     {
-        LogFatal("Failed to find config file at path %s\n", Path.c_str());
+        LogFatal("Failed to find config file at path %s", Path.c_str());
         exit(-1);
     }
 

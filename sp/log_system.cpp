@@ -26,15 +26,15 @@ void LogOutput(log_level Level, const char *Message, ...)
     vsnprintf(OutMessage, 32000, Message, ArgPointer);
     va_end(ArgPointer);
 	
-    char out_message2[32000];
-    sprintf(out_message2, "%s%s\n", LevelStrings[static_cast<uint16_t>(Level)], OutMessage);
+    char FinalMessage[32000];
+    sprintf(FinalMessage, "%s%s\n", LevelStrings[static_cast<uint16_t>(Level)], OutMessage);
 
     HANDLE ConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     if (IsError)
         ConsoleHandle = GetStdHandle(STD_ERROR_HANDLE);
     static uint8_t Levels[6] = {64, 4, 6, 2, 1, 8};
     SetConsoleTextAttribute(ConsoleHandle, Levels[static_cast<uint16_t>(Level)]);
-    OutputDebugStringA(Message);
-    uint64_t Length = strlen(Message);
-    WriteConsoleA(ConsoleHandle, Message, (DWORD)Length, NULL, 0);
+    OutputDebugStringA(FinalMessage);
+    uint64_t Length = strlen(FinalMessage);
+    WriteConsoleA(ConsoleHandle, FinalMessage, (DWORD)Length, NULL, 0);
 }
