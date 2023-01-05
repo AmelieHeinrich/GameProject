@@ -10,6 +10,7 @@
 #include "game_config.hpp"
 #include "timer.h"
 #include "log_system.hpp"
+#include "event_system.hpp"
 
 struct win32_platform_state
 {
@@ -20,6 +21,23 @@ struct win32_platform_state
 
 LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam)
 {
+    switch (Message)
+    {
+        case WM_SIZE:
+        {
+            RECT Rectangle;
+            GetClientRect(Window, &Rectangle);
+            AdjustWindowRect(&Rectangle, WS_OVERLAPPEDWINDOW, false);
+            uint32_t Width = Rectangle.right - Rectangle.left;
+            uint32_t Height = Rectangle.bottom - Rectangle.top;
+
+            event_data Data;
+            Data.data.u32[0] = Width;
+            Data.data.u32[1] = Height;
+            EventSystemFire(event_type::Resize, nullptr, Data);
+        } break;
+    }
+
     return DefWindowProc(Window, Message, WParam, LParam);
 }
 

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#define ToSeconds(Value) Value / 1000.0f
+
 struct timer
 {
     float start;
