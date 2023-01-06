@@ -7,4 +7,14 @@
 
 #include "input_system.hpp"
 
-// ...
+#include <Windows.h>
+
+bool IsKeyPressed(keyboard_key Key)
+{
+    return GetAsyncKeyState(static_cast<uint16_t>(Key)) & 0x01;   
+}
+
+bool IsKeyReleased(keyboard_key Key)
+{
+    return !IsKeyPressed(Key);
+}
