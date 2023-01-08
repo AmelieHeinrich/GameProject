@@ -7,11 +7,11 @@
 
 #include <Windows.h>
 
-#include "game_config.hpp"
 #include "timer.hpp"
 #include "log_system.hpp"
 #include "event_system.hpp"
 #include "input_system.hpp"
+#include "egc_parser.hpp"
 
 struct win32_platform_state
 {
@@ -112,8 +112,8 @@ bool TestEvent(event_type Type, void *Sender, void *ListenerInstance, event_data
 
 int main(int argc, char *argv[])
 {
-    game_config_file ConfigFile;
-    GameConfigLoad("gameconfig.cfg", &ConfigFile);
+    egc_file EgcFile;
+    EgcParseFile("config.egc", &EgcFile);
 
     EventSystemInit();
 
@@ -128,7 +128,9 @@ int main(int argc, char *argv[])
     State.WindowClass.hbrBackground = (HBRUSH)GRAY_BRUSH;
     RegisterClassA(&State.WindowClass);
 
-    State.Window = CreateWindowA(State.WindowClass.lpszClassName, "Game Project | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, ConfigFile.Width, ConfigFile.Height, NULL, NULL, State.Instance, NULL);
+    uint32_t Width = EgcU32(EgcFile, "width");
+    uint32_t Height = EgcU32(EgcFile, "height");
+    State.Window = CreateWindowA(State.WindowClass.lpszClassName, "Game Project | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, NULL, NULL, State.Instance, NULL);
     ShowWindow(State.Window, SW_SHOW);
     UpdateWindow(State.Window);
 
@@ -147,5 +149,7 @@ int main(int argc, char *argv[])
 
     EventSystemExit();
     
+    EgcWriteFile("config.egc", &EgcFile);
+
     return (0);
 }
