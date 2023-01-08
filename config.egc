@@ -2,3 +2,5 @@
 width(u32)=1920
 height(u32)=1080
 asset_path(str)=assets
+fullscreen(b32)=false
+vsync(b32)=false
