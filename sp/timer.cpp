@@ -5,9 +5,9 @@
  *  Create Time: 04/01/2023 23:34
  */
 
-#include "timer.h"
+#include "timer.hpp"
 
-#include <time.h>
+#include <ctime>
 
 void TimerInit(timer *Timer)
 {   

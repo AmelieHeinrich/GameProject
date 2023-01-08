@@ -8,7 +8,7 @@
 #include <Windows.h>
 
 #include "game_config.hpp"
-#include "timer.h"
+#include "timer.hpp"
 #include "log_system.hpp"
 #include "event_system.hpp"
 #include "input_system.hpp"

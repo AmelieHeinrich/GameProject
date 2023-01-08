@@ -18,3 +18,10 @@ bool IsKeyReleased(keyboard_key Key)
 {
     return !IsKeyPressed(Key);
 }
+
+V2 GetMousePosition()
+{
+    POINT Point;
+    GetCursorPos(&Point);
+    return HMM_Vec2(Point.x, Point.y);
+}
