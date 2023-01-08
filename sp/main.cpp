@@ -63,6 +63,36 @@ LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LPa
             Data.data.u16[0] = static_cast<uint16_t>(Key);
             EventSystemFire(Pressed ? event_type::KeyPressed : event_type::KeyReleased, nullptr, Data);
         } break;
+        case WM_LBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+        case WM_LBUTTONUP:
+        case WM_MBUTTONUP:
+        case WM_RBUTTONUP:
+        {
+            bool Pressed = (Message == WM_LBUTTONDOWN || Message == WM_RBUTTONDOWN || Message == WM_MBUTTONDOWN);
+            mouse_button Button = mouse_button::Left;
+
+            switch (Message)
+            {
+                case WM_LBUTTONDOWN:
+                {
+                    Button = mouse_button::Left;
+                } break;
+                case WM_RBUTTONDOWN:
+                {
+                    Button = mouse_button::Right;
+                } break;
+                case WM_MBUTTONDOWN:
+                {
+                    Button = mouse_button::Middle;
+                } break;
+            }
+
+            event_data Data;
+            Data.data.u16[0] = static_cast<uint16_t>(Button);
+            EventSystemFire(Pressed ? event_type::MouseButtonPressed : event_type::MouseButtonReleased, nullptr, Data);
+        } break;
     }
 
     return DefWindowProc(Window, Message, WParam, LParam);

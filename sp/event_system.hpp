@@ -15,7 +15,9 @@ enum class event_type : uint16_t
     GamepadConnect,
     GamepadDisconnect,
     KeyPressed,
-    KeyReleased
+    KeyReleased,
+    MouseButtonPressed,
+    MouseButtonReleased
 };
 
 struct event_data

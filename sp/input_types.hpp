@@ -136,3 +136,10 @@ enum class keyboard_key : uint16_t
     Slash = 0xBF,
     Grave = 0xC0,
 };
+
+enum class mouse_button : uint16_t
+{
+    Left = 0x01,
+    Right = 0x02,
+    Middle = 0x04
+};

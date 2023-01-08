@@ -13,7 +13,8 @@
 bool IsKeyPressed(keyboard_key Key);
 bool IsKeyReleased(keyboard_key Key);
 
-// TODO(amelie.h): Mouse press
+bool IsMouseButtonPressed(mouse_button Button);
+bool IsMouseButtonReleased(mouse_button Button);
 
 V2 GetMousePosition();
 

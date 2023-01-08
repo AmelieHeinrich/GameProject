@@ -19,6 +19,16 @@ bool IsKeyReleased(keyboard_key Key)
     return !IsKeyPressed(Key);
 }
 
+bool IsMouseButtonPressed(mouse_button Button)
+{
+    return ((GetKeyState(static_cast<uint16_t>(Button)) & 0x8000) != 0);
+}
+
+bool IsMouseButtonReleased(mouse_button Button)
+{
+    return !IsMouseButtonPressed(Button);
+}
+
 V2 GetMousePosition()
 {
     POINT Point;
