@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <map>
 #include <vector>
 #include <string>
 
@@ -32,7 +32,7 @@ struct egc_variable
 struct egc_file
 {
     std::string Header;
-    std::unordered_map<std::string, egc_variable> Variables;
+    std::map<std::string, egc_variable> Variables;
 };
 
 #define EgcU32(File, Name) reinterpret_cast<egc_file*>(&File)->Variables[Name].u32
