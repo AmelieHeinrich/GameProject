@@ -42,9 +42,9 @@ void DxRenderContextInit(HWND Window)
     HRESULT Result = 0;
     for (int DriverIndex = 0; DriverIndex < 3; DriverIndex++)
     {
-        Result = D3D11CreateDevice(NULL,
+        Result = D3D11CreateDevice(nullptr,
                                    DriverTypes[DriverIndex],
-                                   NULL,
+                                   nullptr,
                                    D3D11_CREATE_DEVICE_DEBUG,
                                    Levels,
                                    1,
@@ -98,7 +98,7 @@ void DxRenderContextResize(uint32_t Width, uint32_t Height)
     DEVMODE DevMode = {0};
     DevMode.dmSize = sizeof(DevMode);
     DevMode.dmDriverExtra = 0;
-    if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &DevMode) == 0) 
+    if (EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &DevMode) == 0) 
     {
         DxRenderContext.RefreshRate = round(DevMode.dmDisplayFrequency);
     } else
@@ -145,7 +145,7 @@ void DxRenderContextResize(uint32_t Width, uint32_t Height)
     }
 
     SafeRelease(DxRenderContext.RenderTarget);
-    DxRenderContext.Device->CreateRenderTargetView(DxRenderContext.Buffers[0].Buffer, NULL, &DxRenderContext.RenderTarget);
+    DxRenderContext.Device->CreateRenderTargetView(DxRenderContext.Buffers[0].Buffer, nullptr, &DxRenderContext.RenderTarget);
 }
 
 void DxRenderContextFree()
@@ -162,4 +162,24 @@ void DxRenderContextFree()
     SafeRelease(DxRenderContext.Adapter);
     SafeRelease(DxRenderContext.DXGI);
     SafeRelease(DxRenderContext.Device);
+}
+
+void DxRenderContextBegin()
+{
+    D3D11_VIEWPORT Viewport = {};
+    Viewport.TopLeftX = 0;
+    Viewport.TopLeftY = 0;
+    Viewport.Width = (FLOAT)DxRenderContext.Width;
+    Viewport.Height = (FLOAT)DxRenderContext.Height;
+    Viewport.MinDepth = 0.0f;
+    Viewport.MaxDepth = 1.0f;
+
+    DxRenderContext.DeviceContext->RSSetViewports(1, &Viewport);
+    DxRenderContext.DeviceContext->OMSetRenderTargets(1, &DxRenderContext.RenderTarget, nullptr);
+}
+
+void DxRenderContextPresent()
+{
+    bool VerticalSync = EgcB32(EgcFile, "vsync");
+    DxRenderContext.SwapChain->Present(VerticalSync, 0);
 }

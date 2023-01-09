@@ -11,8 +11,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fstream>
 
 #include <Windows.h>
+
+log_buffer LogBuffer;
 
 void LogOutput(log_level Level, const char *Message, ...)
 {
@@ -29,6 +32,9 @@ void LogOutput(log_level Level, const char *Message, ...)
     char FinalMessage[32000];
     sprintf(FinalMessage, "%s%s\n", LevelStrings[static_cast<uint16_t>(Level)], OutMessage);
 
+    std::string Line(FinalMessage);
+    LogBuffer.LogTracker.push_back(Line);
+
     HANDLE ConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     if (IsError)
         ConsoleHandle = GetStdHandle(STD_ERROR_HANDLE);
@@ -37,4 +43,12 @@ void LogOutput(log_level Level, const char *Message, ...)
     OutputDebugStringA(FinalMessage);
     uint64_t Length = strlen(FinalMessage);
     WriteConsoleA(ConsoleHandle, FinalMessage, (DWORD)Length, NULL, 0);
+}
+
+void LogSaveFile(const std::string& Path)
+{
+    std::ofstream LogFile(Path, std::ios::trunc);
+    for (auto& Line : LogBuffer.LogTracker)
+        LogFile << Line;
+    LogFile.close();
 }

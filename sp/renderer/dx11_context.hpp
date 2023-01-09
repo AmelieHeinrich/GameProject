@@ -42,3 +42,5 @@ extern dx_render_context DxRenderContext;
 void DxRenderContextInit(HWND Window);
 void DxRenderContextFree();
 void DxRenderContextResize(uint32_t Width, uint32_t Height);
+void DxRenderContextBegin();
+void DxRenderContextPresent();

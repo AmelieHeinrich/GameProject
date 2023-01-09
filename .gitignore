@@ -2,6 +2,10 @@
 
 build
 
+# Useless game files
+
+*.log
+
 # IDE directories
 
 .vs

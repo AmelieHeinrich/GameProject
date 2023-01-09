@@ -146,13 +146,16 @@ int main(int argc, char *argv[])
             TranslateMessage(&Message);
             DispatchMessage(&Message);
         }
+
+        DxRenderContextBegin();
+        DxRenderContextPresent();
     }
 
     DxRenderContextFree();
-
     DestroyWindow(State.Window);
     UnregisterClassA(State.WindowClass.lpszClassName, State.Instance);
     EventSystemExit();
     EgcWriteFile("config.egc", &EgcFile);
+    LogSaveFile("output_log.log");
     return (0);
 }

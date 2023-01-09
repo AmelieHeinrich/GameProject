@@ -8,6 +8,8 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
+#include <string>
 
 enum class log_level : uint16_t
 {
@@ -19,7 +21,15 @@ enum class log_level : uint16_t
     Trace
 };
 
+struct log_buffer
+{
+    std::vector<std::string> LogTracker;   
+};
+
+extern log_buffer LogBuffer;
+
 void LogOutput(log_level Level, const char *Message, ...);
+void LogSaveFile(const std::string& Path);
 
 #define LogFatal(message, ...) LogOutput(log_level::Fatal, message, ##__VA_ARGS__)
 #define LogError(message, ...) LogOutput(log_level::Error, message, ##__VA_ARGS__)
