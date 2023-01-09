@@ -7,6 +7,8 @@
 
 add_rules("mode.debug", "mode.release")
 
+-- TODO(amelie.h): Add dependencies as targets
+
 target("Game Project")
     set_rundir(".")
     add_files("sp/**.cpp")

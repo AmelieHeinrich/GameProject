@@ -99,21 +99,11 @@ LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LPa
     return DefWindowProc(Window, Message, WParam, LParam);
 }
 
-bool TestEvent(event_type Type, void *Sender, void *ListenerInstance, event_data Data)
-{
-    if (Type == event_type::KeyPressed)
-    {
-        if (Data.data.u16[0] == (uint16_t)keyboard_key::Escape)
-        {
-            LogInfo("Escape Pressed!");
-        }
-    }
-    return true;
-}
-
 int main(int argc, char *argv[])
 {
     EgcParseFile("config.egc", &EgcFile);
+    uint32_t Width = EgcU32(EgcFile, "width");
+    uint32_t Height = EgcU32(EgcFile, "height");
 
     EventSystemInit();
 
@@ -127,8 +117,6 @@ int main(int argc, char *argv[])
     State.WindowClass.lpfnWndProc = WindowProc;
     RegisterClassA(&State.WindowClass);
 
-    uint32_t Width = EgcU32(EgcFile, "width");
-    uint32_t Height = EgcU32(EgcFile, "height");
     State.Window = CreateWindowA(State.WindowClass.lpszClassName, "Game Project | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, NULL, NULL, State.Instance, NULL);
     ShowWindow(State.Window, SW_SHOW);
     UpdateWindow(State.Window);
