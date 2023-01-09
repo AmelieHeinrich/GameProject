@@ -12,6 +12,7 @@
 #include "event_system.hpp"
 #include "input_system.hpp"
 #include "egc_parser.hpp"
+#include "renderer/dx11_context.hpp"
 
 struct win32_platform_state
 {
@@ -134,6 +135,8 @@ int main(int argc, char *argv[])
     ShowWindow(State.Window, SW_SHOW);
     UpdateWindow(State.Window);
 
+    DxRenderContextInit(State.Window);
+
     while (IsWindowVisible(State.Window))
     {
         MSG Message;
@@ -144,12 +147,11 @@ int main(int argc, char *argv[])
         }
     }
 
+    DxRenderContextFree();
+
     DestroyWindow(State.Window);
     UnregisterClassA(State.WindowClass.lpszClassName, State.Instance);
-
     EventSystemExit();
-    
     EgcWriteFile("config.egc", &EgcFile);
-
     return (0);
 }
