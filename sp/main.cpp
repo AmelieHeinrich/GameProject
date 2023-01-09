@@ -15,8 +15,6 @@
 #include "game_data.hpp"
 #include "renderer/dx11_context.hpp"
 
-egc_file EgcFile;
-
 struct win32_platform_state
 {
     HINSTANCE Instance;
