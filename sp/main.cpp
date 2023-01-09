@@ -7,13 +7,12 @@
 
 #include <Windows.h>
 
-#include "timer.hpp"
-#include "log_system.hpp"
-#include "event_system.hpp"
-#include "input_system.hpp"
 #include "egc_parser.hpp"
 #include "game_data.hpp"
-#include "renderer/dx11_context.hpp"
+#include "gpu/dx11_context.hpp"
+#include "systems/log_system.hpp"
+#include "systems/event_system.hpp"
+#include "systems/input_system.hpp"
 
 struct win32_platform_state
 {

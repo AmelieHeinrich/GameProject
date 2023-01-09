@@ -7,8 +7,8 @@
 
 #include "dx11_context.hpp"
 
-#include "log_system.hpp"
-#include "event_system.hpp"
+#include "systems/log_system.hpp"
+#include "systems/event_system.hpp"
 #include "game_data.hpp"
 
 #include <cmath>

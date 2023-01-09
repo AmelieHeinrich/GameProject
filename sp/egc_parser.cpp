@@ -7,7 +7,7 @@
 
 #include "egc_parser.hpp"
 
-#include "log_system.hpp"
+#include "systems/log_system.hpp"
 
 #include <fstream>
 #include <sstream>

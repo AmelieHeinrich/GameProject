@@ -8,7 +8,7 @@
 #include "dx11_buffer.hpp"
 
 #include "dx11_context.hpp"
-#include "log_system.hpp"
+#include "systems/log_system.hpp"
 
 D3D11_BIND_FLAG GpuUsageToD3D11(gpu_buffer_usage Usage)
 {
