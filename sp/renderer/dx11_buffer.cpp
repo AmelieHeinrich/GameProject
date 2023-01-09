@@ -96,9 +96,3 @@ void GpuBufferBindConstant(gpu_buffer *Buffer, int Binding, gpu_buffer_bind Bind
         } break;
     }
 }
-
-void GpuBufferBindUnorderedAccess(gpu_buffer *Buffer, int Binding)
-{
-    uint32_t Count = 1;
-    DxRenderContext.DeviceContext->CSSetUnorderedAccessViews(0, 1, &Buffer->Buffer, &Count);
-}

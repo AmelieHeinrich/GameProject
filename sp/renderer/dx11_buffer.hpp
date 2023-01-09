@@ -39,4 +39,4 @@ void GpuBufferUploadData(gpu_buffer *Buffer, const void *Data);
 void GpuBufferBindVertex(gpu_buffer *Buffer);
 void GpuBufferBindIndex(gpu_buffer *Buffer);
 void GpuBufferBindConstant(gpu_buffer *Buffer, int Binding, gpu_buffer_bind Bind);
-void GpuBufferBindUnorderedAccess(gpu_buffer *Buffer, int Binding);
+// TODO(amelie.h): Unordered access view
