@@ -10,6 +10,12 @@
 #include "dx11_common.hpp"
 
 #include <cstdint>
+#include <vector>
+
+struct dx_swapchain_buffer
+{
+    ID3D11Texture2D* Buffer;
+};
 
 struct dx_render_context
 {
@@ -17,6 +23,7 @@ struct dx_render_context
     uint32_t Width;
     uint32_t Height;
     uint32_t RefreshRate;
+    uint32_t BufferCount;
 
     IDXGIAdapter* Adapter;
     IDXGIFactory* Factory;
@@ -25,9 +32,9 @@ struct dx_render_context
     ID3D11DeviceContext* DeviceContext;
     D3D_FEATURE_LEVEL FeatureLevel;
 
-    IDXGISwapChain* SwapChain;
-    ID3D11Texture2D* SwapChainBuffer;
-    ID3D11RenderTargetView* SwapChainRTV;
+    IDXGISwapChain3* SwapChain;
+    std::vector<dx_swapchain_buffer> Buffers;
+    ID3D11RenderTargetView* RenderTarget;
 };
 
 extern dx_render_context DxRenderContext;

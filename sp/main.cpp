@@ -12,7 +12,10 @@
 #include "event_system.hpp"
 #include "input_system.hpp"
 #include "egc_parser.hpp"
+#include "game_data.hpp"
 #include "renderer/dx11_context.hpp"
+
+egc_file EgcFile;
 
 struct win32_platform_state
 {
@@ -113,7 +116,6 @@ bool TestEvent(event_type Type, void *Sender, void *ListenerInstance, event_data
 
 int main(int argc, char *argv[])
 {
-    egc_file EgcFile;
     EgcParseFile("config.egc", &EgcFile);
 
     EventSystemInit();
@@ -126,7 +128,6 @@ int main(int argc, char *argv[])
     State.WindowClass.hIcon = LoadIcon(State.Instance, IDI_WINLOGO);
     State.WindowClass.lpszClassName = "GameProjectWindowClass";
     State.WindowClass.lpfnWndProc = WindowProc;
-    State.WindowClass.hbrBackground = (HBRUSH)GRAY_BRUSH;
     RegisterClassA(&State.WindowClass);
 
     uint32_t Width = EgcU32(EgcFile, "width");

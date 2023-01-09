@@ -8,6 +8,8 @@
 #include "dx11_context.hpp"
 
 #include "log_system.hpp"
+#include "event_system.hpp"
+#include "game_data.hpp"
 
 #include <cmath>
 #include <string>
@@ -20,6 +22,17 @@ const D3D_DRIVER_TYPE DriverTypes[] =
 };
 
 dx_render_context DxRenderContext;
+
+bool DxRenderResizeCallback(event_type Type, void *Sender, void *ListenerInstance, event_data Data)
+{
+    if (Type == event_type::Resize)
+    {
+        uint32_t Width = Data.data.u32[0];
+        uint32_t Height = Data.data.u32[1];
+        DxRenderContextResize(Width, Height);
+    }
+    return true;
+}
 
 void DxRenderContextInit(HWND Window)
 {
@@ -53,24 +66,34 @@ void DxRenderContextInit(HWND Window)
     DxRenderContext.DXGI->GetParent(IID_PPV_ARGS(&DxRenderContext.Adapter));
     DxRenderContext.Adapter->GetParent(IID_PPV_ARGS(&DxRenderContext.Factory));
 
+    DXGI_ADAPTER_DESC AdapterDesc = {0};
+    DxRenderContext.Adapter->GetDesc(&AdapterDesc);
+    std::wstring AdapterName = std::wstring(AdapterDesc.Description);
+    std::string AnsiAdapterName = std::string(AdapterName.begin(), AdapterName.end());
+    LogInfo("Created D3D11 context using GPU: %s", AnsiAdapterName.c_str());
+
     RECT Rectangle;
     GetClientRect(Window, &Rectangle);
     DxRenderContext.Width = Rectangle.right - Rectangle.left;
     DxRenderContext.Height = Rectangle.bottom - Rectangle.top;
 
     DxRenderContextResize(DxRenderContext.Width, DxRenderContext.Height);
-
-    DXGI_ADAPTER_DESC AdapterDesc = {0};
-    DxRenderContext.Adapter->GetDesc(&AdapterDesc);
-    std::wstring AdapterName = std::wstring(AdapterDesc.Description);
-    std::string AnsiAdapterName = std::string(AdapterName.begin(), AdapterName.end());
-    LogInfo("Created D3D11 context using GPU: %s", AnsiAdapterName.c_str());
+    EventSystemRegister(event_type::Resize, nullptr, DxRenderResizeCallback);
 }
 
 void DxRenderContextResize(uint32_t Width, uint32_t Height)
 {
+    DxRenderContext.BufferCount = EgcU32(EgcFile, "buffer_count");
+    if (DxRenderContext.BufferCount < 1 && DxRenderContext.BufferCount > 3) 
+    {
+        LogError("SwapChain buffer count must be in range [1, 3]!");
+        exit(-1);
+    }
+
     DxRenderContext.Width = Width;
     DxRenderContext.Height = Height;
+    DxRenderContext.Buffers.clear();
+    DxRenderContext.Buffers.resize(DxRenderContext.BufferCount);
 
     DEVMODE DevMode = {0};
     DevMode.dmSize = sizeof(DevMode);
@@ -96,31 +119,44 @@ void DxRenderContextResize(uint32_t Width, uint32_t Height)
         Desc.SampleDesc.Count = 1;
         Desc.SampleDesc.Quality = 0;
         Desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        Desc.BufferCount = 1;
+        Desc.BufferCount = DxRenderContext.BufferCount;
         Desc.OutputWindow = DxRenderContext.RenderWindow;
-        // TODO(amelie.h): Add support for fullscreen
         Desc.Windowed = true;
+        Desc.SwapEffect = DxRenderContext.BufferCount > 1 ? DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL : DXGI_SWAP_EFFECT_DISCARD;
+        Desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-        HRESULT Result = DxRenderContext.Factory->CreateSwapChain(DxRenderContext.Device, &Desc, &DxRenderContext.SwapChain);
+        IDXGISwapChain* Temp = nullptr;
+        HRESULT Result = DxRenderContext.Factory->CreateSwapChain(DxRenderContext.Device, &Desc, &Temp);
         if (FAILED(Result))
         {
             LogError("Failed to create/resize D3D11 swapchain!");
             exit(-1);
         }
+        Temp->QueryInterface(IID_PPV_ARGS(&DxRenderContext.SwapChain));
+        SafeRelease(Temp);
     }
 
-    SafeRelease(DxRenderContext.SwapChainBuffer);
-    SafeRelease(DxRenderContext.SwapChainRTV);
+    DxRenderContext.SwapChain->ResizeBuffers(DxRenderContext.BufferCount, Width, Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 
-    DxRenderContext.SwapChain->ResizeBuffers(1, Width, Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
-    DxRenderContext.SwapChain->GetBuffer(0, IID_PPV_ARGS(&DxRenderContext.SwapChainBuffer));
-    DxRenderContext.Device->CreateRenderTargetView(DxRenderContext.SwapChainBuffer, NULL, &DxRenderContext.SwapChainRTV);
+    for (int BufferIndex = 0; BufferIndex < DxRenderContext.BufferCount; BufferIndex++)
+    {
+        SafeRelease(DxRenderContext.Buffers[BufferIndex].Buffer);
+        DxRenderContext.SwapChain->GetBuffer(BufferIndex, IID_PPV_ARGS(&DxRenderContext.Buffers[BufferIndex].Buffer));
+    }
+
+    SafeRelease(DxRenderContext.RenderTarget);
+    DxRenderContext.Device->CreateRenderTargetView(DxRenderContext.Buffers[0].Buffer, NULL, &DxRenderContext.RenderTarget);
 }
 
 void DxRenderContextFree()
 {
-    SafeRelease(DxRenderContext.SwapChainBuffer);
-    SafeRelease(DxRenderContext.SwapChainRTV);
+    EventSystemUnregister(event_type::Resize, nullptr, DxRenderResizeCallback);
+
+    for (int BufferIndex = 0; BufferIndex < DxRenderContext.BufferCount; BufferIndex++)
+    {
+        SafeRelease(DxRenderContext.Buffers[BufferIndex].Buffer);
+    }
+    SafeRelease(DxRenderContext.RenderTarget);
     SafeRelease(DxRenderContext.SwapChain);
     SafeRelease(DxRenderContext.Factory);
     SafeRelease(DxRenderContext.Adapter);
