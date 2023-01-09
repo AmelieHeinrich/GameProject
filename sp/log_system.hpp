@@ -29,6 +29,7 @@ struct log_buffer
 extern log_buffer LogBuffer;
 
 void LogOutput(log_level Level, const char *Message, ...);
+void LogResetColor();
 void LogSaveFile(const std::string& Path);
 
 #define LogFatal(message, ...) LogOutput(log_level::Fatal, message, ##__VA_ARGS__)

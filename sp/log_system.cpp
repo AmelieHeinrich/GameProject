@@ -45,6 +45,14 @@ void LogOutput(log_level Level, const char *Message, ...)
     WriteConsoleA(ConsoleHandle, FinalMessage, (DWORD)Length, NULL, 0);
 }
 
+void LogResetColor()
+{
+    HANDLE ConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(ConsoleHandle, 7);
+    ConsoleHandle = GetStdHandle(STD_ERROR_HANDLE);
+    SetConsoleTextAttribute(ConsoleHandle, 7);
+}
+
 void LogSaveFile(const std::string& Path)
 {
     std::ofstream LogFile(Path, std::ios::trunc);

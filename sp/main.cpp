@@ -157,5 +157,6 @@ int main(int argc, char *argv[])
     EventSystemExit();
     EgcWriteFile("config.egc", &EgcFile);
     LogSaveFile("output_log.log");
+    LogResetColor();
     return (0);
 }
