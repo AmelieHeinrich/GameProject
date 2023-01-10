@@ -44,3 +44,5 @@ void DxRenderContextFree();
 void DxRenderContextResize(uint32_t Width, uint32_t Height);
 void DxRenderContextBegin();
 void DxRenderContextPresent();
+void DxRenderContextDraw(uint32_t Count);
+void DxRenderContextDrawIndexed(uint32_t Count);

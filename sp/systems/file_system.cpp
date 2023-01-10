@@ -8,8 +8,8 @@
 #include "file_system.hpp"
 
 #include <Windows.h>
-#include <sys/stat.h>
-#include <stdio.h>
+#include <sstream>
+#include <fstream>
 
 bool FileBufferExists(const std::string& Path)
 {
@@ -32,14 +32,19 @@ void FileBufferRead(const std::string& Path, file_buffer *Buffer)
 {
     if (!FileBufferExists(Path))
         return;
-    Buffer->Size = FileBufferGetSize(Path);
-    Buffer->Data = malloc(Buffer->Size);
-    FILE* File = fopen(Path.c_str(), "r");
-    fread(Buffer->Data, Buffer->Size, 1, File);
-    fclose(File);
+    std::ifstream FileStream(Path);
+    auto Size = FileBufferGetSize(Path);
+    FileStream.read(Buffer->Data.data(), Size);
+    FileStream.close();
 }
 
-void FileBufferFree(file_buffer *Buffer)
+std::string FileRead(const std::string& Path)
 {
-    free(Buffer->Data);
+    if (!FileBufferExists(Path))
+        return "";
+    std::ifstream Stream(Path);
+    std::stringstream StringStream;
+    StringStream << Stream.rdbuf();
+    Stream.close();
+    return StringStream.str();
 }

@@ -10,6 +10,9 @@
 #include "egc_parser.hpp"
 #include "game_data.hpp"
 #include "gpu/dx11_context.hpp"
+#include "gpu/dx11_shader.hpp"
+#include "gpu/dx11_buffer.hpp"
+#include "gpu/dx11_render_state.hpp"
 #include "systems/log_system.hpp"
 #include "systems/event_system.hpp"
 #include "systems/input_system.hpp"
@@ -123,6 +126,27 @@ int main(int argc, char *argv[])
 
     DxRenderContextInit(State.Window);
 
+    float Data[] = 
+    {
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    gpu_shader Shader;
+    GpuShaderInit(&Shader, "assets/shaders/forward/Vertex.hlsl", "assets/shaders/forward/Pixel.hlsl");
+
+    gpu_buffer Buffer;
+    GpuBufferCreate(&Buffer, sizeof(Data), sizeof(float) * 6, gpu_buffer_usage::Vertex);
+    GpuBufferUploadData(&Buffer, Data);
+
+    gpu_render_state RenderState;
+    RenderState.CounterClockwise = false;
+    RenderState.CullMode = render_state_cull_mode::None;
+    RenderState.Depth = render_state_op::Less;
+    RenderState.FillMode = render_state_fill_mode::Fill;
+    GpuRenderStateCreate(&RenderState);
+
     while (IsWindowVisible(State.Window))
     {
         MSG Message;
@@ -133,8 +157,16 @@ int main(int argc, char *argv[])
         }
 
         DxRenderContextBegin();
+        GpuRenderStateBind(&RenderState);
+        GpuShaderBind(&Shader);
+        GpuBufferBindVertex(&Buffer);
+        DxRenderContextDraw(3);
         DxRenderContextPresent();
     }
+
+    GpuRenderStateFree(&RenderState);
+    GpuBufferFree(&Buffer);
+    GpuShaderFree(&Shader);
 
     DxRenderContextFree();
     DestroyWindow(State.Window);

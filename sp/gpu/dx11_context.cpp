@@ -98,8 +98,8 @@ void DxRenderContextResize(uint32_t Width, uint32_t Height)
 
     DxRenderContext.Width = Width;
     DxRenderContext.Height = Height;
-    DxRenderContext.Buffers.clear();
-    DxRenderContext.Buffers.resize(DxRenderContext.BufferCount);
+    if (DxRenderContext.Buffers.empty())
+        DxRenderContext.Buffers.resize(DxRenderContext.BufferCount);
 
     DEVMODE DevMode = {0};
     DevMode.dmSize = sizeof(DevMode);
@@ -142,15 +142,15 @@ void DxRenderContextResize(uint32_t Width, uint32_t Height)
         SafeRelease(Temp);
     }
 
+    for (int BufferIndex = 0; BufferIndex < DxRenderContext.BufferCount; BufferIndex++)
+        SafeRelease(DxRenderContext.Buffers[BufferIndex].Buffer);
+    SafeRelease(DxRenderContext.RenderTarget);
+
     DxRenderContext.SwapChain->ResizeBuffers(DxRenderContext.BufferCount, Width, Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 
     for (int BufferIndex = 0; BufferIndex < DxRenderContext.BufferCount; BufferIndex++)
-    {
-        SafeRelease(DxRenderContext.Buffers[BufferIndex].Buffer);
         DxRenderContext.SwapChain->GetBuffer(BufferIndex, IID_PPV_ARGS(&DxRenderContext.Buffers[BufferIndex].Buffer));
-    }
 
-    SafeRelease(DxRenderContext.RenderTarget);
     DxRenderContext.Device->CreateRenderTargetView(DxRenderContext.Buffers[0].Buffer, nullptr, &DxRenderContext.RenderTarget);
 }
 
@@ -180,12 +180,25 @@ void DxRenderContextBegin()
     Viewport.MinDepth = 0.0f;
     Viewport.MaxDepth = 1.0f;
 
+    float Clear[] = {0.0f, 0.0f, 0.0f, 1.0f};
+    DxRenderContext.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     DxRenderContext.DeviceContext->RSSetViewports(1, &Viewport);
     DxRenderContext.DeviceContext->OMSetRenderTargets(1, &DxRenderContext.RenderTarget, nullptr);
+    DxRenderContext.DeviceContext->ClearRenderTargetView(DxRenderContext.RenderTarget, Clear);
 }
 
 void DxRenderContextPresent()
 {
     bool VerticalSync = EgcB32(EgcFile, "vsync");
     DxRenderContext.SwapChain->Present(VerticalSync, 0);
+}
+
+void DxRenderContextDraw(uint32_t Count)
+{
+    DxRenderContext.DeviceContext->Draw(Count, 0);
+}
+
+void DxRenderContextDrawIndexed(uint32_t Count)
+{
+    DxRenderContext.DeviceContext->DrawIndexed(Count, 0, 0);
 }

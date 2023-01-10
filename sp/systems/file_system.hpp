@@ -8,15 +8,16 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 #include <string>
 
 struct file_buffer
 {
-    void *Data;
-    uint64_t Size;
+    std::vector<char> Data;
 };
 
 bool FileBufferExists(const std::string& Path);
 uint64_t FileBufferGetSize(const std::string& Path);
 void FileBufferRead(const std::string& Path, file_buffer *Buffer);
-void FileBufferFree(file_buffer *Buffer);
+
+std::string FileRead(const std::string& Path);

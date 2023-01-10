@@ -32,7 +32,7 @@ void GpuBufferCreate(gpu_buffer *Buffer, int64_t Size, int64_t Stride, gpu_buffe
 
     D3D11_BUFFER_DESC Desc = {};
     Desc.Usage = D3D11_USAGE_DEFAULT;
-    Desc.ByteWidth = Stride;
+    Desc.ByteWidth = Size;
     Desc.BindFlags = GpuUsageToD3D11(Usage);
     Desc.CPUAccessFlags = 0;
     Desc.MiscFlags = 0;

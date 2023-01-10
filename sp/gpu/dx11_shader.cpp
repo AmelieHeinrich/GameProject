@@ -13,20 +13,20 @@
 
 std::string GetEntryPointFromProfile(const std::string& Profile)
 {
-    if (Profile == "vs_5_1")
+    if (Profile == "vs_5_0")
         return "VSMain";
-    if (Profile == "ps_5_1")
+    if (Profile == "ps_5_0")
         return "PSMain";
-    if (Profile == "cs_5_1")
+    if (Profile == "cs_5_0")
         return "CSMain";
 }
 
-ID3DBlob* CompileBlob(file_buffer *Buffer, const char *Profile)
+ID3DBlob* CompileBlob(const std::string& Source, const char *Profile)
 {
     ID3DBlob* ShaderBlob;
     ID3DBlob* ErrorBlob;
-    D3DCompile(Buffer->Data, 
-               Buffer->Size, 
+    D3DCompile(Source.c_str(), 
+               Source.length(), 
                NULL, 
                NULL, 
                D3D_COMPILE_STANDARD_FILE_INCLUDE, 
@@ -55,10 +55,7 @@ void GpuShaderInit(gpu_shader *Shader, const char *V,
 
     if (V)
     {
-        file_buffer Buffer;
-        FileBufferRead(V, &Buffer);
-        VS = CompileBlob(&Buffer, "vs_5_1");
-        FileBufferFree(&Buffer);
+        VS = CompileBlob(FileRead(V), "vs_5_0");
 
         HRESULT Result = DxRenderContext.Device->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &Shader->VS);
         if (FAILED(Result))
@@ -66,25 +63,19 @@ void GpuShaderInit(gpu_shader *Shader, const char *V,
     }
     if (P)
     {
-        file_buffer Buffer;
-        FileBufferRead(P, &Buffer);
-        PS = CompileBlob(&Buffer, "ps_5_1");
-        FileBufferFree(&Buffer);
+        PS = CompileBlob(FileRead(P), "ps_5_0");
 
         HRESULT Result = DxRenderContext.Device->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &Shader->PS);
         if (FAILED(Result))
-            LogError("Failed to create vertex shader!");
+            LogError("Failed to create pixel shader!");
     }
     if (C)
     {
-        file_buffer Buffer;
-        FileBufferRead(C, &Buffer);
-        CS = CompileBlob(&Buffer, "cs_5_1");
-        FileBufferFree(&Buffer);
+        CS = CompileBlob(FileRead(C), "cs_5_0");
 
         HRESULT Result = DxRenderContext.Device->CreateComputeShader(CS->GetBufferPointer(), CS->GetBufferSize(), NULL, &Shader->CS);
         if (FAILED(Result))
-            LogError("Failed to create vertex shader!");
+            LogError("Failed to create compute shader!");
     }
 
     if (VS)
