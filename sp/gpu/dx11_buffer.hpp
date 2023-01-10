@@ -21,10 +21,7 @@ enum class gpu_resource_bind
 {
     Vertex,
     Pixel,
-    Compute,
-    Geometry,
-    Hull,
-    Domain
+    Compute
 };
 
 struct gpu_buffer

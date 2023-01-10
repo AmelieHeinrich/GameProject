@@ -22,7 +22,8 @@ enum class gpu_texture_bind
 struct gpu_texture
 {
     ID3D11Texture2D* Texture;
-    ID3D11Texture2D* DepthTexture;
+    int Width;
+    int Height;
 
     DXGI_FORMAT Format;
     DXGI_FORMAT DepthFormat;
@@ -40,7 +41,7 @@ void GpuTextureInitDSV(gpu_texture *Texture, DXGI_FORMAT DepthFormat);
 void GpuTextureInitSRV(gpu_texture *Texture);
 void GpuTextureInitUAV(gpu_texture *Texture);
 
-void GpuTextureBindRTV(gpu_texture *Texture, V4 ClearColor);
+void GpuTextureBindRTV(gpu_texture *Texture, gpu_texture *Depth, V4 ClearColor);
 void GpuTextureBindSRV(gpu_texture *Texture, int Binding, gpu_resource_bind Bind);
 void GpuTextureBindUAV(gpu_texture *Texture, int Binding);
 

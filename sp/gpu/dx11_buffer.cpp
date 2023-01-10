@@ -78,21 +78,9 @@ void GpuBufferBindConstant(gpu_buffer *Buffer, int Binding, gpu_resource_bind Bi
         {
             DxRenderContext.DeviceContext->PSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
         } break;
-        case gpu_resource_bind::Geometry:
-        {
-            DxRenderContext.DeviceContext->GSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
-        } break;
         case gpu_resource_bind::Compute:
         {
             DxRenderContext.DeviceContext->CSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
-        } break;
-        case gpu_resource_bind::Hull:
-        {
-            DxRenderContext.DeviceContext->HSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
-        } break;
-        case gpu_resource_bind::Domain:
-        {
-            DxRenderContext.DeviceContext->DSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
         } break;
     }
 }
