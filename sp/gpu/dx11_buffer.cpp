@@ -66,31 +66,31 @@ void GpuBufferBindIndex(gpu_buffer *Buffer)
     DxRenderContext.DeviceContext->IASetIndexBuffer(Buffer->Buffer, DXGI_FORMAT_R32_UINT, 0);
 }
 
-void GpuBufferBindConstant(gpu_buffer *Buffer, int Binding, gpu_buffer_bind Bind)
+void GpuBufferBindConstant(gpu_buffer *Buffer, int Binding, gpu_resource_bind Bind)
 {
     switch (Bind)
     {
-        case gpu_buffer_bind::Vertex:
+        case gpu_resource_bind::Vertex:
         {
             DxRenderContext.DeviceContext->VSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
         } break;
-        case gpu_buffer_bind::Pixel:
+        case gpu_resource_bind::Pixel:
         {
             DxRenderContext.DeviceContext->PSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
         } break;
-        case gpu_buffer_bind::Geometry:
+        case gpu_resource_bind::Geometry:
         {
             DxRenderContext.DeviceContext->GSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
         } break;
-        case gpu_buffer_bind::Compute:
+        case gpu_resource_bind::Compute:
         {
             DxRenderContext.DeviceContext->CSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
         } break;
-        case gpu_buffer_bind::Hull:
+        case gpu_resource_bind::Hull:
         {
             DxRenderContext.DeviceContext->HSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
         } break;
-        case gpu_buffer_bind::Domain:
+        case gpu_resource_bind::Domain:
         {
             DxRenderContext.DeviceContext->DSSetConstantBuffers(Binding, 1, &Buffer->Buffer);
         } break;

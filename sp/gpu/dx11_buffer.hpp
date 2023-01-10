@@ -17,7 +17,7 @@ enum class gpu_buffer_usage
     UnorderedAccess
 };
 
-enum class gpu_buffer_bind
+enum class gpu_resource_bind
 {
     Vertex,
     Pixel,
@@ -38,5 +38,5 @@ void GpuBufferFree(gpu_buffer *Buffer);
 void GpuBufferUploadData(gpu_buffer *Buffer, const void *Data);
 void GpuBufferBindVertex(gpu_buffer *Buffer);
 void GpuBufferBindIndex(gpu_buffer *Buffer);
-void GpuBufferBindConstant(gpu_buffer *Buffer, int Binding, gpu_buffer_bind Bind);
+void GpuBufferBindConstant(gpu_buffer *Buffer, int Binding, gpu_resource_bind Bind);
 // TODO(amelie.h): Unordered access view
