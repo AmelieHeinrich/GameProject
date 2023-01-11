@@ -24,7 +24,6 @@ void GuiInit()
     
     IO.DisplaySize = ImVec2(DxRenderContext.Width, DxRenderContext.Height);
     IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    IO.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports;
     IO.Fonts->AddFontFromFileTTF("assets/fonts/Roboto.ttf", 14);
     
     ImGui::StyleColorsDark();
@@ -36,6 +35,7 @@ void GuiInit()
         Style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
     
+    ImGui_ImplWin32_EnableDpiAwareness();
     ImGui_ImplDX11_Init(DxRenderContext.Device, DxRenderContext.DeviceContext);
     ImGui_ImplWin32_Init(Win32.Window);
 }

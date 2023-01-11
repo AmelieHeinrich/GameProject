@@ -27,13 +27,15 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam
 
 LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam)
 {
+    if (ImGui_ImplWin32_WndProcHandler(Window, Message, WParam, LParam))
+        return 1;
+
     switch (Message)
     {
         case WM_SIZE:
         {
             RECT Rectangle;
             GetClientRect(Window, &Rectangle);
-            AdjustWindowRect(&Rectangle, WS_OVERLAPPEDWINDOW, FALSE);
             uint32_t Width = Rectangle.right - Rectangle.left;
             uint32_t Height = Rectangle.bottom - Rectangle.top;
 
@@ -99,9 +101,6 @@ LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LPa
             EventSystemFire(Pressed ? event_type::MouseButtonPressed : event_type::MouseButtonReleased, nullptr, Data);
         } break;
     }
-
-    if (ImGui_ImplWin32_WndProcHandler(Window, Message, WParam, LParam))
-        return 1;
 
     return DefWindowProc(Window, Message, WParam, LParam);
 }

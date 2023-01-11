@@ -80,7 +80,6 @@ void DxRenderContextInit(HWND Window)
 
     RECT Rectangle;
     GetClientRect(Window, &Rectangle);
-    AdjustWindowRect(&Rectangle, WS_OVERLAPPEDWINDOW, FALSE);
     DxRenderContext.Width = Rectangle.right - Rectangle.left;
     DxRenderContext.Height = Rectangle.bottom - Rectangle.top;
 
