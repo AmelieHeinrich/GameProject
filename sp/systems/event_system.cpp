@@ -44,7 +44,7 @@ void EventSystemRegister(event_type Type, void *Listener, PFN_OnEvent Callback)
     uint64_t RegisteredCount = EventSystem.Registered[Type].Events.size();
     for (uint64_t RegisterIndex = 0; RegisterIndex < RegisteredCount; RegisterIndex++)
     {
-        if (EventSystem.Registered[Type].Events[RegisterIndex].Listener == Listener) 
+        if (EventSystem.Registered[Type].Events[RegisterIndex].Callback == Callback) 
         {
             LogWarn("Trying to register an eventthat is already registered!");
             return;

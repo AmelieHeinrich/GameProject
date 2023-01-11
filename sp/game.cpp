@@ -7,6 +7,8 @@
 
 #include "game.hpp"
 
+#include "timer.hpp"
+#include "cameras/noclip_camera.hpp"
 #include "gpu/dx11_buffer.hpp"
 #include "gpu/dx11_context.hpp"
 #include "gpu/dx11_render_state.hpp"
@@ -15,6 +17,7 @@
 #include "gui/gui.hpp"
 #include "systems/event_system.hpp"
 #include "systems/input_system.hpp"
+#include "systems/shader_system.hpp"
 #include "systems/log_system.hpp"
 
 #include <ImGui/imgui.h>
@@ -22,8 +25,13 @@
 struct game_state
 {
     bool TerminalOpen;
+    bool TerminalFocus;
 
-    gpu_shader Shader;
+    timer Timer;
+    float LastFrame;
+    noclip_camera Camera;
+
+    gpu_buffer ConstantBuffer;
     gpu_buffer Buffer;
     gpu_render_state RenderState;
 };
@@ -40,6 +48,13 @@ bool GameKeyPressed(event_type Type, void *Sender, void *Listener, event_data Da
     return true;
 }
 
+bool GameResize(event_type Type, void *Sender, void *Listener, event_data Data)
+{
+    if (Type == event_type::Resize)
+        NoClipCameraResize(&GameState.Camera, Data.data.u32[0], Data.data.u32[1]);
+    return true;
+}
+
 void GameInit()
 {
     GameState.TerminalOpen = false;
@@ -51,10 +66,12 @@ void GameInit()
          0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
-    GpuShaderInit(&GameState.Shader, "shaders/forward/Vertex.hlsl", "shaders/forward/Pixel.hlsl");
+    ShaderLibraryPush("Forward", "shaders/forward/Vertex.hlsl", "shaders/forward/Pixel.hlsl");
 
     GpuBufferCreate(&GameState.Buffer, sizeof(Data), sizeof(float) * 6, gpu_buffer_usage::Vertex);
     GpuBufferUploadData(&GameState.Buffer, Data);
+
+    GpuBufferCreate(&GameState.ConstantBuffer, sizeof(hmm_mat4) * 2, 0, gpu_buffer_usage::Constant);
 
     GameState.RenderState.CounterClockwise = false;
     GameState.RenderState.CullMode = render_state_cull_mode::None;
@@ -63,29 +80,43 @@ void GameInit()
     GpuRenderStateCreate(&GameState.RenderState);
 
     EventSystemRegister(event_type::KeyPressed, nullptr, GameKeyPressed);
+    EventSystemRegister(event_type::Resize, nullptr, GameResize);
     DevTerminalInit();
+
+    TimerInit(&GameState.Timer);
+    NoClipCameraInit(&GameState.Camera);
 }
 
 void GameUpdate()
 {
+    float Time = TimerGetElapsed(&GameState.Timer);
+    float DT = (Time - GameState.LastFrame) / 1000.0f;
+    GameState.LastFrame = Time;
+
+    hmm_mat4 DataToSend[] = { GameState.Camera.View, GameState.Camera.Projection };
+    GpuBufferUploadData(&GameState.ConstantBuffer, DataToSend);
+
     GpuRenderStateBind(&GameState.RenderState);
-    GpuShaderBind(&GameState.Shader);
+    ShaderLibraryBind("Forward");
     GpuBufferBindVertex(&GameState.Buffer);
+    GpuBufferBindConstant(&GameState.ConstantBuffer, 0, gpu_resource_bind::Vertex);
     DxRenderContextDraw(3);
 
-    GuiBeginFrame();
+    if (!GameState.TerminalFocus)
+        NoClipCameraInput(&GameState.Camera, DT);
+    NoClipCameraUpdate(&GameState.Camera, DT);
+    NoClipCameraUpdateFrustum(&GameState.Camera);
 
-    bool Focused = false;
+    GuiBeginFrame();
     if (GameState.TerminalOpen)
-        DevTerminalDraw(&GameState.TerminalOpen, &Focused);
-    
+        DevTerminalDraw(&GameState.TerminalOpen, &GameState.TerminalFocus);
     GuiEndFrame();
 }
 
 void GameExit()
 {
     DevTerminalShutdown();
+    GpuBufferFree(&GameState.ConstantBuffer);
     GpuBufferFree(&GameState.Buffer);
     GpuRenderStateFree(&GameState.RenderState);
-    GpuShaderFree(&GameState.Shader);
 }

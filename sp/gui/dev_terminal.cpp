@@ -8,6 +8,7 @@
 #include "dev_terminal.hpp"
 
 #include "windows_data.hpp"
+#include "systems/shader_system.hpp"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -73,6 +74,13 @@ void DevTerminalInit()
     });
     DevTerminalAddCommand("quit", [](const std::vector<std::string>&) {
         ShutdownGame();
+    });
+    DevTerminalAddCommand("recompile_shader", [](const std::vector<std::string>& Args) {
+        if (!Args[1].empty())
+            ShaderLibraryRecompile(Args[1]);
+    });
+    DevTerminalAddCommand("recompile_shaders_all", [](const std::vector<std::string>&) {
+        ShaderLibraryRecompileAll();
     });
 }
 

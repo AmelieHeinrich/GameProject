@@ -12,6 +12,7 @@
 #include "game_data.hpp"
 #include "gpu/dx11_context.hpp"
 #include "gui/gui.hpp"
+#include "systems/shader_system.hpp"
 #include "systems/log_system.hpp"
 #include "systems/event_system.hpp"
 #include "systems/input_system.hpp"
@@ -148,6 +149,7 @@ int main(int argc, char *argv[])
         DxRenderContextPresent();
     }
 
+    ShaderLibraryFree();
     GameExit();
     GuiExit();
     DxRenderContextFree();

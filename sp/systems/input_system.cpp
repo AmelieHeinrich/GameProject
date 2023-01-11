@@ -6,12 +6,13 @@
  */
 
 #include "input_system.hpp"
+#include "windows_data.hpp"
 
 #include <Windows.h>
 
 bool IsKeyPressed(keyboard_key Key)
 {
-    return GetAsyncKeyState(static_cast<uint16_t>(Key)) & 0x01;   
+    return GetAsyncKeyState(static_cast<uint16_t>(Key)) == -32768;   
 }
 
 bool IsKeyReleased(keyboard_key Key)
@@ -21,7 +22,7 @@ bool IsKeyReleased(keyboard_key Key)
 
 bool IsMouseButtonPressed(mouse_button Button)
 {
-    return ((GetKeyState(static_cast<uint16_t>(Button)) & 0x8000) != 0);
+    return ((GetKeyState(static_cast<uint16_t>(Button)) & 0x8000) != 0) && GetForegroundWindow() == Win32.Window;
 }
 
 bool IsMouseButtonReleased(mouse_button Button)
