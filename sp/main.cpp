@@ -8,17 +8,14 @@
 #include <Windows.h>
 
 #include "egc_parser.hpp"
+#include "game.hpp"
 #include "game_data.hpp"
-#include "windows_data.hpp"
 #include "gpu/dx11_context.hpp"
 #include "gui/gui.hpp"
 #include "systems/log_system.hpp"
 #include "systems/event_system.hpp"
 #include "systems/input_system.hpp"
-
-#include "gpu/dx11_shader.hpp"
-#include "gpu/dx11_buffer.hpp"
-#include "gpu/dx11_render_state.hpp"
+#include "windows_data.hpp"
 
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_win32.h>
@@ -107,8 +104,8 @@ LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LPa
 
 void WindowInit(void)
 {
-    uint32_t Width = EgcU32(EgcFile, "width");
-    uint32_t Height = EgcU32(EgcFile, "height");
+    uint32_t Width = EgcI32(EgcFile, "width");
+    uint32_t Height = EgcI32(EgcFile, "height");
 
     Win32.Instance = GetModuleHandle(NULL);
     Win32.WindowClass.hInstance = Win32.Instance;
@@ -130,31 +127,12 @@ void WindowExit()
 int main(int argc, char *argv[])
 {
     EgcParseFile("config.egc", &EgcFile);
+    EgcParseFile("cvars.egc", &CVars);
     EventSystemInit();
     WindowInit();
     DxRenderContextInit(Win32.Window);
     GuiInit();
-
-    float Data[] = 
-    {
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-    };
-
-    gpu_shader Shader;
-    GpuShaderInit(&Shader, "assets/shaders/forward/Vertex.hlsl", "assets/shaders/forward/Pixel.hlsl");
-
-    gpu_buffer Buffer;
-    GpuBufferCreate(&Buffer, sizeof(Data), sizeof(float) * 6, gpu_buffer_usage::Vertex);
-    GpuBufferUploadData(&Buffer, Data);
-
-    gpu_render_state RenderState;
-    RenderState.CounterClockwise = false;
-    RenderState.CullMode = render_state_cull_mode::None;
-    RenderState.Depth = render_state_op::Less;
-    RenderState.FillMode = render_state_fill_mode::Fill;
-    GpuRenderStateCreate(&RenderState);
+    GameInit();
 
     while (IsWindowVisible(Win32.Window))
     {
@@ -166,20 +144,11 @@ int main(int argc, char *argv[])
         }
 
         DxRenderContextBegin();
-        GpuRenderStateBind(&RenderState);
-        GpuShaderBind(&Shader);
-        GpuBufferBindVertex(&Buffer);
-        DxRenderContextDraw(3);
-        GuiBeginFrame();
-        ImGui::ShowDemoWindow();
-        GuiEndFrame();
+        GameUpdate();
         DxRenderContextPresent();
     }
 
-    GpuRenderStateFree(&RenderState);
-    GpuBufferFree(&Buffer);
-    GpuShaderFree(&Shader);
-
+    GameExit();
     GuiExit();
     DxRenderContextFree();
     WindowExit();

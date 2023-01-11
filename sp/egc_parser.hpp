@@ -14,7 +14,7 @@
 enum class egc_variable_type
 {
     String,
-    UnsignedInt,
+    Int,
     Boolean,
     Float
 };
@@ -24,7 +24,7 @@ struct egc_variable
     egc_variable_type Type;
     std::string StringRepresentation;
     std::string str;
-    uint32_t u32;
+    int i32;
     bool b32;
     float f32;
 };
@@ -35,7 +35,7 @@ struct egc_file
     std::map<std::string, egc_variable> Variables;
 };
 
-#define EgcU32(File, Name) reinterpret_cast<egc_file*>(&File)->Variables[Name].u32
+#define EgcI32(File, Name) reinterpret_cast<egc_file*>(&File)->Variables[Name].i32
 #define EgcStr(File, Name) reinterpret_cast<egc_file*>(&File)->Variables[Name].str
 #define EgcF32(File, Name) reinterpret_cast<egc_file*>(&File)->Variables[Name].f32
 #define EgcB32(File, Name) reinterpret_cast<egc_file*>(&File)->Variables[Name].b32

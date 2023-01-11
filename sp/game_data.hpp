@@ -10,3 +10,4 @@
 #include "egc_parser.hpp"
 
 extern egc_file EgcFile;
+extern egc_file CVars;

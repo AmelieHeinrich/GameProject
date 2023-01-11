@@ -1,10 +1,10 @@
 [config]
 asset_path(str)=assets
-buffer_count(u32)=1
+buffer_count(i32)=1
 fullscreen(b32)=false
-height(u32)=720
+height(i32)=720
 music_volume(f32)=1.0
 sound_volume(f32)=1.0
 voice_volume(f32)=1.0
 vsync(b32)=false
-width(u32)=1280
+width(i32)=1280

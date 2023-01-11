@@ -32,8 +32,8 @@ std::string GetSubstringAfter(const std::string& String, char Character)
 
 egc_variable_type GetTypeFromString(const std::string& String)
 {
-    if (String == "u32")
-        return egc_variable_type::UnsignedInt;
+    if (String == "i32")
+        return egc_variable_type::Int;
     if (String == "str")
         return egc_variable_type::String;
     if (String == "b32")
@@ -52,8 +52,8 @@ std::string GetStringFromType(egc_variable_type Type)
             return "(f32)";
         case egc_variable_type::String:
             return "(str)";
-        case egc_variable_type::UnsignedInt:
-            return "(u32)";
+        case egc_variable_type::Int:
+            return "(i32)";
     }
 }
 
@@ -96,10 +96,10 @@ void EgcParseFile(const std::string& Path, egc_file *File)
                 File->Variables[VariableName].Type = Type;
                 File->Variables[VariableName].f32 = std::atof(VariableValue.c_str());
             } break;
-            case egc_variable_type::UnsignedInt:
+            case egc_variable_type::Int:
             {
                 File->Variables[VariableName].Type = Type;
-                File->Variables[VariableName].u32 = std::atoi(VariableValue.c_str());
+                File->Variables[VariableName].i32 = std::atoi(VariableValue.c_str());
             } break;
         }
         File->Variables[VariableName].StringRepresentation = VariableValue;

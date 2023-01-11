@@ -89,7 +89,7 @@ void DxRenderContextInit(HWND Window)
 
 void DxRenderContextResize(uint32_t Width, uint32_t Height)
 {
-    DxRenderContext.BufferCount = EgcU32(EgcFile, "buffer_count");
+    DxRenderContext.BufferCount = EgcI32(EgcFile, "buffer_count");
     if (DxRenderContext.BufferCount < 1 && DxRenderContext.BufferCount > 3) 
     {
         LogError("SwapChain buffer count must be in range [1, 3]!");

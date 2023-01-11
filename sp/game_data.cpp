@@ -8,3 +8,4 @@
 #include "game_data.hpp"
 
 egc_file EgcFile;
+egc_file CVars;

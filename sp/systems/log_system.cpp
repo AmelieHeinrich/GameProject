@@ -6,6 +6,7 @@
  */
 
 #include "log_system.hpp"
+#include "gui/dev_terminal.hpp"
 
 #include <stdarg.h>
 #include <string.h>
@@ -43,6 +44,8 @@ void LogOutput(log_level Level, const char *Message, ...)
     OutputDebugStringA(FinalMessage);
     uint64_t Length = strlen(FinalMessage);
     WriteConsoleA(ConsoleHandle, FinalMessage, (DWORD)Length, NULL, 0);
+
+    DevTerminalAddLog("%s", FinalMessage);
 }
 
 void LogResetColor()
