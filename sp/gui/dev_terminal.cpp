@@ -7,6 +7,8 @@
 
 #include "dev_terminal.hpp"
 
+#include "windows_data.hpp"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <sstream>
@@ -68,6 +70,9 @@ void DevTerminalInit()
 
     DevTerminalAddCommand("clear", [](const std::vector<std::string>&) {
         DevTerminalClear();
+    });
+    DevTerminalAddCommand("quit", [](const std::vector<std::string>&) {
+        ShutdownGame();
     });
 }
 

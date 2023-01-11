@@ -8,3 +8,8 @@
 #include "windows_data.hpp"
 
 win32_platform_state Win32;
+
+void ShutdownGame()
+{
+    DestroyWindow(Win32.Window);
+}

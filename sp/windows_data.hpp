@@ -17,3 +17,5 @@ struct win32_platform_state
 };
 
 extern win32_platform_state Win32;
+
+void ShutdownGame();
