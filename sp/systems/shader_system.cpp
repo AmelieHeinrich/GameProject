@@ -26,9 +26,6 @@ void ShaderLibraryPush(const std::string& ShaderName, const std::string& VS, con
 void ShaderLibraryErase(const std::string& ShaderName)
 {
     GpuShaderFree(&Library.Entries[ShaderName].Shader);
-    Library.Entries.erase(ShaderName);
-    auto Pos = std::find(Library.Exists.begin(), Library.Exists.end(), ShaderName);
-    Library.Exists.erase(Pos);
 }
 
 void ShaderLibraryFree()
