@@ -120,8 +120,8 @@ void DxRenderContextResize(uint32_t Width, uint32_t Height)
         Desc.BufferDesc.RefreshRate.Numerator = DxRenderContext.RefreshRate;
         Desc.BufferDesc.RefreshRate.Denominator = 1;
         Desc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        Desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-        Desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+        Desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
+        Desc.BufferDesc.Scaling = DXGI_MODE_SCALING_CENTERED;
         Desc.SampleDesc.Count = 1;
         Desc.SampleDesc.Quality = 0;
         Desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -150,7 +150,6 @@ void DxRenderContextResize(uint32_t Width, uint32_t Height)
 
     for (int BufferIndex = 0; BufferIndex < DxRenderContext.BufferCount; BufferIndex++)
         DxRenderContext.SwapChain->GetBuffer(BufferIndex, IID_PPV_ARGS(&DxRenderContext.Buffers[BufferIndex].Buffer));
-
     DxRenderContext.Device->CreateRenderTargetView(DxRenderContext.Buffers[0].Buffer, nullptr, &DxRenderContext.RenderTarget);
 }
 
@@ -159,9 +158,7 @@ void DxRenderContextFree()
     EventSystemUnregister(event_type::Resize, nullptr, DxRenderResizeCallback);
 
     for (int BufferIndex = 0; BufferIndex < DxRenderContext.BufferCount; BufferIndex++)
-    {
         SafeRelease(DxRenderContext.Buffers[BufferIndex].Buffer);
-    }
     SafeRelease(DxRenderContext.RenderTarget);
     SafeRelease(DxRenderContext.SwapChain);
     SafeRelease(DxRenderContext.Factory);

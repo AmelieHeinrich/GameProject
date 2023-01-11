@@ -24,7 +24,7 @@ void GuiInit()
     
     IO.DisplaySize = ImVec2(DxRenderContext.Width, DxRenderContext.Height);
     IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    IO.Fonts->AddFontFromFileTTF("assets/fonts/Roboto.ttf", 14);
+    IO.Fonts->AddFontFromFileTTF("assets/fonts/Roboto.ttf", 16);
     
     ImGui::StyleColorsDark();
     
