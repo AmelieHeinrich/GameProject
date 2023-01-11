@@ -5,6 +5,7 @@ build
 # Useless game files
 
 *.log
+imgui.ini
 
 # IDE directories
 

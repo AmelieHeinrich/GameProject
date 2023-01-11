@@ -80,6 +80,7 @@ void DxRenderContextInit(HWND Window)
 
     RECT Rectangle;
     GetClientRect(Window, &Rectangle);
+    AdjustWindowRect(&Rectangle, WS_OVERLAPPEDWINDOW, FALSE);
     DxRenderContext.Width = Rectangle.right - Rectangle.left;
     DxRenderContext.Height = Rectangle.bottom - Rectangle.top;
 
@@ -119,7 +120,7 @@ void DxRenderContextResize(uint32_t Width, uint32_t Height)
         Desc.BufferDesc.Height = Height;
         Desc.BufferDesc.RefreshRate.Numerator = DxRenderContext.RefreshRate;
         Desc.BufferDesc.RefreshRate.Denominator = 1;
-        Desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        Desc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
         Desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
         Desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
         Desc.SampleDesc.Count = 1;
@@ -175,16 +176,23 @@ void DxRenderContextBegin()
     D3D11_VIEWPORT Viewport = {};
     Viewport.TopLeftX = 0;
     Viewport.TopLeftY = 0;
-    Viewport.Width = (FLOAT)DxRenderContext.Width;
-    Viewport.Height = (FLOAT)DxRenderContext.Height;
+    Viewport.Width = DxRenderContext.Width;
+    Viewport.Height = DxRenderContext.Height;
     Viewport.MinDepth = 0.0f;
     Viewport.MaxDepth = 1.0f;
+    
+    D3D11_RECT Rect;
+    Rect.top = 0;
+    Rect.left = 0;
+    Rect.right = Viewport.Width;
+    Rect.bottom = Viewport.Height;
 
     float Clear[] = {0.0f, 0.0f, 0.0f, 1.0f};
     DxRenderContext.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    DxRenderContext.DeviceContext->RSSetViewports(1, &Viewport);
     DxRenderContext.DeviceContext->OMSetRenderTargets(1, &DxRenderContext.RenderTarget, nullptr);
     DxRenderContext.DeviceContext->ClearRenderTargetView(DxRenderContext.RenderTarget, Clear);
+    DxRenderContext.DeviceContext->RSSetScissorRects(1, &Rect);
+    DxRenderContext.DeviceContext->RSSetViewports(1, &Viewport);
 }
 
 void DxRenderContextPresent()

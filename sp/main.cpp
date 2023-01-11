@@ -9,20 +9,21 @@
 
 #include "egc_parser.hpp"
 #include "game_data.hpp"
+#include "windows_data.hpp"
 #include "gpu/dx11_context.hpp"
-#include "gpu/dx11_shader.hpp"
-#include "gpu/dx11_buffer.hpp"
-#include "gpu/dx11_render_state.hpp"
+#include "gui/gui.hpp"
 #include "systems/log_system.hpp"
 #include "systems/event_system.hpp"
 #include "systems/input_system.hpp"
 
-struct win32_platform_state
-{
-    HINSTANCE Instance;
-    WNDCLASSA WindowClass;
-    HWND Window;
-};
+#include "gpu/dx11_shader.hpp"
+#include "gpu/dx11_buffer.hpp"
+#include "gpu/dx11_render_state.hpp"
+
+#include <ImGui/imgui.h>
+#include <ImGui/imgui_impl_win32.h>
+
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam)
 {
@@ -32,7 +33,7 @@ LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LPa
         {
             RECT Rectangle;
             GetClientRect(Window, &Rectangle);
-            AdjustWindowRect(&Rectangle, WS_OVERLAPPEDWINDOW, false);
+            AdjustWindowRect(&Rectangle, WS_OVERLAPPEDWINDOW, FALSE);
             uint32_t Width = Rectangle.right - Rectangle.left;
             uint32_t Height = Rectangle.bottom - Rectangle.top;
 
@@ -99,32 +100,41 @@ LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LPa
         } break;
     }
 
+    if (ImGui_ImplWin32_WndProcHandler(Window, Message, WParam, LParam))
+        return 1;
+
     return DefWindowProc(Window, Message, WParam, LParam);
+}
+
+void WindowInit(void)
+{
+    uint32_t Width = EgcU32(EgcFile, "width");
+    uint32_t Height = EgcU32(EgcFile, "height");
+
+    Win32.Instance = GetModuleHandle(NULL);
+    Win32.WindowClass.hInstance = Win32.Instance;
+    Win32.WindowClass.hCursor = LoadCursor(Win32.Instance, IDC_ARROW);
+    Win32.WindowClass.lpszClassName = "GameProjectWindowClass";
+    Win32.WindowClass.lpfnWndProc = WindowProc;
+    RegisterClassA(&Win32.WindowClass);
+
+    Win32.Window = CreateWindowA(Win32.WindowClass.lpszClassName, "Game Project | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, NULL, NULL, Win32.Instance, NULL);
+    ShowWindow(Win32.Window, SW_SHOW);
+}
+
+void WindowExit()
+{
+    DestroyWindow(Win32.Window);
+    UnregisterClassA(Win32.WindowClass.lpszClassName, Win32.Instance);
 }
 
 int main(int argc, char *argv[])
 {
     EgcParseFile("config.egc", &EgcFile);
-    uint32_t Width = EgcU32(EgcFile, "width");
-    uint32_t Height = EgcU32(EgcFile, "height");
-
     EventSystemInit();
-
-    win32_platform_state State = {};
-    State.Instance = GetModuleHandle(NULL);
-
-    State.WindowClass.hInstance = State.Instance;
-    State.WindowClass.hCursor = LoadCursor(State.Instance, IDC_ARROW);
-    State.WindowClass.hIcon = LoadIcon(State.Instance, IDI_WINLOGO);
-    State.WindowClass.lpszClassName = "GameProjectWindowClass";
-    State.WindowClass.lpfnWndProc = WindowProc;
-    RegisterClassA(&State.WindowClass);
-
-    State.Window = CreateWindowA(State.WindowClass.lpszClassName, "Game Project | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, NULL, NULL, State.Instance, NULL);
-    ShowWindow(State.Window, SW_SHOW);
-    UpdateWindow(State.Window);
-
-    DxRenderContextInit(State.Window);
+    WindowInit();
+    DxRenderContextInit(Win32.Window);
+    GuiInit();
 
     float Data[] = 
     {
@@ -147,10 +157,10 @@ int main(int argc, char *argv[])
     RenderState.FillMode = render_state_fill_mode::Fill;
     GpuRenderStateCreate(&RenderState);
 
-    while (IsWindowVisible(State.Window))
+    while (IsWindowVisible(Win32.Window))
     {
         MSG Message;
-        while (PeekMessage(&Message, State.Window, 0, 0, PM_REMOVE) > 0)
+        while (PeekMessage(&Message, Win32.Window, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&Message);
             DispatchMessage(&Message);
@@ -161,6 +171,9 @@ int main(int argc, char *argv[])
         GpuShaderBind(&Shader);
         GpuBufferBindVertex(&Buffer);
         DxRenderContextDraw(3);
+        GuiBeginFrame();
+        ImGui::ShowDemoWindow();
+        GuiEndFrame();
         DxRenderContextPresent();
     }
 
@@ -168,9 +181,9 @@ int main(int argc, char *argv[])
     GpuBufferFree(&Buffer);
     GpuShaderFree(&Shader);
 
+    GuiExit();
     DxRenderContextFree();
-    DestroyWindow(State.Window);
-    UnregisterClassA(State.WindowClass.lpszClassName, State.Instance);
+    WindowExit();
     EventSystemExit();
     EgcWriteFile("config.egc", &EgcFile);
     LogSaveFile("output_log.log");

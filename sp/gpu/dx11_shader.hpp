@@ -11,11 +11,11 @@
 
 struct gpu_shader
 {
-    ID3D11VertexShader* VS;
-    ID3D11PixelShader* PS;
-    ID3D11ComputeShader* CS;
+    ID3D11VertexShader* VS = nullptr;
+    ID3D11PixelShader* PS = nullptr;
+    ID3D11ComputeShader* CS = nullptr;
 
-    ID3D11InputLayout* Layout;
+    ID3D11InputLayout* Layout = nullptr;
 };
 
 void GpuShaderInit(gpu_shader *Shader, const char *V = NULL,
