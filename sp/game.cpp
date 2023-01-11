@@ -51,7 +51,7 @@ void GameInit()
          0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
-    GpuShaderInit(&GameState.Shader, "assets/shaders/forward/Vertex.hlsl", "assets/shaders/forward/Pixel.hlsl");
+    GpuShaderInit(&GameState.Shader, "shaders/forward/Vertex.hlsl", "shaders/forward/Pixel.hlsl");
 
     GpuBufferCreate(&GameState.Buffer, sizeof(Data), sizeof(float) * 6, gpu_buffer_usage::Vertex);
     GpuBufferUploadData(&GameState.Buffer, Data);
