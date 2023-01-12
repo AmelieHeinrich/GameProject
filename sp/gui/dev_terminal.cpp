@@ -63,12 +63,8 @@ void DevTerminalClear()
     DevTerminal.Items.clear();
 }
 
-void DevTerminalInit()
+void DevTerminalInitCommands()
 {
-    memset(DevTerminal.InputBuffer, 0, sizeof(char) * 1024);
-    DevTerminal.HistoryPos = -1;
-    DevTerminal.AutoScroll = true;
-
     DevTerminalAddCommand("clear", [](const std::vector<std::string>&) {
         DevTerminalClear();
     });
@@ -82,6 +78,29 @@ void DevTerminalInit()
     DevTerminalAddCommand("recompile_shaders_all", [](const std::vector<std::string>&) {
         ShaderLibraryRecompileAll();
     });
+    DevTerminalAddCommand("reload_settings", [](const std::vector<std::string>&) {
+        EgcParseFile("config.egc", &EgcFile);
+    });
+    DevTerminalAddCommand("load_settings", [](const std::vector<std::string>& Args) {
+        if (!Args[1].empty())
+            EgcParseFile(Args[1], &EgcFile);
+    });
+    DevTerminalAddCommand("sync_settings", [](const std::vector<std::string>&) {
+        EgcWriteFile("config.egc", &EgcFile);
+    });
+    DevTerminalAddCommand("sync_settings_path", [](const std::vector<std::string>& Args) {
+        if (!Args[1].empty())
+            EgcWriteFile(Args[1], &EgcFile);
+    });
+}
+
+void DevTerminalInit()
+{
+    memset(DevTerminal.InputBuffer, 0, sizeof(char) * 1024);
+    DevTerminal.HistoryPos = -1;
+    DevTerminal.AutoScroll = true;
+
+    DevTerminalInitCommands();
 }
 
 void DevTerminalShutdown()
@@ -102,8 +121,6 @@ void DevTerminalDraw(bool* Open, bool* Focused)
     }
     
     *Focused = ImGui::IsWindowFocused();
-    
-    ImGui::Separator();
     
     const float FooterHeighToReserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
     ImGui::BeginChild("ScrollingRegion", ImVec2(0, -FooterHeighToReserve), false, ImGuiWindowFlags_HorizontalScrollbar);
@@ -142,56 +159,58 @@ void DevTerminalDraw(bool* Open, bool* Focused)
         char* s = DevTerminal.InputBuffer;
         DevTerminalAddLog("> %s", s);
         std::string Cmd = std::string(s);
-        std::istringstream Stream(Cmd);
-        std::vector<std::string> Args;
-        
-        std::string Arg;
-        while (Stream >> Arg)
-            Args.push_back(Arg);
-        
-        DevTerminal.HistoryPos = -1;
-        for (int i = (int)DevTerminal.History.size() - 1; i >= 0; i--)
+        if (Cmd[0] != ' ' && !Cmd.empty())
         {
-            if (Stricmp(DevTerminal.History[i], Args[0].c_str()) == 0)
+            std::istringstream Stream(Cmd);
+            std::vector<std::string> Args;
+
+            std::string Arg;
+            while (Stream >> Arg)
+                Args.push_back(Arg);
+
+            DevTerminal.HistoryPos = -1;
+            for (int i = (int)DevTerminal.History.size() - 1; i >= 0; i--)
             {
-                free(DevTerminal.History[i]);
-                DevTerminal.History.erase(DevTerminal.History.begin() + i);
-                break;
-            }
-        }
-        
-        bool ShouldFindCommand = true;
-        //for (auto cvar = cvar_registry.cvars.begin(); cvar != cvar_registry.cvars.end(); ++cvar)
-        //{
-        //    if (args[0] == cvar->first)
-        //    {
-        //        if (cvar->second.type == sp_cvar_type::cvar_int)
-        //            cvar_registry.set_i(args[0], std::stoi(args[1]));
-        //        if (cvar->second.type == sp_cvar_type::cvar_float)
-        //            cvar_registry.set_f(args[0], std::stof(args[1]));
-        //        if (cvar->second.type == sp_cvar_type::cvar_string)
-        //            cvar_registry.set_s(args[0], args[1]);
-        //        should_find_command = false;
-        //    }
-        //}
-        
-        if (ShouldFindCommand)
-        {
-            bool FoundCommand = false;
-            for (auto Command = DevTerminal.Commands.begin(); Command != DevTerminal.Commands.end(); ++Command)
-            {
-                if (Args[0] == Command->first)
+                if (Stricmp(DevTerminal.History[i], Args[0].c_str()) == 0)
                 {
-                    DevTerminal.History.push_back(Strdup(s));
-                    FoundCommand = true;
-                    
-                    Command->second(Args);
+                    free(DevTerminal.History[i]);
+                    DevTerminal.History.erase(DevTerminal.History.begin() + i);
+                    break;
                 }
             }
-            if (!FoundCommand)
-                DevTerminalAddLog("Unknown command: %s", Args[0].c_str());
+
+            bool ShouldFindCommand = true;
+            //for (auto cvar = cvar_registry.cvars.begin(); cvar != cvar_registry.cvars.end(); ++cvar)
+            //{
+            //    if (args[0] == cvar->first)
+            //    {
+            //        if (cvar->second.type == sp_cvar_type::cvar_int)
+            //            cvar_registry.set_i(args[0], std::stoi(args[1]));
+            //        if (cvar->second.type == sp_cvar_type::cvar_float)
+            //            cvar_registry.set_f(args[0], std::stof(args[1]));
+            //        if (cvar->second.type == sp_cvar_type::cvar_string)
+            //            cvar_registry.set_s(args[0], args[1]);
+            //        should_find_command = false;
+            //    }
+            //}
+
+            if (ShouldFindCommand)
+            {
+                bool FoundCommand = false;
+                for (auto Command = DevTerminal.Commands.begin(); Command != DevTerminal.Commands.end(); ++Command)
+                {
+                    if (Args[0] == Command->first)
+                    {
+                        DevTerminal.History.push_back(Strdup(s));
+                        FoundCommand = true;
+
+                        Command->second(Args);
+                    }
+                }
+                if (!FoundCommand)
+                    DevTerminalAddLog("Unknown command: %s", Args[0].c_str());
+            }
         }
-        
         DevTerminal.ScrollToBottom = true;
         strcpy(s, "");
         ReclaimFocus = true;
