@@ -22,7 +22,6 @@ enum class egc_variable_type
 struct egc_variable
 {
     egc_variable_type Type;
-    std::string StringRepresentation;
     std::string str;
     int i32;
     bool b32;

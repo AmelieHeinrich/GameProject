@@ -57,6 +57,33 @@ std::string GetStringFromType(egc_variable_type Type)
     }
 }
 
+std::string ConvertVariableStr(egc_variable Variable)
+{
+    switch (Variable.Type)
+    {
+        case egc_variable_type::Boolean:
+        {
+            return Variable.b32 ? "true" : "false";
+        }
+        case egc_variable_type::Float:
+        {
+            char Buffer[512];
+            sprintf(Buffer, "%.1f", Variable.f32);
+            return std::string(Buffer);
+        }
+        case egc_variable_type::Int:
+        {
+            char Buffer[512];
+            sprintf(Buffer, "%d", Variable.i32);
+            return std::string(Buffer);
+        }
+        case egc_variable_type::String:
+        {
+            return Variable.str;
+        }
+    }
+}
+
 void EgcParseFile(const std::string& Path, egc_file *File)
 {
     std::ifstream FileStream(Path);
@@ -83,26 +110,25 @@ void EgcParseFile(const std::string& Path, egc_file *File)
         {
             case egc_variable_type::Boolean:
             {
-                File->Variables[VariableName].Type = Type;
+                File->Variables[VariableName].Type = egc_variable_type::Boolean;
                 File->Variables[VariableName].b32 = VariableValue == "false" ? false : true;
             } break;
             case egc_variable_type::String:
             {
-                File->Variables[VariableName].Type = Type;
+                File->Variables[VariableName].Type = egc_variable_type::String;
                 File->Variables[VariableName].str = VariableValue;
             } break;
             case egc_variable_type::Float:
             {
-                File->Variables[VariableName].Type = Type;
+                File->Variables[VariableName].Type = egc_variable_type::Float;
                 File->Variables[VariableName].f32 = std::atof(VariableValue.c_str());
             } break;
             case egc_variable_type::Int:
             {
-                File->Variables[VariableName].Type = Type;
+                File->Variables[VariableName].Type = egc_variable_type::Int;
                 File->Variables[VariableName].i32 = std::atoi(VariableValue.c_str());
             } break;
         }
-        File->Variables[VariableName].StringRepresentation = VariableValue;
     }
     
     FileStream.close();
@@ -116,7 +142,7 @@ void EgcWriteFile(const std::string& Path, egc_file *File)
     for (std::pair<std::string, egc_variable> Variable : File->Variables)
     {
         // NOTE(amelie.h): variable_name(type)=value
-        FileStream << Variable.first << GetStringFromType(Variable.second.Type) << "=" << Variable.second.StringRepresentation << std::endl;
+        FileStream << Variable.first << GetStringFromType(Variable.second.Type) << "=" << ConvertVariableStr(Variable.second) << std::endl;
     }
 
     FileStream.close();

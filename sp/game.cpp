@@ -15,6 +15,7 @@
 #include "gpu/dx11_shader.hpp"
 #include "gui/dev_terminal.hpp"
 #include "gui/gui.hpp"
+#include "gui/settings_panel.hpp"
 #include "systems/event_system.hpp"
 #include "systems/input_system.hpp"
 #include "systems/shader_system.hpp"
@@ -26,6 +27,8 @@ struct game_state
 {
     bool TerminalOpen;
     bool TerminalFocus;
+    bool SettingsOpen;
+    bool SettingsFocus;
 
     timer Timer;
     float LastFrame;
@@ -44,6 +47,8 @@ bool GameKeyPressed(event_type Type, void *Sender, void *Listener, event_data Da
     {
         if (Data.data.u16[0] == (uint16_t)keyboard_key::F1)
             GameState.TerminalOpen = !GameState.TerminalOpen;
+        if (Data.data.u16[0] == (uint16_t)keyboard_key::Escape)
+            GameState.SettingsOpen = !GameState.SettingsOpen;
     }
     return true;
 }
@@ -58,6 +63,7 @@ bool GameResize(event_type Type, void *Sender, void *Listener, event_data Data)
 void GameInit()
 {
     GameState.TerminalOpen = false;
+    GameState.SettingsOpen = false;
 
     float Data[] = 
     {
@@ -102,7 +108,7 @@ void GameUpdate()
     GpuBufferBindConstant(&GameState.ConstantBuffer, 0, gpu_resource_bind::Vertex);
     DxRenderContextDraw(3);
 
-    if (!GameState.TerminalFocus)
+    if (!GameState.TerminalFocus && !GameState.SettingsFocus)
         NoClipCameraInput(&GameState.Camera, DT);
     NoClipCameraUpdate(&GameState.Camera, DT);
     NoClipCameraUpdateFrustum(&GameState.Camera);
@@ -110,6 +116,8 @@ void GameUpdate()
     GuiBeginFrame();
     if (GameState.TerminalOpen)
         DevTerminalDraw(&GameState.TerminalOpen, &GameState.TerminalFocus);
+    if (GameState.SettingsOpen)
+        SettingsPanelDraw(&GameState.SettingsOpen, &GameState.SettingsFocus);
     GuiEndFrame();
 }
 
