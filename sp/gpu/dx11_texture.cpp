@@ -26,7 +26,7 @@ void GpuTextureInit(gpu_texture *Texture, int Width, int Height, DXGI_FORMAT For
     Desc.SampleDesc.Count = 1;
     Desc.MipLevels = 1;
 
-    HRESULT Result = DxRenderContext.Device->CreateTexture2D(&Desc, NULL, &Texture->Texture);
+    HRESULT Result = DxRenderContext.Device->CreateTexture2D(&Desc, nullptr, &Texture->Texture);
     if (FAILED(Result))
     {
         LogError("Failed to create Texture2D!");
@@ -44,14 +44,14 @@ void GpuTextureFree(gpu_texture *Texture)
 
 void GpuTextureInitRTV(gpu_texture *Texture)
 {
-    HRESULT Result = DxRenderContext.Device->CreateRenderTargetView(Texture->Texture, NULL, &Texture->RTV);
+    HRESULT Result = DxRenderContext.Device->CreateRenderTargetView(Texture->Texture, nullptr, &Texture->RTV);
     if (FAILED(Result))
         LogError("Failed to create render target view!");
 }
 
 void GpuTextureInitDSV(gpu_texture *Texture, DXGI_FORMAT DepthFormat)
 {
-    HRESULT Result = DxRenderContext.Device->CreateDepthStencilView(Texture->Texture, NULL, &Texture->DSV);
+    HRESULT Result = DxRenderContext.Device->CreateDepthStencilView(Texture->Texture, nullptr, &Texture->DSV);
     if (FAILED(Result))
         LogError("Failed to create depth stencil view!");
 }
@@ -116,13 +116,13 @@ void GpuTextureBindSRV(gpu_texture *Texture, int Binding, gpu_resource_bind Bind
 
 void GpuTextureBindUAV(gpu_texture *Texture, int Binding)
 {
-    DxRenderContext.DeviceContext->CSSetUnorderedAccessViews(Binding, 1, &Texture->UAV, NULL);
+    DxRenderContext.DeviceContext->CSSetUnorderedAccessViews(Binding, 1, &Texture->UAV, nullptr);
 }
 
 void GpuResetRTV()
 {
-    ID3D11RenderTargetView* const RTV[1] = { NULL };
-	ID3D11DepthStencilView* DSV = NULL;
+    ID3D11RenderTargetView* const RTV[1] = { nullptr };
+	ID3D11DepthStencilView* DSV = nullptr;
 
     DxRenderContext.DeviceContext->OMSetRenderTargets(1, RTV, DSV);
 }
@@ -149,6 +149,6 @@ void GpuResetSRV(int Binding, gpu_resource_bind Bind)
 
 void GpuResetUAV(int Binding)
 {
-    ID3D11UnorderedAccessView* const UAV[1] = { NULL };
-    DxRenderContext.DeviceContext->CSSetUnorderedAccessViews(Binding, 1, UAV, NULL);
+    ID3D11UnorderedAccessView* const UAV[1] = { nullptr };
+    DxRenderContext.DeviceContext->CSSetUnorderedAccessViews(Binding, 1, UAV, nullptr);
 }

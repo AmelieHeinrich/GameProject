@@ -18,8 +18,8 @@ struct gpu_shader
     ID3D11InputLayout* Layout = nullptr;
 };
 
-void GpuShaderInit(gpu_shader *Shader, const char *V = NULL,
-                                       const char *P = NULL,
-                                       const char *C = NULL);
+void GpuShaderInit(gpu_shader *Shader, const char *V = nullptr,
+                                       const char *P = nullptr,
+                                       const char *C = nullptr);
 void GpuShaderFree(gpu_shader *Shader);
 void GpuShaderBind(gpu_shader *Shader);

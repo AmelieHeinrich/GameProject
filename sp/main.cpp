@@ -109,14 +109,14 @@ void WindowInit(void)
     uint32_t Width = EgcI32(EgcFile, "width");
     uint32_t Height = EgcI32(EgcFile, "height");
 
-    Win32.Instance = GetModuleHandle(NULL);
+    Win32.Instance = GetModuleHandle(nullptr);
     Win32.WindowClass.hInstance = Win32.Instance;
     Win32.WindowClass.hCursor = LoadCursor(Win32.Instance, IDC_ARROW);
     Win32.WindowClass.lpszClassName = "GameProjectWindowClass";
     Win32.WindowClass.lpfnWndProc = WindowProc;
     RegisterClassA(&Win32.WindowClass);
 
-    Win32.Window = CreateWindowA(Win32.WindowClass.lpszClassName, "Game Project | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, NULL, NULL, Win32.Instance, NULL);
+    Win32.Window = CreateWindowA(Win32.WindowClass.lpszClassName, "Game Project | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, nullptr, nullptr, Win32.Instance, nullptr);
     ShowWindow(Win32.Window, SW_SHOWMAXIMIZED);
 }
 

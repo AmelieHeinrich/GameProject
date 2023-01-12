@@ -43,7 +43,7 @@ void LogOutput(log_level Level, const char *Message, ...)
     SetConsoleTextAttribute(ConsoleHandle, Levels[static_cast<uint16_t>(Level)]);
     OutputDebugStringA(FinalMessage);
     uint64_t Length = strlen(FinalMessage);
-    WriteConsoleA(ConsoleHandle, FinalMessage, (DWORD)Length, NULL, 0);
+    WriteConsoleA(ConsoleHandle, FinalMessage, (DWORD)Length, nullptr, 0);
 
     DevTerminalAddLog("%s", FinalMessage);
 }

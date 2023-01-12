@@ -27,8 +27,8 @@ ID3DBlob* CompileBlob(const std::string& Source, const char *Profile)
     ID3DBlob* ErrorBlob;
     D3DCompile(Source.c_str(), 
                Source.length(), 
-               NULL, 
-               NULL, 
+               nullptr, 
+               nullptr, 
                D3D_COMPILE_STANDARD_FILE_INCLUDE, 
                GetEntryPointFromProfile(Profile).c_str(), 
                Profile, 
@@ -57,7 +57,7 @@ void GpuShaderInit(gpu_shader *Shader, const char *V,
     {
         VS = CompileBlob(FileRead(V), "vs_5_0");
 
-        HRESULT Result = DxRenderContext.Device->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &Shader->VS);
+        HRESULT Result = DxRenderContext.Device->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), nullptr, &Shader->VS);
         if (FAILED(Result))
             LogError("Failed to create vertex shader!");
     }
@@ -65,7 +65,7 @@ void GpuShaderInit(gpu_shader *Shader, const char *V,
     {
         PS = CompileBlob(FileRead(P), "ps_5_0");
 
-        HRESULT Result = DxRenderContext.Device->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &Shader->PS);
+        HRESULT Result = DxRenderContext.Device->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), nullptr, &Shader->PS);
         if (FAILED(Result))
             LogError("Failed to create pixel shader!");
     }
@@ -73,7 +73,7 @@ void GpuShaderInit(gpu_shader *Shader, const char *V,
     {
         CS = CompileBlob(FileRead(C), "cs_5_0");
 
-        HRESULT Result = DxRenderContext.Device->CreateComputeShader(CS->GetBufferPointer(), CS->GetBufferSize(), NULL, &Shader->CS);
+        HRESULT Result = DxRenderContext.Device->CreateComputeShader(CS->GetBufferPointer(), CS->GetBufferSize(), nullptr, &Shader->CS);
         if (FAILED(Result))
             LogError("Failed to create compute shader!");
     }
@@ -154,8 +154,8 @@ void GpuShaderFree(gpu_shader *Shader)
 
 void GpuShaderBind(gpu_shader *Shader)
 {
-    if (Shader->VS) DxRenderContext.DeviceContext->VSSetShader(Shader->VS, NULL, 0);
-    if (Shader->PS) DxRenderContext.DeviceContext->PSSetShader(Shader->PS, NULL, 0);
-    if (Shader->CS) DxRenderContext.DeviceContext->CSSetShader(Shader->CS, NULL, 0);
+    if (Shader->VS) DxRenderContext.DeviceContext->VSSetShader(Shader->VS, nullptr, 0);
+    if (Shader->PS) DxRenderContext.DeviceContext->PSSetShader(Shader->PS, nullptr, 0);
+    if (Shader->CS) DxRenderContext.DeviceContext->CSSetShader(Shader->CS, nullptr, 0);
     if (Shader->Layout) DxRenderContext.DeviceContext->IASetInputLayout(Shader->Layout);
 }

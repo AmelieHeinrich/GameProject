@@ -15,7 +15,7 @@ void ApuInit()
 {
     // TODO(amelie.h): Choose audio device
 
-    HRESULT Result = DirectSoundCreate8(NULL, &DsAudioContext.Device, nullptr);
+    HRESULT Result = DirectSoundCreate8(nullptr, &DsAudioContext.Device, nullptr);
     if (Result != DS_OK)
         LogError("DirectSound: Failed to create device! (%s)", DsoundErrorString(Result));
     Result = DsAudioContext.Device->SetCooperativeLevel(Win32.Window, DSSCL_PRIORITY);
