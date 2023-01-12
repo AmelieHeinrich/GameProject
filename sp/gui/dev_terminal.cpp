@@ -94,7 +94,8 @@ void DevTerminalShutdown()
 void DevTerminalDraw(bool* Open, bool* Focused)
 {
     ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
-    if (!ImGui::Begin("Developper Console", Open))
+
+    if (!ImGui::Begin("Developper Console", Open, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
@@ -181,7 +182,7 @@ void DevTerminalDraw(bool* Open, bool* Focused)
             {
                 if (Args[0] == Command->first)
                 {
-                    DevTerminal.History.push_back(Strdup(Command->first));
+                    DevTerminal.History.push_back(Strdup(s));
                     FoundCommand = true;
                     
                     Command->second(Args);

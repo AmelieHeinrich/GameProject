@@ -10,9 +10,9 @@
 #include "game_data.hpp"
 #include <ImGui/imgui.h>
 
-#define SETTINGS_GRAPHICS
-#define SETTINGS_MOUSE
-#define SETTINGS_AUDIO
+#define SETTINGS_GRAPHICS 0
+#define SETTINGS_MOUSE 1
+#define SETTINGS_AUDIO 2
 
 struct settings_panel
 {
@@ -52,7 +52,7 @@ void SettingsDrawAudio()
 
 void SettingsPanelDraw(bool *Closed, bool *Focused)
 {
-    ImGui::Begin("Settings", Closed, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin("Settings", Closed, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
 
     *Focused = ImGui::IsWindowFocused();
 

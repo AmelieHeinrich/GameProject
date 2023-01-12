@@ -1,2 +1,2 @@
 [cvars]
-display_triangle(b32)=false
+g_timescale(f32)=1.0

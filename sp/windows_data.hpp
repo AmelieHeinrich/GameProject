@@ -9,6 +9,8 @@
 
 #include <Windows.h>
 
+#define SafeRelease(Object) if (Object) Object->Release()
+
 struct win32_platform_state
 {
     HINSTANCE Instance;

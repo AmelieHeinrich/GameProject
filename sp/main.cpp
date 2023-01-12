@@ -7,6 +7,7 @@
 
 #include <Windows.h>
 
+#include "apu/dsound_context.hpp"
 #include "egc_parser.hpp"
 #include "game.hpp"
 #include "game_data.hpp"
@@ -116,7 +117,7 @@ void WindowInit(void)
     RegisterClassA(&Win32.WindowClass);
 
     Win32.Window = CreateWindowA(Win32.WindowClass.lpszClassName, "Game Project | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, NULL, NULL, Win32.Instance, NULL);
-    ShowWindow(Win32.Window, SW_SHOW);
+    ShowWindow(Win32.Window, SW_SHOWMAXIMIZED);
 }
 
 void WindowExit()
@@ -131,6 +132,7 @@ int main(int argc, char *argv[])
     EgcParseFile("cvars.egc", &CVars);
     EventSystemInit();
     WindowInit();
+    ApuInit();
     DxRenderContextInit(Win32.Window);
     GuiInit();
     GameInit();
@@ -153,6 +155,7 @@ int main(int argc, char *argv[])
     GameExit();
     GuiExit();
     DxRenderContextFree();
+    ApuExit();
     WindowExit();
     EventSystemExit();
     EgcWriteFile("config.egc", &EgcFile);

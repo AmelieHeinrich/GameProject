@@ -11,4 +11,4 @@
 #include <d3dcompiler.h>
 #include <dxgi1_6.h>
 
-#define SafeRelease(Object) if (Object) Object->Release()
+#include "windows_data.hpp"
