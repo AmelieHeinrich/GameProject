@@ -7,6 +7,12 @@
 
 add_rules("mode.debug", "mode.release")
 
+target("dr_libs")
+    set_kind("static")
+    add_files("external/dr_libs/*.c")
+    add_headerfiles("external/dr_libs/*.h")
+    add_includedirs("external/dr_libs/")
+
 target("ImGui")
     set_kind("static")
     add_files("external/ImGui/**.cpp")
@@ -16,7 +22,7 @@ target("ImGui")
 
 target("Game Project")
     set_rundir(".")
-    add_deps("ImGui")
+    add_deps("ImGui", "dr_libs")
     add_files("sp/**.cpp")
     add_headerfiles("sp/**.hpp")
     add_includedirs("sp", "external", { public = true })
