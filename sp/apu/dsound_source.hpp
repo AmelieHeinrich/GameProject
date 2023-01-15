@@ -30,3 +30,4 @@ void ApuSourceFree(apu_source *Source);
 void ApuSourcePlay(apu_source *Source);
 void ApuSourceStop(apu_source *Source);
 void ApuSourcePause(apu_source *Source);
+void ApuSourceSetLoop(apu_source *Source, bool Loop);

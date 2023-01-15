@@ -10,6 +10,8 @@
 #include "dsound_context.hpp"
 #include "systems/log_system.hpp"
 
+#include <dr_libs/dr_wav.h>
+
 void ApuSourceInitPCM(apu_source *Source, int SampleRate, int Channels, int SampleCount, short *Samples, bool Loop)
 {
     Source->Samples = Samples;
@@ -47,17 +49,29 @@ void ApuSourceInitPCM(apu_source *Source, int SampleRate, int Channels, int Samp
         LogError("DirectSound: Failed to lock APU buffer! %s", DsoundErrorString(Result));
     memcpy(WriteVoid, Samples, Length);
     Source->Buffer->Unlock(WriteVoid, Length, nullptr, 0);
+
+    delete Source->Samples;
 }
 
 void ApuSourceInitFile(apu_source *Source, const char *File, bool Loop)
 {
-    // TODO(amelie.h)
+    drwav Wave;
+    if (!drwav_init_file(&Wave, File, nullptr))
+        LogError("Failed to open sound file %s!", File);
+
+    int SampleRate = Wave.sampleRate;
+    int SampleCount = Wave.totalPCMFrameCount;
+    int Channels = Wave.channels;
+    short *Samples = new short[SampleCount];
+
+    if (drwav_read_pcm_frames_s16(&Wave, SampleCount, Samples) != SampleCount)
+        LogWarn("Not all PCM frames have been read!");
+    ApuSourceInitPCM(Source, SampleRate, Channels, SampleCount, Samples, false);
 }
 
 void ApuSourceFree(apu_source *Source)
 {
     SafeRelease(Source->Buffer);
-    free(Source->Samples);
 }
 
 void ApuSourcePlay(apu_source *Source)
@@ -87,4 +101,9 @@ void ApuSourcePause(apu_source *Source)
         ApuSourcePlay(Source);
     }
     Source->Paused = !Source->Paused;
+}
+
+void ApuSourceSetLoop(apu_source *Source, bool Loop)
+{
+    Source->Looping = Loop;
 }
