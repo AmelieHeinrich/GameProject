@@ -8,6 +8,7 @@
 #include "dsound_source.hpp"
 
 #include "dsound_context.hpp"
+#include "game_data.hpp"
 #include "systems/log_system.hpp"
 
 #include <dr_libs/dr_wav.h>
@@ -67,6 +68,8 @@ void ApuSourceInitFile(apu_source *Source, const char *File, bool Loop)
     if (drwav_read_pcm_frames_s16(&Wave, SampleCount, Samples) != SampleCount)
         LogWarn("Not all PCM frames have been read!");
     ApuSourceInitPCM(Source, SampleRate, Channels, SampleCount, Samples, false);
+
+    drwav_uninit(&Wave);
 }
 
 void ApuSourceFree(apu_source *Source)
@@ -79,6 +82,31 @@ void ApuSourcePlay(apu_source *Source)
     HRESULT Result = Source->Buffer->Play(0, 0, Source->Looping ? DSBPLAY_LOOPING : 0);
     if (FAILED(Result))
         LogError("DirectSound: Failed to play sound source! %s", DsoundErrorString(Result));
+}
+
+void ApuSourceUpdate(apu_source *Source)
+{
+    float VolumeToSet = 1.0f;
+
+    switch (Source->Type)
+    {
+        case apu_source_type::Music:
+        {
+            VolumeToSet = EgcF32(EgcFile, "music_volume");
+        } break;
+        case apu_source_type::Sound:
+        {
+            VolumeToSet = EgcF32(EgcFile, "sound_volume");
+        } break;
+        case apu_source_type::Voice:
+        {
+            VolumeToSet = EgcF32(EgcFile, "voice_volume");
+        } break;
+    }
+    int Range = -10000;
+    VolumeToSet = (Range + VolumeToSet * 10000);
+
+    Source->Buffer->SetVolume(VolumeToSet);
 }
 
 void ApuSourceStop(apu_source *Source)
@@ -106,4 +134,9 @@ void ApuSourcePause(apu_source *Source)
 void ApuSourceSetLoop(apu_source *Source, bool Loop)
 {
     Source->Looping = Loop;
+}
+
+void ApuSourceSetType(apu_source *Source, apu_source_type Type)
+{
+    Source->Type = Type;
 }
