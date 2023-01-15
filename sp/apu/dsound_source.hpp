@@ -13,7 +13,7 @@
 
 struct apu_source
 {
-    IDirectSoundBuffer8* Buffer;
+    IDirectSoundBuffer* Buffer;
 
     int SampleRate;
     int Channels;

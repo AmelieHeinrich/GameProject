@@ -36,12 +36,9 @@ void ApuSourceInitPCM(apu_source *Source, int SampleRate, int Channels, int Samp
     if (BufferDesc.dwBufferBytes > DSBSIZE_MAX)
         LogError("DirectSound: Buffer of size %d is too big!", BufferDesc.dwBufferBytes);
     
-    IDirectSoundBuffer* Temp;
-    HRESULT Result = DsAudioContext.Device->CreateSoundBuffer(&BufferDesc, &Temp, nullptr);
+    HRESULT Result = DsAudioContext.Device->CreateSoundBuffer(&BufferDesc, &Source->Buffer, nullptr);
     if (FAILED(Result))
         LogError("DirectSound: Failed to create sound buffer! %s", DsoundErrorString(Result));
-    Temp->QueryInterface(IID_IDirectSoundBuffer8, (void**)&Source->Buffer);
-    SafeRelease(Temp);
 
     LPVOID WriteVoid;
     DWORD Length;
