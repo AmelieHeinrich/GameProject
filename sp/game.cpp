@@ -8,6 +8,7 @@
 #include "game.hpp"
 
 #include "timer.hpp"
+#include "apu/dsound_source.hpp"
 #include "cameras/noclip_camera.hpp"
 #include "gpu/dx11_buffer.hpp"
 #include "gpu/dx11_context.hpp"
@@ -37,6 +38,8 @@ struct game_state
     gpu_buffer ConstantBuffer;
     gpu_buffer Buffer;
     gpu_render_state RenderState;
+
+    apu_source Source;
 };
 
 game_state GameState;
@@ -91,6 +94,9 @@ void GameInit()
 
     TimerInit(&GameState.Timer);
     NoClipCameraInit(&GameState.Camera);
+
+    ApuSourceInitFile(&GameState.Source, "assets/bgm/test.wav", true);
+    ApuSourcePlay(&GameState.Source);
 }
 
 void GameUpdate()
@@ -98,6 +104,8 @@ void GameUpdate()
     float Time = TimerGetElapsed(&GameState.Timer);
     float DT = (Time - GameState.LastFrame) / 1000.0f;
     GameState.LastFrame = Time;
+
+    ApuSourceUpdate(&GameState.Source);
 
     hmm_mat4 DataToSend[] = { GameState.Camera.View, GameState.Camera.Projection };
     GpuBufferUploadData(&GameState.ConstantBuffer, DataToSend);
@@ -123,6 +131,7 @@ void GameUpdate()
 
 void GameExit()
 {
+    ApuSourceFree(&GameState.Source);
     DevTerminalShutdown();
     GpuBufferFree(&GameState.ConstantBuffer);
     GpuBufferFree(&GameState.Buffer);

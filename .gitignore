@@ -1,6 +1,7 @@
 # Build directories
 
 build
+assets/bgm
 
 # Useless game files
 

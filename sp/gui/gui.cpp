@@ -9,6 +9,7 @@
 
 #include "gpu/dx11_context.hpp"
 #include "windows_data.hpp"
+#include "systems/file_system.hpp"
 #include "systems/log_system.hpp"
 
 #include <ImGui/imgui.h>
@@ -24,7 +25,8 @@ void GuiInit()
     
     IO.DisplaySize = ImVec2(DxRenderContext.Width, DxRenderContext.Height);
     IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    IO.Fonts->AddFontFromFileTTF("assets/fonts/Roboto.ttf", 16);
+    if (FileBufferExists("assets/fonts/Roboto.ttf"))
+        IO.Fonts->AddFontFromFileTTF("assets/fonts/Roboto.ttf", 16);
     
     ImGui::StyleColorsDark();
     

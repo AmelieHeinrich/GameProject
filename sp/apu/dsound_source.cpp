@@ -48,7 +48,7 @@ void ApuSourceInitPCM(apu_source *Source, int SampleRate, int Channels, int Samp
     Result = Source->Buffer->Lock(0, 0, &WriteVoid, &Length, nullptr, nullptr, DSBLOCK_ENTIREBUFFER);
     if (FAILED(Result))
         LogError("DirectSound: Failed to lock APU buffer! %s", DsoundErrorString(Result));
-    memcpy(WriteVoid, Samples, Length);
+    memcpy(WriteVoid, Samples, SampleCount * sizeof(short) * Channels);
     Source->Buffer->Unlock(WriteVoid, Length, nullptr, 0);
 
     delete Source->Samples;
@@ -63,10 +63,11 @@ void ApuSourceInitFile(apu_source *Source, const char *File, bool Loop)
     int SampleRate = Wave.sampleRate;
     int SampleCount = Wave.totalPCMFrameCount;
     int Channels = Wave.channels;
-    short *Samples = new short[SampleCount];
+    short *Samples = reinterpret_cast<short*>(malloc(SampleCount * sizeof(short) * Wave.channels));
 
-    if (drwav_read_pcm_frames_s16(&Wave, SampleCount, Samples) != SampleCount)
-        LogWarn("Not all PCM frames have been read!");
+    int ReadSamples = drwav_read_pcm_frames_s16(&Wave, SampleCount, Samples);
+    if (ReadSamples != SampleCount)
+        LogWarn(".wav loader loaded %d/%d PCM frames!", ReadSamples, SampleCount);
     ApuSourceInitPCM(Source, SampleRate, Channels, SampleCount, Samples, false);
 
     drwav_uninit(&Wave);
@@ -103,8 +104,8 @@ void ApuSourceUpdate(apu_source *Source)
             VolumeToSet = EgcF32(EgcFile, "voice_volume");
         } break;
     }
-    int Range = -10000;
-    VolumeToSet = (Range + VolumeToSet * 10000);
+    int Range = -6000;
+    VolumeToSet = (Range + VolumeToSet * 6000);
 
     Source->Buffer->SetVolume(VolumeToSet);
 }

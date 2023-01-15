@@ -9,7 +9,7 @@ add_rules("mode.debug", "mode.release")
 
 target("dr_libs")
     set_kind("static")
-    add_files("external/dr_libs/*.c")
+    add_files("external/dr_libs/*.cpp")
     add_headerfiles("external/dr_libs/*.h")
     add_includedirs("external/dr_libs/")
 
