@@ -37,7 +37,7 @@ bool DxRenderResizeCallback(event_type Type, void *Sender, void *ListenerInstanc
         uint32_t Height = Data.data.u32[1];
         DxRenderContextResize(Width, Height);
     }
-    return true;
+    return false;
 }
 
 void DxRenderContextInit(HWND Window)
@@ -186,7 +186,7 @@ void DxRenderContextBegin()
     float Clear[] = {0.0f, 0.0f, 0.0f, 1.0f};
     DxRenderContext.DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     DxRenderContext.DeviceContext->OMSetRenderTargets(1, &DxRenderContext.RenderTarget, nullptr);
-    DxRenderContext.DeviceContext->ClearRenderTargetView(DxRenderContext.RenderTarget, Clear);
+    //DxRenderContext.DeviceContext->ClearRenderTargetView(DxRenderContext.RenderTarget, Clear);
     DxRenderContext.DeviceContext->RSSetScissorRects(1, &Rect);
     DxRenderContext.DeviceContext->RSSetViewports(1, &Viewport);
 }

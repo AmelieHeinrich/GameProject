@@ -5,6 +5,8 @@
  *  Create Time: 09/01/2023 22:11
  */
 
+#pragma once
+
 #include "dx11_common.hpp"
 
 #include <cstdint>

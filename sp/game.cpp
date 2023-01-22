@@ -17,6 +17,7 @@
 #include "gui/dev_terminal.hpp"
 #include "gui/gui.hpp"
 #include "gui/settings_panel.hpp"
+#include "renderer/renderer.hpp"
 #include "systems/event_system.hpp"
 #include "systems/input_system.hpp"
 #include "systems/shader_system.hpp"
@@ -35,10 +36,6 @@ struct game_state
     float LastFrame;
     noclip_camera Camera;
 
-    gpu_buffer ConstantBuffer;
-    gpu_buffer Buffer;
-    gpu_render_state RenderState;
-
     apu_source Source;
 };
 
@@ -53,14 +50,20 @@ bool GameKeyPressed(event_type Type, void *Sender, void *Listener, event_data Da
         if (Data.data.u16[0] == (uint16_t)keyboard_key::Escape)
             GameState.SettingsOpen = !GameState.SettingsOpen;
     }
-    return true;
+    return false;
 }
 
 bool GameResize(event_type Type, void *Sender, void *Listener, event_data Data)
 {
     if (Type == event_type::Resize)
-        NoClipCameraResize(&GameState.Camera, Data.data.u32[0], Data.data.u32[1]);
-    return true;
+    {
+        uint32_t Width = Data.data.u32[0];
+        uint32_t Height = Data.data.u32[1];
+
+        NoClipCameraResize(&GameState.Camera, Width, Height);
+        RendererResize(Width, Height);
+    }
+    return false;
 }
 
 void GameInit()
@@ -68,30 +71,11 @@ void GameInit()
     GameState.TerminalOpen = false;
     GameState.SettingsOpen = false;
 
-    float Data[] = 
-    {
-        -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-    };
-
-    ShaderLibraryPush("Forward", "shaders/forward/Vertex.hlsl", "shaders/forward/Pixel.hlsl");
-
-    GpuBufferCreate(&GameState.Buffer, sizeof(Data), sizeof(float) * 6, gpu_buffer_usage::Vertex);
-    GpuBufferUploadData(&GameState.Buffer, Data);
-
-    GpuBufferCreate(&GameState.ConstantBuffer, sizeof(hmm_mat4) * 2, 0, gpu_buffer_usage::Constant);
-
-    GameState.RenderState.CounterClockwise = false;
-    GameState.RenderState.CullMode = render_state_cull_mode::None;
-    GameState.RenderState.Depth = render_state_op::Less;
-    GameState.RenderState.FillMode = render_state_fill_mode::Fill;
-    GpuRenderStateCreate(&GameState.RenderState);
-
     EventSystemRegister(event_type::KeyPressed, nullptr, GameKeyPressed);
     EventSystemRegister(event_type::Resize, nullptr, GameResize);
     DevTerminalInit();
 
+    RendererInit();
     TimerInit(&GameState.Timer);
     NoClipCameraInit(&GameState.Camera);
 
@@ -107,20 +91,14 @@ void GameUpdate()
 
     ApuSourceUpdate(&GameState.Source);
 
-    hmm_mat4 DataToSend[] = { GameState.Camera.View, GameState.Camera.Projection };
-    GpuBufferUploadData(&GameState.ConstantBuffer, DataToSend);
-
-    GpuRenderStateBind(&GameState.RenderState);
-    ShaderLibraryBind("Forward");
-    GpuBufferBindVertex(&GameState.Buffer);
-    GpuBufferBindConstant(&GameState.ConstantBuffer, 0, gpu_resource_bind::Vertex);
-    DxRenderContextDraw(3);
+    RendererUpdate();
 
     if (!GameState.TerminalFocus && !GameState.SettingsFocus)
         NoClipCameraInput(&GameState.Camera, DT);
     NoClipCameraUpdate(&GameState.Camera, DT);
     NoClipCameraUpdateFrustum(&GameState.Camera);
 
+    DxRenderContextBegin();
     GuiBeginFrame();
     if (GameState.TerminalOpen)
         DevTerminalDraw(&GameState.TerminalOpen, &GameState.TerminalFocus);
@@ -133,7 +111,5 @@ void GameExit()
 {
     ApuSourceFree(&GameState.Source);
     DevTerminalShutdown();
-    GpuBufferFree(&GameState.ConstantBuffer);
-    GpuBufferFree(&GameState.Buffer);
-    GpuRenderStateFree(&GameState.RenderState);
+    RendererExit();
 }
