@@ -13,9 +13,59 @@
 
 #include "systems/log_system.hpp"
 
-void ProcessMesh(loaded_model *Model, aiMesh *Mesh, const aiScene *Scene)
+mesh ProcessMesh(loaded_model *Model, aiMesh *Mesh, const aiScene *Scene)
 {
-    // TODO(amelie.h)
+    mesh Out;
+
+    std::vector<mesh_vertex> Vertices;
+    std::vector<uint32_t> Indices;
+
+    for (uint32_t VertexIndex = 0; VertexIndex < Mesh->mNumVertices; VertexIndex++)
+    {
+        mesh_vertex Vertex;
+        
+        Vertex.Position.X = Mesh->mVertices[VertexIndex].x;
+        Vertex.Position.Y = Mesh->mVertices[VertexIndex].y;
+        Vertex.Position.Z = Mesh->mVertices[VertexIndex].z;
+
+        if (Mesh->HasNormals())
+        {
+            Vertex.Normal.X = Mesh->mNormals[VertexIndex].x;
+            Vertex.Normal.Y = Mesh->mNormals[VertexIndex].y;
+            Vertex.Normal.Z = Mesh->mNormals[VertexIndex].z;
+        }
+
+        if (Mesh->mTextureCoords[0])
+        {
+            Vertex.UV.X = Mesh->mTextureCoords[VertexIndex]->x;
+            Vertex.UV.Y = Mesh->mTextureCoords[VertexIndex]->y;
+        } 
+        else
+        {
+            Vertex.UV = HMM_Vec2(0.0f, 0.0f);
+        }
+
+        Vertices.push_back(Vertex);
+    }
+
+    for (uint32_t FaceIndex = 0; FaceIndex < Mesh->mNumFaces; FaceIndex++)
+    {
+        aiFace Face = Mesh->mFaces[FaceIndex];
+        for (uint32_t IndexIndex = 0; IndexIndex < Face.mNumIndices; IndexIndex++)
+            Indices.push_back(Face.mIndices[IndexIndex]);
+    }
+
+    Out.VertexCount = Vertices.size();
+    Out.IndexCount = Indices.size();
+
+    GpuBufferCreate(&Out.VertexBuffer, Vertices.size() * sizeof(mesh_vertex), sizeof(mesh_vertex), gpu_buffer_usage::Vertex);
+    GpuBufferUploadData(&Out.VertexBuffer, Vertices.data());
+    GpuBufferCreate(&Out.IndexBuffer, Indices.size() * sizeof(uint32_t), sizeof(uint32_t), gpu_buffer_usage::Index);
+    GpuBufferUploadData(&Out.IndexBuffer, Indices.data());
+
+    // TODO(amelie.h): Texture loading
+
+    return Out;
 }
 
 void ProcessNode(loaded_model *Model, aiNode *Node, const aiScene *Scene)
@@ -23,7 +73,7 @@ void ProcessNode(loaded_model *Model, aiNode *Node, const aiScene *Scene)
     for (int MeshIndex = 0; MeshIndex < Node->mNumMeshes; MeshIndex++)
     {
         aiMesh *Mesh = Scene->mMeshes[MeshIndex];
-        ProcessMesh(Model, Mesh, Scene);
+        Model->Meshes.push_back(ProcessMesh(Model, Mesh, Scene));
     }
     for (int ChildIndex = 0; ChildIndex < Node->mNumChildren; ChildIndex++)
     {
@@ -45,5 +95,10 @@ void ModelLoad(loaded_model *Model, const std::string& Path)
 
 void ModelFree(loaded_model *Model)
 {
-
+    for (auto Mesh : Model->Meshes)
+    {
+        GpuBufferFree(&Mesh.VertexBuffer);
+        GpuBufferFree(&Mesh.IndexBuffer);
+    }
+    Model->Meshes.clear();
 }
