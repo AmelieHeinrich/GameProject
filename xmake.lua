@@ -28,3 +28,7 @@ target("Game Project")
     add_includedirs("sp", "external", { public = true })
     add_linkdirs("bin/")
     add_syslinks("user32", "dsound", "gdi32", "kernel32", "d3d11", "d3dcompiler", "dxgi", "assimp-vc143-mtd")
+
+    if is_plat("windows") then
+        add_cflags("/MT")
+    end

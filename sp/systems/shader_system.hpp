@@ -9,6 +9,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <vector>
 #include "gpu/dx11_shader.hpp"
 
 struct shader_entry
