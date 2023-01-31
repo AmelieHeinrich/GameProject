@@ -5,7 +5,7 @@
  *  Create Time: 05/01/2023 19:52
  */
 
-#include "input_system.hpp"
+#include "systems/input_system.hpp"
 #include "windows_data.hpp"
 
 #include <Windows.h>

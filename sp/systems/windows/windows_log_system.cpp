@@ -5,7 +5,7 @@
  *  Create Time: 04/01/2023 17:53
  */
 
-#include "log_system.hpp"
+#include "systems/log_system.hpp"
 #include "gui/dev_terminal.hpp"
 
 #include <stdarg.h>
