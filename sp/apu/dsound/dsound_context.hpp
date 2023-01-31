@@ -8,7 +8,7 @@
 #pragma once
 
 #include "dsound_common.hpp"
-#include "windows_data.hpp"
+#include "windows/windows_data.hpp"
 
 struct ds_audio_context
 {

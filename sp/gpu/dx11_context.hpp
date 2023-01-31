@@ -8,6 +8,7 @@
 #pragma once
 
 #include "dx11_common.hpp"
+#include "windows/windows_data.hpp"
 
 #include <cstdint>
 #include <vector>

@@ -7,8 +7,8 @@
 
 #include "dev_terminal.hpp"
 
-#include "windows_data.hpp"
 #include "systems/shader_system.hpp"
+#include "game_data.hpp"
 
 #include <stdio.h>
 #include <stdarg.h>

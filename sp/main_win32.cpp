@@ -17,8 +17,9 @@
 #include "systems/log_system.hpp"
 #include "systems/event_system.hpp"
 #include "systems/input_system.hpp"
-#include "windows_data.hpp"
+#include "windows/windows_data.hpp"
 
+#include <cstdint>
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_win32.h>
 

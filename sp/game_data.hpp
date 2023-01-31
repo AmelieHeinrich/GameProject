@@ -11,3 +11,5 @@
 
 extern egc_file EgcFile;
 extern egc_file CVars;
+
+void ShutdownGame();
