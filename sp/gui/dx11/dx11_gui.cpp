@@ -5,7 +5,7 @@
  *  Create Time: 11/01/2023 09:50
  */
 
-#include "gui.hpp"
+#include "gui/gui.hpp"
 
 #include "gpu/dx11_context.hpp"
 #include "windows_data.hpp"

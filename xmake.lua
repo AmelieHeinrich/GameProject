@@ -31,5 +31,5 @@ target("Game Project")
     if is_plat("windows") then
         --add_cflags("/MT")
         add_syslinks("user32", "dsound", "gdi32", "kernel32", "d3d11", "d3dcompiler", "dxgi", "assimp-vc143-mtd")
-        add_files("sp/apu/dsound/*.cpp", "sp/gpu/*.cpp")
+        add_files("sp/apu/dsound/*.cpp", "sp/gpu/*.cpp", "sp/gui/dx11/*.cpp")
     end
