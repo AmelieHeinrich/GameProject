@@ -132,6 +132,8 @@ void EgcParseFile(const std::string& Path, egc_file *File)
     }
     
     FileStream.close();
+
+    LogInfo("Parsed EGC file (%s)", Path.c_str());
 }
 
 void EgcWriteFile(const std::string& Path, egc_file *File)
@@ -146,4 +148,6 @@ void EgcWriteFile(const std::string& Path, egc_file *File)
     }
 
     FileStream.close();
+
+    LogInfo("Wrote EGC file (%s)", Path.c_str());
 }

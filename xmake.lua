@@ -23,12 +23,13 @@ target("ImGui")
 target("Game Project")
     set_rundir(".")
     add_deps("ImGui", "dr_libs")
-    add_files("sp/**.cpp")
+    add_files("sp/*.cpp", "sp/cameras/*.cpp", "sp/gui/*.cpp", "sp/renderer/*.cpp", "sp/scene/*.cpp", "sp/systems/*.cpp")
     add_headerfiles("sp/**.hpp")
     add_includedirs("sp", "external", { public = true })
     add_linkdirs("bin/")
-    add_syslinks("user32", "dsound", "gdi32", "kernel32", "d3d11", "d3dcompiler", "dxgi", "assimp-vc143-mtd")
 
     if is_plat("windows") then
-        add_cflags("/MT")
+        --add_cflags("/MT")
+        add_syslinks("user32", "dsound", "gdi32", "kernel32", "d3d11", "d3dcompiler", "dxgi", "assimp-vc143-mtd")
+        add_files("sp/apu/dsound/*.cpp", "sp/gpu/*.cpp")
     end

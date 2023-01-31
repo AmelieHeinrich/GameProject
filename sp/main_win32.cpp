@@ -7,7 +7,7 @@
 
 #include <Windows.h>
 
-#include "apu/dsound_context.hpp"
+#include "apu/apu_context.hpp"
 #include "egc_parser.hpp"
 #include "game.hpp"
 #include "game_data.hpp"

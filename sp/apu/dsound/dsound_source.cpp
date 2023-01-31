@@ -5,7 +5,7 @@
  *  Create Time: 12/01/2023 13:29
  */
 
-#include "dsound_source.hpp"
+#include "apu/apu_source.hpp"
 
 #include "dsound_context.hpp"
 #include "game_data.hpp"
@@ -37,21 +37,24 @@ void ApuSourceInitPCM(apu_source *Source, int SampleRate, int Channels, int Samp
     BufferDesc.guid3DAlgorithm = GUID_NULL;
 
     if (BufferDesc.dwBufferBytes > DSBSIZE_MAX)
-        LogError("DirectSound: Buffer of size %d is too big!", BufferDesc.dwBufferBytes);
-    
-    HRESULT Result = DsAudioContext.Device->CreateSoundBuffer(&BufferDesc, &Source->Buffer, nullptr);
+        LogError("DirectSound: Handle of size %d is too big!", BufferDesc.dwBufferBytes);
+
+    HRESULT Result = DsAudioContext.Device->CreateSoundBuffer(&BufferDesc, (IDirectSoundBuffer**)(&Source->Handle), nullptr);
     if (FAILED(Result))
         LogError("DirectSound: Failed to create sound buffer! %s", DsoundErrorString(Result));
 
+    IDirectSoundBuffer *Handle = (IDirectSoundBuffer*)(Source->Handle);
+
     LPVOID WriteVoid;
     DWORD Length;
-    Result = Source->Buffer->Lock(0, 0, &WriteVoid, &Length, nullptr, nullptr, DSBLOCK_ENTIREBUFFER);
+    Result = Handle->Lock(0, 0, &WriteVoid, &Length, nullptr, nullptr, DSBLOCK_ENTIREBUFFER);
     if (FAILED(Result))
         LogError("DirectSound: Failed to lock APU buffer! %s", DsoundErrorString(Result));
     memcpy(WriteVoid, Samples, SampleCount * sizeof(short) * Channels);
-    Source->Buffer->Unlock(WriteVoid, Length, nullptr, 0);
+    Handle->Unlock(WriteVoid, Length, nullptr, 0);
 
     delete Source->Samples;
+
 }
 
 void ApuSourceInitFile(apu_source *Source, const char *File, bool Loop)
@@ -75,18 +78,21 @@ void ApuSourceInitFile(apu_source *Source, const char *File, bool Loop)
 
 void ApuSourceFree(apu_source *Source)
 {
-    SafeRelease(Source->Buffer);
+    IDirectSoundBuffer *Buffer = (IDirectSoundBuffer*)(Source->Handle);
+    SafeRelease(Buffer);
 }
 
 void ApuSourcePlay(apu_source *Source)
 {
-    HRESULT Result = Source->Buffer->Play(0, 0, Source->Looping ? DSBPLAY_LOOPING : 0);
+    IDirectSoundBuffer *Buffer = (IDirectSoundBuffer*)(Source->Handle);
+    HRESULT Result = Buffer->Play(0, 0, Source->Looping ? DSBPLAY_LOOPING : 0);
     if (FAILED(Result))
         LogError("DirectSound: Failed to play sound source! %s", DsoundErrorString(Result));
 }
 
 void ApuSourceUpdate(apu_source *Source)
 {
+    IDirectSoundBuffer *Buffer = (IDirectSoundBuffer*)(Source->Handle);
     float VolumeToSet = 1.0f;
 
     switch (Source->Type)
@@ -107,26 +113,28 @@ void ApuSourceUpdate(apu_source *Source)
     int Range = -6000;
     VolumeToSet = (Range + VolumeToSet * 6000);
 
-    Source->Buffer->SetVolume(VolumeToSet);
+    Buffer->SetVolume(VolumeToSet);
 }
 
 void ApuSourceStop(apu_source *Source)
 {
-    HRESULT Result = Source->Buffer->Stop();
+    IDirectSoundBuffer *Buffer = (IDirectSoundBuffer*)(Source->Handle);
+    HRESULT Result = Buffer->Stop();
     if (FAILED(Result))
         LogError("DirectSound: Failed to stop sound source! %s", DsoundErrorString(Result));
 }
 
 void ApuSourcePause(apu_source *Source)
 {
+    IDirectSoundBuffer *Buffer = (IDirectSoundBuffer*)(Source->Handle);
     if (Source->Paused)
     {
-        Source->Buffer->GetCurrentPosition((LPDWORD)&Source->PauseCursor, nullptr);
-        Source->Buffer->Stop();
+        Buffer->GetCurrentPosition((LPDWORD)&Source->PauseCursor, nullptr);
+        Buffer->Stop();
     }
     else
     {
-        Source->Buffer->SetCurrentPosition(Source->PauseCursor);
+        Buffer->SetCurrentPosition(Source->PauseCursor);
         ApuSourcePlay(Source);
     }
     Source->Paused = !Source->Paused;

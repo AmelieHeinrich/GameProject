@@ -2,12 +2,10 @@
  *  Author: Amélie Heinrich
  *  Company: Amélie Games
  *  License: MIT
- *  Create Time: 12/01/2023 13:23
+ *  Create Time: 31/01/2023 22:38
  */
 
 #pragma once
-
-#include "dsound_common.hpp"
 
 #include <cstdint>
 
@@ -20,7 +18,7 @@ enum class apu_source_type
 
 struct apu_source
 {
-    IDirectSoundBuffer* Buffer;
+    void* Handle;
 
     int SampleRate;
     int Channels;

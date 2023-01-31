@@ -18,6 +18,3 @@ struct ds_audio_context
 };
 
 extern ds_audio_context DsAudioContext;
-
-void ApuInit();
-void ApuExit();

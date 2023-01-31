@@ -8,7 +8,7 @@
 #include "game.hpp"
 
 #include "timer.hpp"
-#include "apu/dsound_source.hpp"
+#include "apu/apu_source.hpp"
 #include "cameras/noclip_camera.hpp"
 #include "gpu/dx11_buffer.hpp"
 #include "gpu/dx11_context.hpp"
