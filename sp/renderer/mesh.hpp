@@ -11,8 +11,8 @@
 #include <vector>
 
 #include "math_types.hpp"
-#include "gpu/dx11_buffer.hpp"
-#include "gpu/dx11_texture.hpp"
+#include "gpu/dx11/dx11_buffer.hpp"
+#include "gpu/dx11/dx11_texture.hpp"
 
 struct mesh_vertex
 {

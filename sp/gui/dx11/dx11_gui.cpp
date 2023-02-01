@@ -7,7 +7,7 @@
 
 #include "gui/gui.hpp"
 
-#include "gpu/dx11_context.hpp"
+#include "gpu/dx11/dx11_context.hpp"
 #include "systems/file_system.hpp"
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"

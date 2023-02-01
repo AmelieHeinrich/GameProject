@@ -30,7 +30,7 @@ target("Game Project")
 
     if is_plat("windows") then
         add_syslinks("user32", "dsound", "gdi32", "kernel32", "d3d11", "d3dcompiler", "dxgi", "assimp-vc143-mtd")
-        add_files("sp/apu/dsound/*.cpp", "sp/gpu/*.cpp", "sp/gui/dx11/*.cpp", "sp/systems/windows/*.cpp", "sp/windows/*.cpp")
+        add_files("sp/apu/dsound/*.cpp", "sp/gpu/dx11/*.cpp", "sp/gui/dx11/*.cpp", "sp/systems/windows/*.cpp", "sp/windows/*.cpp")
         add_files("sp/main_win32.cpp")
     end
     -- TODO(amelie.h): MacOS

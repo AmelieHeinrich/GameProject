@@ -11,7 +11,7 @@
 #include "egc_parser.hpp"
 #include "game.hpp"
 #include "game_data.hpp"
-#include "gpu/dx11_context.hpp"
+#include "gpu/dx11/dx11_context.hpp"
 #include "gui/gui.hpp"
 #include "systems/shader_system.hpp"
 #include "systems/log_system.hpp"
@@ -134,8 +134,8 @@ int main(int argc, char *argv[])
     EventSystemInit();
     WindowInit();
     ApuInit();
-    DxRenderContextInit(Win32.Window);
-    GuiInit();
+    // DxRenderContextInit(Win32.Window);
+    // GuiInit();
     GameInit();
 
     while (IsWindowVisible(Win32.Window))
@@ -148,13 +148,13 @@ int main(int argc, char *argv[])
         }
 
         GameUpdate();
-        DxRenderContextPresent();
+        // DxRenderContextPresent();
     }
 
     ShaderLibraryFree();
     GameExit();
-    GuiExit();
-    DxRenderContextFree();
+    // GuiExit();
+    // DxRenderContextFree();
     ApuExit();
     WindowExit();
     EventSystemExit();

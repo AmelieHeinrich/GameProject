@@ -8,7 +8,7 @@
 #include "pass_forward.hpp"
 
 #include "game_data.hpp"
-#include "gpu/dx11_context.hpp"
+#include "gpu/dx11/dx11_context.hpp"
 
 void ForwardPassInit(forward_pass *Pass)
 {

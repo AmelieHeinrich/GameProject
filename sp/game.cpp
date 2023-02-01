@@ -10,10 +10,10 @@
 #include "timer.hpp"
 #include "apu/apu_source.hpp"
 #include "cameras/noclip_camera.hpp"
-#include "gpu/dx11_buffer.hpp"
-#include "gpu/dx11_context.hpp"
-#include "gpu/dx11_render_state.hpp"
-#include "gpu/dx11_shader.hpp"
+#include "gpu/dx11/dx11_buffer.hpp"
+#include "gpu/dx11/dx11_context.hpp"
+#include "gpu/dx11/dx11_render_state.hpp"
+#include "gpu/dx11/dx11_shader.hpp"
 #include "gui/dev_terminal.hpp"
 #include "gui/gui.hpp"
 #include "gui/settings_panel.hpp"
@@ -75,7 +75,7 @@ void GameInit()
     EventSystemRegister(event_type::Resize, nullptr, GameResize);
     DevTerminalInit();
 
-    RendererInit();
+    // RendererInit();
     TimerInit(&GameState.Timer);
     NoClipCameraInit(&GameState.Camera);
 
@@ -91,20 +91,20 @@ void GameUpdate()
 
     ApuSourceUpdate(&GameState.Source);
 
-    RendererUpdate();
+    // RendererUpdate();
 
     if (!GameState.TerminalFocus && !GameState.SettingsFocus)
         NoClipCameraInput(&GameState.Camera, DT);
     NoClipCameraUpdate(&GameState.Camera, DT);
     NoClipCameraUpdateFrustum(&GameState.Camera);
 
-    DxRenderContextBegin();
-    GuiBeginFrame();
-    if (GameState.TerminalOpen)
-        DevTerminalDraw(&GameState.TerminalOpen, &GameState.TerminalFocus);
-    if (GameState.SettingsOpen)
-        SettingsPanelDraw(&GameState.SettingsOpen, &GameState.SettingsFocus);
-    GuiEndFrame();
+    // DxRenderContextBegin();
+    // GuiBeginFrame();
+    // if (GameState.TerminalOpen)
+    //     DevTerminalDraw(&GameState.TerminalOpen, &GameState.TerminalFocus);
+    // if (GameState.SettingsOpen)
+    //     SettingsPanelDraw(&GameState.SettingsOpen, &GameState.SettingsFocus);
+    // GuiEndFrame();
 }
 
 void GameExit()

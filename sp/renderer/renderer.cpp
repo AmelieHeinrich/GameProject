@@ -7,7 +7,7 @@
 
 #include "renderer.hpp"
 
-#include "gpu/dx11_context.hpp"
+#include "gpu/dx11/dx11_context.hpp"
 
 renderer_data Renderer;
 

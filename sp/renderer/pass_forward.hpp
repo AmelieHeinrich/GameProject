@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "gpu/dx11_buffer.hpp"
-#include "gpu/dx11_texture.hpp"
+#include "gpu/dx11/dx11_buffer.hpp"
+#include "gpu/dx11/dx11_texture.hpp"
 
 struct forward_pass
 {
