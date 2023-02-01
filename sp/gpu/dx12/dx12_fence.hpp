@@ -14,7 +14,7 @@ struct dx12_fence
 {
     ID3D12Fence* Fence;
     uint64_t Value;
-}
+};
 
 void Dx12FenceInit(dx12_fence *Fence);
 void Dx12FenceFree(dx12_fence *Fence);

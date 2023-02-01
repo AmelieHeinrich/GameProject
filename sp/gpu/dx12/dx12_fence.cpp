@@ -28,6 +28,7 @@ uint64_t Dx12FenceSignal(dx12_fence *Fence)
 {
     Fence->Value++;
     DX12.CommandQueue->Signal(Fence->Fence, Fence->Value);
+    return Fence->Value;
 }
 
 bool Dx12FenceReached(dx12_fence *Fence, uint64_t Value)
