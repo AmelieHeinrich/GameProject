@@ -11,6 +11,21 @@
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"
 
+const char *HeapTypeToString(D3D12_DESCRIPTOR_HEAP_TYPE Type)
+{
+    switch (Type)
+    {
+        case D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV:
+            return "D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV";
+        case D3D12_DESCRIPTOR_HEAP_TYPE_DSV:
+            return "D3D12_DESCRIPTOR_HEAP_TYPE_DSV";
+        case D3D12_DESCRIPTOR_HEAP_TYPE_RTV:
+            return "D3D12_DESCRIPTOR_HEAP_TYPE_RTV";
+        case D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER:
+            return "D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER";
+    }
+}
+
 void Dx12DescriptorHeapInit(dx12_descriptor_heap *Heap, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint32_t Count)
 {
     Heap->Type = Type;
@@ -28,6 +43,8 @@ void Dx12DescriptorHeapInit(dx12_descriptor_heap *Heap, D3D12_DESCRIPTOR_HEAP_TY
     if (FAILED(Result))
         LogError("D3D12: Failed to create descriptor heap!");
     Heap->IncrementSize = DX12.Device->GetDescriptorHandleIncrementSize(Type);
+
+    LogDebug("D3D12: Allocated descriptor heap of type (%s) of size (%d)", HeapTypeToString(Type), Count);
 }
 
 void Dx12DescriptorHeapFree(dx12_descriptor_heap *Heap)

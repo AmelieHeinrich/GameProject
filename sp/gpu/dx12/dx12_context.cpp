@@ -61,7 +61,7 @@ void GetHardwareAdapter(IDXGIFactory3 *Factory, IDXGIAdapter1 **RetAdapter, bool
 
 void GpuInit()
 {
-    bool Debug = EgcB32(EgcFile, "debug_rhi");
+    bool Debug = EgcB32(EgcFile, "debug_enabled");
     
     if (Debug)
     {
@@ -143,13 +143,18 @@ void GpuInit()
         if (FAILED(Result))
             LogError("D3D12: Faile to close graphics command list (frame %d)", FrameIndex);
     }
+
+    Dx12DescriptorHeapInit(&DX12.RTVHeap, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1024);
+    Dx12DescriptorHeapInit(&DX12.CBVSRVUAVHeap, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1'000'000);
 }
 
 void GpuExit()
 {
-    bool Debug = EgcB32(EgcFile, "debug_rhi");
+    bool Debug = EgcB32(EgcFile, "debug_enabled");
     int BufferCount = EgcI32(EgcFile, "buffer_count");
 
+    Dx12DescriptorHeapFree(&DX12.CBVSRVUAVHeap);
+    Dx12DescriptorHeapFree(&DX12.RTVHeap);
     for (int FrameIndex = 0; FrameIndex < BufferCount; FrameIndex++)
     {
         SafeRelease(DX12.Lists[FrameIndex]);

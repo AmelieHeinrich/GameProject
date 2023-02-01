@@ -11,6 +11,8 @@
 #include <dxgi1_6.h>
 #include <vector>
 
+#include "dx12_descriptor_heap.hpp"
+
 struct dx12_context
 {
     ID3D12Device* Device;
@@ -23,6 +25,9 @@ struct dx12_context
     ID3D12CommandQueue* CommandQueue;
     std::vector<ID3D12CommandAllocator*> Allocators;
     std::vector<ID3D12GraphicsCommandList*> Lists;
+
+    dx12_descriptor_heap RTVHeap;
+    dx12_descriptor_heap CBVSRVUAVHeap;
 };
 
 extern dx12_context DX12;

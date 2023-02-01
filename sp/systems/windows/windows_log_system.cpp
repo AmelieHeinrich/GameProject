@@ -6,6 +6,8 @@
  */
 
 #include "systems/log_system.hpp"
+
+#include "game_data.hpp"
 #include "gui/dev_terminal.hpp"
 
 #include <stdarg.h>
@@ -20,6 +22,9 @@ log_buffer LogBuffer;
 
 void LogOutput(log_level Level, const char *Message, ...)
 {
+    if (Level == log_level::Debug && EgcB32(EgcFile, "debug_enabled") == false)
+        return;
+
     const char* LevelStrings[6] = {"[FATAL]: ", "[ERROR]: ", "[WARN]:  ", "[INFO]:  ", "[DEBUG]: ", "[TRACE]: "};
     bool IsError = Level < log_level::Warn;
 	
