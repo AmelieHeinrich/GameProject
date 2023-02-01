@@ -13,6 +13,7 @@
 #include <cstdint>
 
 #include "dx12_descriptor_heap.hpp"
+#include "dx12_swapchain.hpp"
 
 struct dx12_context
 {
@@ -32,6 +33,7 @@ struct dx12_context
 
     uint32_t Width;
     uint32_t Height;
+    dx12_swapchain SwapChain;
 };
 
 extern dx12_context DX12;

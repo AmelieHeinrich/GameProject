@@ -55,14 +55,14 @@ void Dx12DescriptorHeapFree(dx12_descriptor_heap *Heap)
 D3D12_CPU_DESCRIPTOR_HANDLE Dx12DescriptorHeapCPU(dx12_descriptor_heap *Heap, int Offset)
 {
     D3D12_CPU_DESCRIPTOR_HANDLE Handle = Heap->Heap->GetCPUDescriptorHandleForHeapStart();
-    Handle.ptr += Offset;
+    Handle.ptr += Offset * Heap->IncrementSize;
     return Handle;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE Dx12DescriptorHeapGPU(dx12_descriptor_heap *Heap, int Offset)
 {
     D3D12_GPU_DESCRIPTOR_HANDLE Handle = Heap->Heap->GetGPUDescriptorHandleForHeapStart();
-    Handle.ptr += Offset;
+    Handle.ptr += Offset * Heap->IncrementSize;
     return Handle;
 }
 
