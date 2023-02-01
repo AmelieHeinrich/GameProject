@@ -10,6 +10,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <vector>
+#include <cstdint>
 
 #include "dx12_descriptor_heap.hpp"
 
@@ -28,6 +29,9 @@ struct dx12_context
 
     dx12_descriptor_heap RTVHeap;
     dx12_descriptor_heap CBVSRVUAVHeap;
+
+    uint32_t Width;
+    uint32_t Height;
 };
 
 extern dx12_context DX12;
