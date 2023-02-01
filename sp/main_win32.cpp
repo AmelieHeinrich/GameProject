@@ -117,7 +117,7 @@ void WindowInit(void)
     Win32.WindowClass.lpfnWndProc = WindowProc;
     RegisterClassA(&Win32.WindowClass);
 
-    Win32.Window = CreateWindowA(Win32.WindowClass.lpszClassName, "Game Project | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, nullptr, nullptr, Win32.Instance, nullptr);
+    Win32.Window = CreateWindowA(Win32.WindowClass.lpszClassName, "Game Project | <Direct3D 12>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, nullptr, nullptr, Win32.Instance, nullptr);
     ShowWindow(Win32.Window, SW_SHOWMAXIMIZED);
 }
 

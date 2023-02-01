@@ -112,12 +112,18 @@ void GpuInit()
     std::wstring WideName = Desc.Description;
     std::string DeviceName = std::string(WideName.begin(), WideName.end());
     LogInfo("D3D12: Using GPU %s", DeviceName.c_str());
+
+    D3D12_COMMAND_QUEUE_DESC QueueDesc = {};
+    Result = DX12.Device->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(&DX12.CommandQueue));
+    if (FAILED(Result))
+        LogError("D3D12: Failed to create command queue!");
 }
 
 void GpuExit()
 {
     bool Debug = EgcB32(EgcFile, "debug_rhi");
 
+    SafeRelease(DX12.CommandQueue);
     SafeRelease(DX12.Device);
     SafeRelease(DX12.Factory);
     SafeRelease(DX12.Adapter);

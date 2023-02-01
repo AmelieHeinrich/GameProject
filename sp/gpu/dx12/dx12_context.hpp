@@ -19,6 +19,10 @@ struct dx12_context
     IDXGIDevice* DXGI;
     IDXGIFactory3* Factory;
     IDXGIAdapter1* Adapter;
+
+    ID3D12CommandQueue* CommandQueue;
+    std::vector<ID3D12CommandAllocator*> Allocators;
+    std::vector<ID3D12GraphicsCommandList*> Lists;
 };
 
 extern dx12_context DX12;
