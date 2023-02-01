@@ -18,7 +18,7 @@ target("ImGui")
     add_files("external/ImGui/**.cpp")
     add_headerfiles("external/ImGui/*.h")
     add_includedirs("external/ImGui/")
-    add_syslinks("d3d11", "d3dcompiler", "dxgi")
+    add_syslinks("d3d11", "d3dcompiler", "dxgi", "d3d12")
 
 target("Game Project")
     set_rundir(".")
@@ -29,9 +29,10 @@ target("Game Project")
     add_linkdirs("bin/")
 
     if is_plat("windows") then
-        --add_cflags("/MT")
         add_syslinks("user32", "dsound", "gdi32", "kernel32", "d3d11", "d3dcompiler", "dxgi", "assimp-vc143-mtd")
         add_files("sp/apu/dsound/*.cpp", "sp/gpu/*.cpp", "sp/gui/dx11/*.cpp", "sp/systems/windows/*.cpp", "sp/windows/*.cpp")
-        -- Entry point
         add_files("sp/main_win32.cpp")
     end
+    -- TODO(amelie.h): MacOS
+    -- TODO(amelie.h): Linux
+    -- TODO(amelie.h): Nintendo Switch? :flushed:

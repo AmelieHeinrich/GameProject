@@ -12,7 +12,7 @@ xmake run
 
 ## The plan
 
-- Rework platform architecture
+- Refactor to D3D12
 - Start rendering
 - Map system
 - Finish rendering
