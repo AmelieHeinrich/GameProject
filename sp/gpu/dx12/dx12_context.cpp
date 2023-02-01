@@ -23,7 +23,7 @@ dx12_context DX12;
 
 void GetHardwareAdapter(IDXGIFactory3 *Factory, IDXGIAdapter1 **RetAdapter, bool HighPerf)
 {
-    *RetAdapter = NULL;
+    *RetAdapter = nullptr;
     IDXGIAdapter1* Adapter = 0;
     IDXGIFactory6* Factory6;
     
@@ -37,12 +37,12 @@ void GetHardwareAdapter(IDXGIFactory3 *Factory, IDXGIAdapter1 **RetAdapter, bool
             if (Desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
                 continue;
 
-            if (SUCCEEDED(D3D12CreateDevice((IUnknown*)Adapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device*), NULL)))
+            if (SUCCEEDED(D3D12CreateDevice((IUnknown*)Adapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device*), nullptr)))
                 break;
         }
     }
     
-    if (Adapter == NULL) {
+    if (Adapter == nullptr) {
         for (uint32_t AdapterIndex = 0; SUCCEEDED(Factory->EnumAdapters1(AdapterIndex, &Adapter)); ++AdapterIndex) 
         {
             DXGI_ADAPTER_DESC1 Desc;
@@ -51,7 +51,7 @@ void GetHardwareAdapter(IDXGIFactory3 *Factory, IDXGIAdapter1 **RetAdapter, bool
             if (Desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
                 continue;
 
-            if (SUCCEEDED(D3D12CreateDevice((IUnknown*)Adapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device*), NULL)))
+            if (SUCCEEDED(D3D12CreateDevice((IUnknown*)Adapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device*), nullptr)))
                 break;
         }
     }
