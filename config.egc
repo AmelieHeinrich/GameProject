@@ -1,6 +1,6 @@
 [config]
 asset_path(str)=assets
-buffer_count(i32)=1
+buffer_count(i32)=2
 debug_rhi(b32)=true
 fullscreen(b32)=false
 height(i32)=720

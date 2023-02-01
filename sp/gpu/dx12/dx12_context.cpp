@@ -13,6 +13,12 @@
 
 #include <string>
 
+extern "C" 
+{
+    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 dx12_context DX12;
 
 void GetHardwareAdapter(IDXGIFactory3 *Factory, IDXGIAdapter1 **RetAdapter, bool HighPerf)
@@ -117,17 +123,42 @@ void GpuInit()
     Result = DX12.Device->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(&DX12.CommandQueue));
     if (FAILED(Result))
         LogError("D3D12: Failed to create command queue!");
+
+    int BufferCount = EgcI32(EgcFile, "buffer_count");
+
+    DX12.Allocators.resize(BufferCount);
+    DX12.Lists.resize(BufferCount);
+
+    for (int FrameIndex = 0; FrameIndex < BufferCount; FrameIndex++)
+    {
+        Result = DX12.Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&DX12.Allocators[FrameIndex]));
+        if (FAILED(Result))
+            LogError("D3D12: Failed to create command allocator (frame %d)", FrameIndex);
+
+        Result = DX12.Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, DX12.Allocators[FrameIndex], nullptr, IID_PPV_ARGS(&DX12.Lists[FrameIndex]));
+        if (FAILED(Result))
+            LogError("D3D12: Failed to create graphics command list (frame %d)", FrameIndex);
+
+        Result = DX12.Lists[FrameIndex]->Close();
+        if (FAILED(Result))
+            LogError("D3D12: Faile to close graphics command list (frame %d)", FrameIndex);
+    }
 }
 
 void GpuExit()
 {
     bool Debug = EgcB32(EgcFile, "debug_rhi");
+    int BufferCount = EgcI32(EgcFile, "buffer_count");
 
+    for (int FrameIndex = 0; FrameIndex < BufferCount; FrameIndex++)
+    {
+        SafeRelease(DX12.Lists[FrameIndex]);
+        SafeRelease(DX12.Allocators[FrameIndex]);
+    }
     SafeRelease(DX12.CommandQueue);
     SafeRelease(DX12.Device);
     SafeRelease(DX12.Factory);
     SafeRelease(DX12.Adapter);
-    
     if (Debug)
     {
         DX12.DebugDevice->ReportLiveDeviceObjects(D3D12_RLDO_IGNORE_INTERNAL | D3D12_RLDO_DETAIL);

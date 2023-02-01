@@ -61,7 +61,7 @@ bool GameResize(event_type Type, void *Sender, void *Listener, event_data Data)
         uint32_t Height = Data.data.u32[1];
 
         NoClipCameraResize(&GameState.Camera, Width, Height);
-        RendererResize(Width, Height);
+        //RendererResize(Width, Height);
     }
     return false;
 }
