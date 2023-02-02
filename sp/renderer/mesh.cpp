@@ -58,10 +58,10 @@ mesh ProcessMesh(loaded_model *Model, aiMesh *Mesh, const aiScene *Scene)
     Out.VertexCount = Vertices.size();
     Out.IndexCount = Indices.size();
 
-    GpuBufferCreate(&Out.VertexBuffer, Vertices.size() * sizeof(mesh_vertex), sizeof(mesh_vertex), gpu_buffer_usage::Vertex);
-    GpuBufferUploadData(&Out.VertexBuffer, Vertices.data());
-    GpuBufferCreate(&Out.IndexBuffer, Indices.size() * sizeof(uint32_t), sizeof(uint32_t), gpu_buffer_usage::Index);
-    GpuBufferUploadData(&Out.IndexBuffer, Indices.data());
+    GpuBufferInit(&Out.VertexBuffer, Vertices.size() * sizeof(mesh_vertex), sizeof(mesh_vertex), gpu_buffer_type::Vertex);
+    GpuBufferUpload(&Out.VertexBuffer, Vertices.data(), Vertices.size() * sizeof(mesh_vertex));
+    GpuBufferInit(&Out.IndexBuffer, Indices.size() * sizeof(uint32_t), sizeof(uint32_t), gpu_buffer_type::Index);
+    GpuBufferUpload(&Out.IndexBuffer, Indices.data(), Indices.size() * sizeof(uint32_t));
 
     // TODO(amelie.h): Texture loading
 

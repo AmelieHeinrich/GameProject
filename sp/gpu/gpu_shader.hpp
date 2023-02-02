@@ -2,20 +2,14 @@
  *  Author: Amélie Heinrich
  *  Company: Amélie Games
  *  License: MIT
- *  Create Time: 10/01/2023 09:35
+ *  Create Time: 02/02/2023 11:04
  */
 
 #pragma once
 
-#include "dx11_common.hpp"
-
 struct gpu_shader
 {
-    ID3D11VertexShader* VS = nullptr;
-    ID3D11PixelShader* PS = nullptr;
-    ID3D11ComputeShader* CS = nullptr;
-
-    ID3D11InputLayout* Layout = nullptr;
+    int placeholder;
 };
 
 void GpuShaderInit(gpu_shader *Shader, const char *V = nullptr,

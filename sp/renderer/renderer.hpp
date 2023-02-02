@@ -7,12 +7,7 @@
 
 #pragma once
 
-#include "pass_forward.hpp"
-
-struct renderer_data
-{
-    forward_pass Forward;
-};
+#include <cstdint>
 
 void RendererInit();
 void RendererExit();

@@ -80,8 +80,3 @@ void ShaderLibraryRecompileAll()
 
     LogInfo("Recompiled all shaders in %f seconds", ToSeconds(TimerGetElapsed(&Timer)));
 }
-
-void ShaderLibraryBind(const std::string& ShaderName)
-{
-    GpuShaderBind(&Library.Entries[ShaderName].Shader);
-}

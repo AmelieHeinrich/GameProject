@@ -144,6 +144,8 @@ void GpuInit()
             LogError("D3D12: Faile to close graphics command list (frame %d)", FrameIndex);
     }
 
+    Dx12FenceInit(&DX12.DeviceFence);
+
     Dx12DescriptorHeapInit(&DX12.RTVHeap, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1024);
     Dx12DescriptorHeapInit(&DX12.CBVSRVUAVHeap, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1'000'000);
 
@@ -152,6 +154,8 @@ void GpuInit()
 
 void GpuExit()
 {
+    Dx12FenceFlush(&DX12.DeviceFence);
+
     bool Debug = EgcB32(EgcFile, "debug_enabled");
     int BufferCount = EgcI32(EgcFile, "buffer_count");
 
@@ -163,6 +167,7 @@ void GpuExit()
         SafeRelease(DX12.Lists[FrameIndex]);
         SafeRelease(DX12.Allocators[FrameIndex]);
     }
+    Dx12FenceFree(&DX12.DeviceFence);
     SafeRelease(DX12.CommandQueue);
     SafeRelease(DX12.Device);
     SafeRelease(DX12.Factory);

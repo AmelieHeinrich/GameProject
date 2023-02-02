@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
-#include "gpu/dx11/dx11_shader.hpp"
+#include "gpu/gpu_shader.hpp"
 
 struct shader_entry
 {
@@ -31,4 +31,3 @@ void ShaderLibraryErase(const std::string& ShaderName);
 void ShaderLibraryFree();
 void ShaderLibraryRecompile(const std::string& ShaderName);
 void ShaderLibraryRecompileAll();
-void ShaderLibraryBind(const std::string& ShaderName);
