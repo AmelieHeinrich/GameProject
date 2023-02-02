@@ -179,3 +179,9 @@ void GpuExit()
         SafeRelease(DX12.Debug);
     }
 }
+
+void GpuResize(uint32_t Width, uint32_t Height)
+{
+    Dx12FenceFlush(&DX12.DeviceFence);
+    Dx12SwapchainResize(&DX12.SwapChain, Width, Height);
+}

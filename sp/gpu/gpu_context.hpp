@@ -7,5 +7,8 @@
 
 #pragma once
 
+#include <cstdint>w
+
 void GpuInit();
 void GpuExit();
+void GpuResize(uint32_t Width, uint32_t Height);

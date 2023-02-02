@@ -7,6 +7,8 @@
 
 #include "renderer.hpp"
 
+#include "gpu/gpu_context.hpp"
+
 void RendererInit()
 {
     
@@ -24,5 +26,5 @@ void RendererUpdate()
 
 void RendererResize(uint32_t Width, uint32_t Height)
 {
-
+    GpuResize(Width, Height);
 }
