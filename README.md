@@ -13,9 +13,21 @@ xmake run
 ## The plan
 
 - Refactor to D3D12
+    - Command buffers
+    - Shader blobs
+    - Pipelines
+    - Images
 - Start rendering
+    - Skybox renderer
+    - Deferred renderer
+    - Opaque pass
+    - Shadows
+    - Anti-aliasing (MSAA/FXAA)
+    - Bloom
+    - Color correction
+    - Blit
+    - UI
 - Map system
-- Finish rendering
 - Physics
 - Scripting
 - Polish, publish on windows
