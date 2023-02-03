@@ -9,11 +9,10 @@
 
 struct gpu_shader
 {
-    int placeholder;
+    void *Private;
 };
 
 void GpuShaderInit(gpu_shader *Shader, const char *V = nullptr,
                                        const char *P = nullptr,
                                        const char *C = nullptr);
 void GpuShaderFree(gpu_shader *Shader);
-void GpuShaderBind(gpu_shader *Shader);
