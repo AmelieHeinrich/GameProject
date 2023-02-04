@@ -126,23 +126,10 @@ void GpuInit()
 
     int BufferCount = EgcI32(EgcFile, "buffer_count");
 
-    DX12.Allocators.resize(BufferCount);
-    DX12.Lists.resize(BufferCount);
+    DX12.CommandBuffers.resize(BufferCount);
 
     for (int FrameIndex = 0; FrameIndex < BufferCount; FrameIndex++)
-    {
-        Result = DX12.Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&DX12.Allocators[FrameIndex]));
-        if (FAILED(Result))
-            LogError("D3D12: Failed to create command allocator (frame %d)", FrameIndex);
-
-        Result = DX12.Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, DX12.Allocators[FrameIndex], nullptr, IID_PPV_ARGS(&DX12.Lists[FrameIndex]));
-        if (FAILED(Result))
-            LogError("D3D12: Failed to create graphics command list (frame %d)", FrameIndex);
-
-        Result = DX12.Lists[FrameIndex]->Close();
-        if (FAILED(Result))
-            LogError("D3D12: Faile to close graphics command list (frame %d)", FrameIndex);
-    }
+        GpuCommandBufferInit(&DX12.CommandBuffers[FrameIndex], gpu_command_buffer_type::Graphics);
 
     Dx12FenceInit(&DX12.DeviceFence);
 
@@ -163,10 +150,7 @@ void GpuExit()
     Dx12DescriptorHeapFree(&DX12.CBVSRVUAVHeap);
     Dx12DescriptorHeapFree(&DX12.RTVHeap);
     for (int FrameIndex = 0; FrameIndex < BufferCount; FrameIndex++)
-    {
-        SafeRelease(DX12.Lists[FrameIndex]);
-        SafeRelease(DX12.Allocators[FrameIndex]);
-    }
+        GpuCommandBufferFree(&DX12.CommandBuffers[FrameIndex]);
     Dx12FenceFree(&DX12.DeviceFence);
     SafeRelease(DX12.CommandQueue);
     SafeRelease(DX12.Device);

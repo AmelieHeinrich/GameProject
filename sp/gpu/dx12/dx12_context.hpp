@@ -15,6 +15,7 @@
 #include "dx12_descriptor_heap.hpp"
 #include "dx12_swapchain.hpp"
 #include "dx12_fence.hpp"
+#include "gpu/gpu_command_buffer.hpp"
 
 struct dx12_context
 {
@@ -29,8 +30,7 @@ struct dx12_context
     IDXGIAdapter1* Adapter;
 
     ID3D12CommandQueue* CommandQueue;
-    std::vector<ID3D12CommandAllocator*> Allocators;
-    std::vector<ID3D12GraphicsCommandList*> Lists;
+    std::vector<gpu_command_buffer> CommandBuffers;
 
     dx12_fence DeviceFence;
 

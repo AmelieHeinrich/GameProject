@@ -46,6 +46,10 @@ void GpuCommandBufferInit(gpu_command_buffer *Buffer, gpu_command_buffer_type Ty
     Result = DX12.Device->CreateCommandList(0, Dx12CommandBufferType(Type), Private->Allocator, nullptr, IID_PPV_ARGS(&Private->List));
     if (FAILED(Result))
         LogError("D3D12: Failed to create command list!");
+
+    Result = Private->List->Close();
+    if (FAILED(Result))
+        LogError("D3D12: Failed to close command list!");
 }
 
 void GpuCommandBufferFree(gpu_command_buffer *Buffer)
