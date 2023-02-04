@@ -25,6 +25,7 @@ xmake run
     - Anti-aliasing (MSAA/FXAA)
     - Bloom
     - Color correction
+    - Accessibility (color correction for daltonism)
     - Blit
     - UI
 - Map system
