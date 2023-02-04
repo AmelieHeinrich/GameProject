@@ -14,10 +14,10 @@ xmake run
 
 - Refactor to D3D12
     - Command buffers
-    - Shader blobs
     - Pipelines
     - Images
 - Start rendering
+    - Render graph
     - Skybox renderer
     - Deferred renderer
     - Opaque pass
