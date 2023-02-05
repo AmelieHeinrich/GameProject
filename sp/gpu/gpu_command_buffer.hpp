@@ -29,7 +29,7 @@ void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer)
 // TODO(amelie.h): Bind descriptor
 // TODO(amelie.h): Bind pipeline
 // TODO(amelie.h): Clear
-// TODO(amelie.h): Set viewport
+void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float Height, float X, float Y);
 // TODO(amelie.h): Draw
 // TODO(amelie.h): Draw indexed
 // TODO(amelie.h): Dispatch

@@ -79,3 +79,18 @@ void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer)
             break;
     }
 }
+
+void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float Height, float X, float Y)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+
+    D3D12_VIEWPORT Viewport = {};
+    Viewport.Width = Width;
+    Viewport.Height = Height;
+    Viewport.TopLeftX = X;
+    Viewport.TopLeftY = Y;
+    Viewport.MinDepth = 0.0f;
+    Viewport.MaxDepth = 1.0f;
+
+    Private->List->RSSetViewports(1, &Viewport);
+}
