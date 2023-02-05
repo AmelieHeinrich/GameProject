@@ -5,22 +5,11 @@
  *  Create Time: 01/02/2023 21:10
  */
 
-#include "gpu/gpu_buffer.hpp"
+#include "dx12_buffer.hpp"
 
 #include "dx12_context.hpp"
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"
-
-struct dx12_buffer
-{
-    ID3D12Resource *Resource;
-
-    int HeapIndex;
-    D3D12_VERTEX_BUFFER_VIEW VertexView;
-    D3D12_INDEX_BUFFER_VIEW IndexView;
-    D3D12_CONSTANT_BUFFER_VIEW_DESC ConstantDesc;
-    D3D12_UNORDERED_ACCESS_VIEW_DESC UnorderedDesc;
-};
 
 void GpuBufferInit(gpu_buffer *Buffer, uint64_t Size, uint64_t Stride, gpu_buffer_type Type)
 {
