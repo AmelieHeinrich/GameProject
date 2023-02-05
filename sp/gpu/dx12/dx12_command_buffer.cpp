@@ -94,3 +94,24 @@ void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float
 
     Private->List->RSSetViewports(1, &Viewport);
 }
+
+void GpuCommandBufferDraw(gpu_command_buffer *Command, int VertexCount)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+
+    Private->List->DrawInstanced(VertexCount, 1, 0, 0);
+}
+
+void GpuCommandBufferDrawIndexed(gpu_command_buffer *Command, int IndexCount)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+
+    Private->List->DrawIndexedInstanced(IndexCount, 1, 0, 0, 0);
+}
+
+void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+
+    Private->List->Dispatch(X, Y, Z);
+}

@@ -30,9 +30,9 @@ void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer)
 // TODO(amelie.h): Bind pipeline
 // TODO(amelie.h): Clear
 void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float Height, float X, float Y);
-// TODO(amelie.h): Draw
-// TODO(amelie.h): Draw indexed
-// TODO(amelie.h): Dispatch
+void GpuCommandBufferDraw(gpu_command_buffer *Command, int VertexCount);
+void GpuCommandBufferDrawIndexed(gpu_command_buffer *Command, int IndexCount);
+void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z);
 // TODO(amelie.h): Barrier
 // TODO(amelie.h): Blit
 // TODO(amelie.h): Flush
