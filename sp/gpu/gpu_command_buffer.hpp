@@ -24,15 +24,17 @@ struct gpu_command_buffer
 
 void GpuCommandBufferInit(gpu_command_buffer *Buffer, gpu_command_buffer_type Type);
 void GpuCommandBufferFree(gpu_command_buffer *Buffer);
-// TODO(amelie.h): Bind texture
 void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer);
 // TODO(amelie.h): Bind descriptor
 // TODO(amelie.h): Bind pipeline
-// TODO(amelie.h): Clear
+// TODO(amelie.h): Clear color
+// TODO(amelie.h): Clear depth
 void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float Height, float X, float Y);
 void GpuCommandBufferDraw(gpu_command_buffer *Command, int VertexCount);
 void GpuCommandBufferDrawIndexed(gpu_command_buffer *Command, int IndexCount);
 void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z);
 // TODO(amelie.h): Barrier
 // TODO(amelie.h): Blit
-// TODO(amelie.h): Flush
+void GpuCommandBufferBegin(gpu_command_buffer *Command);
+void GpuCommandBufferEnd(gpu_command_buffer *Command);
+void GpuCommandBufferFlush(gpu_command_buffer *Command);

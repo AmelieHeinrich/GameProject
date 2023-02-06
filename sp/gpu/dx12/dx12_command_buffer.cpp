@@ -115,3 +115,26 @@ void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z)
 
     Private->List->Dispatch(X, Y, Z);
 }
+
+void GpuCommandBufferBegin(gpu_command_buffer *Command)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+
+    Private->Allocator->Reset();
+    Private->List->Reset(Private->Allocator, nullptr);
+}
+
+void GpuCommandBufferEnd(gpu_command_buffer *Command)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    
+    Private->List->Close();
+}
+
+void GpuCommandBufferFlush(gpu_command_buffer *Command)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+
+    ID3D12CommandList* CommandLists[] = { Private->List };
+    DX12.CommandQueue->ExecuteCommandLists(1, CommandLists);
+}
