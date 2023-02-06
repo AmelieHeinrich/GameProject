@@ -14,6 +14,9 @@
 struct dx12_image
 {
     ID3D12Resource* Resource;
-    uint32_t Descriptor;
     D3D12_RESOURCE_STATES State;
+
+    uint32_t RTV;
+    uint32_t DSV;
+    uint32_t SRV_UAV;
 };

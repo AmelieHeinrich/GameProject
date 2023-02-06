@@ -35,6 +35,7 @@ struct dx12_context
     dx12_fence DeviceFence;
 
     dx12_descriptor_heap RTVHeap;
+    dx12_descriptor_heap DSVHeap;
     dx12_descriptor_heap CBVSRVUAVHeap;
 
     dx12_swapchain SwapChain;
