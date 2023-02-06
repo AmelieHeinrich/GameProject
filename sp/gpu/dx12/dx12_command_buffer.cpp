@@ -34,6 +34,27 @@ D3D12_COMMAND_LIST_TYPE Dx12CommandBufferType(gpu_command_buffer_type Type)
     }
 }
 
+D3D12_RESOURCE_STATES GetStateFromImageLayout(gpu_image_layout Layout)
+{
+    switch (Layout)
+    {
+        case gpu_image_layout::ImageLayoutCopyDest:
+            return D3D12_RESOURCE_STATE_COPY_DEST;
+        case gpu_image_layout::ImageLayoutCopySource:
+            return D3D12_RESOURCE_STATE_COPY_SOURCE;
+        case gpu_image_layout::ImageLayoutDepth:
+            return D3D12_RESOURCE_STATE_DEPTH_WRITE;
+        case gpu_image_layout::ImageLayoutPresent:
+            return D3D12_RESOURCE_STATE_PRESENT;
+        case gpu_image_layout::ImageLayoutRenderTarget:
+            return D3D12_RESOURCE_STATE_RENDER_TARGET;
+        case gpu_image_layout::ImageLayoutShaderResource:
+            return D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+        case gpu_image_layout::ImageLayoutStorage:
+            return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+    }
+}
+
 void GpuCommandBufferInit(gpu_command_buffer *Buffer, gpu_command_buffer_type Type)
 {
     Buffer->Type = Type;
@@ -115,6 +136,23 @@ void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z)
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
 
     Private->List->Dispatch(X, Y, Z);
+}
+
+void GpuCommandBufferImageBarrier(gpu_command_buffer *Command, gpu_image *Image, gpu_image_layout New)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_image *ImagePrivate = (dx12_image*)Image->Private;
+
+    D3D12_RESOURCE_BARRIER Barrier = {};
+    Barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    Barrier.Transition.pResource = ImagePrivate->Resource;
+    Barrier.Transition.StateBefore = GetStateFromImageLayout(Image->Layout);
+    Barrier.Transition.StateAfter = GetStateFromImageLayout(New);
+    Barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+    Image->Layout = New;
+
+    Private->List->ResourceBarrier(1, &Barrier);
 }
 
 void GpuCommandBufferBlit(gpu_command_buffer *Command, gpu_image *Source, gpu_image *Dest)

@@ -34,7 +34,8 @@ void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float
 void GpuCommandBufferDraw(gpu_command_buffer *Command, int VertexCount);
 void GpuCommandBufferDrawIndexed(gpu_command_buffer *Command, int IndexCount);
 void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z);
-// TODO(amelie.h): Barrier
+// TODO(amelie.h): Barrier buffer
+void GpuCommandBufferImageBarrier(gpu_command_buffer *Command, gpu_image *Image, gpu_image_layout New);
 void GpuCommandBufferBlit(gpu_command_buffer *Command, gpu_image *Source, gpu_image *Dest);
 void GpuCommandBufferBegin(gpu_command_buffer *Command);
 void GpuCommandBufferEnd(gpu_command_buffer *Command);
