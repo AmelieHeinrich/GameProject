@@ -20,6 +20,7 @@ void GpuBeginFrame();
 void GpuEndFrame();
 void GpuResize(uint32_t Width, uint32_t Height);
 void GpuPresent();
+void GpuWait();
 hmm_v2 GpuGetDimensions();
 gpu_command_buffer* GpuGetImageCommandBuffer();
 gpu_image* GpuGetSwapChainImage();

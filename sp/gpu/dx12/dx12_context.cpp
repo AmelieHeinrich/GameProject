@@ -179,8 +179,17 @@ void GpuEndFrame()
     DX12.FrameSync[DX12.FrameIndex] = Dx12FenceSignal(&DX12.DeviceFence);
 }
 
+void GpuWait()
+{
+    Dx12FenceFlush(&DX12.DeviceFence);
+}
+
 void GpuResize(uint32_t Width, uint32_t Height)
 {
+    DX12.Width = Width;
+    DX12.Height = Height;
+
+    Dx12FenceFlush(&DX12.DeviceFence);
     Dx12SwapchainResize(&DX12.SwapChain, Width, Height);
 }
 

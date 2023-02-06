@@ -80,6 +80,6 @@ void RendererEndSync()
 
 void RendererResize(uint32_t Width, uint32_t Height)
 {
-    ForwardPassResize(&Renderer.Forward, Width, Height);
     GpuResize(Width, Height);
+    ForwardPassResize(&Renderer.Forward, Width, Height);
 }
