@@ -113,6 +113,15 @@ void GpuCommandBufferClearColor(gpu_command_buffer *Command, gpu_image *Image, f
     Private->List->ClearRenderTargetView(CPUHandle, Clear, 0, nullptr);
 }
 
+void GpuCommandBufferClearDepth(gpu_command_buffer *Command, gpu_image *Image, float Depth, float Stencil)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_image *ImagePrivate = (dx12_image*)Image->Private;
+
+    auto CPUHandle = Dx12DescriptorHeapCPU(&DX12.DSVHeap, ImagePrivate->DSV);
+    Private->List->ClearDepthStencilView(CPUHandle, D3D12_CLEAR_FLAG_DEPTH, Depth, Stencil, 0, nullptr);
+}
+
 void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float Height, float X, float Y)
 {
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
