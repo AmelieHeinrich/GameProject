@@ -75,6 +75,8 @@ void GameInit()
     TimerInit(&GameState.Timer);
     NoClipCameraInit(&GameState.Camera);
 
+    ShaderLibraryPush("Forward", "shaders/forward/Vertex.hlsl", "shaders/forward/Pixel.hlsl");
+
     ApuSourceInitFile(&GameState.Source, "assets/bgm/test.wav", true);
     ApuSourcePlay(&GameState.Source);
 }
@@ -107,5 +109,5 @@ void GameExit()
 {
     ApuSourceFree(&GameState.Source);
     DevTerminalShutdown();
-    RendererExit();
+    // RendererExit();
 }

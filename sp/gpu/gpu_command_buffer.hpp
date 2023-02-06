@@ -25,8 +25,8 @@ struct gpu_command_buffer
 void GpuCommandBufferInit(gpu_command_buffer *Buffer, gpu_command_buffer_type Type);
 void GpuCommandBufferFree(gpu_command_buffer *Buffer);
 void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer);
-// TODO(amelie.h): Bind descriptor
 // TODO(amelie.h): Bind pipeline
+// TODO(amelie.h): Bind descriptor
 // TODO(amelie.h): Clear color
 // TODO(amelie.h): Clear depth
 void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float Height, float X, float Y);
