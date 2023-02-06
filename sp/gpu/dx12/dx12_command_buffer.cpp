@@ -11,6 +11,7 @@
 
 #include "dx12_buffer.hpp"
 #include "dx12_context.hpp"
+#include "dx12_image.hpp"
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"
 
@@ -114,6 +115,25 @@ void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z)
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
 
     Private->List->Dispatch(X, Y, Z);
+}
+
+void GpuCommandBufferBlit(gpu_command_buffer *Command, gpu_image *Source, gpu_image *Dest)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_image *SourcePrivate = (dx12_image*)Source->Private;
+    dx12_image *DestPrivate = (dx12_image*)Dest->Private;
+
+    D3D12_TEXTURE_COPY_LOCATION BlitSource = {};
+    BlitSource.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    BlitSource.pResource = SourcePrivate->Resource;
+    BlitSource.SubresourceIndex = 0;
+
+    D3D12_TEXTURE_COPY_LOCATION BlitDest = {};
+    BlitDest.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    BlitDest.pResource = DestPrivate->Resource;
+    BlitDest.SubresourceIndex = 0;
+
+    Private->List->CopyTextureRegion(&BlitDest, 0, 0, 0, &BlitSource, nullptr);
 }
 
 void GpuCommandBufferBegin(gpu_command_buffer *Command)

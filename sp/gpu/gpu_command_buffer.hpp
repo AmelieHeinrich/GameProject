@@ -8,6 +8,7 @@
 #pragma once
 
 #include "gpu_buffer.hpp"
+#include "gpu_image.hpp"
 
 enum class gpu_command_buffer_type
 {
@@ -34,7 +35,7 @@ void GpuCommandBufferDraw(gpu_command_buffer *Command, int VertexCount);
 void GpuCommandBufferDrawIndexed(gpu_command_buffer *Command, int IndexCount);
 void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z);
 // TODO(amelie.h): Barrier
-// TODO(amelie.h): Blit
+void GpuCommandBufferBlit(gpu_command_buffer *Command, gpu_image *Source, gpu_image *Dest);
 void GpuCommandBufferBegin(gpu_command_buffer *Command);
 void GpuCommandBufferEnd(gpu_command_buffer *Command);
 void GpuCommandBufferFlush(gpu_command_buffer *Command);
