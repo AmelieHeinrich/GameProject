@@ -5,7 +5,7 @@
  *  Create Time: 03/02/2023 11:39
  */
 
-#include "gpu/gpu_command_buffer.hpp"
+#include "dx12_command_buffer.hpp"
 
 #include <d3d12.h>
 
@@ -14,12 +14,6 @@
 #include "dx12_image.hpp"
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"
-
-struct dx12_command_buffer
-{
-    ID3D12CommandAllocator *Allocator;
-    ID3D12GraphicsCommandList *List;
-};
 
 D3D12_COMMAND_LIST_TYPE Dx12CommandBufferType(gpu_command_buffer_type Type)
 {

@@ -5,7 +5,7 @@
  *  Create Time: 02/02/2023 11:04
  */
 
-#include "gpu/gpu_shader.hpp"
+#include "dx12_shader.hpp"
 
 #include "systems/log_system.hpp"
 #include "systems/file_system.hpp"
@@ -16,13 +16,6 @@
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #include <cassert>
-
-struct dx12_shader
-{
-    ID3DBlob *VertexBlob;
-    ID3DBlob *PixelBlob;
-    ID3DBlob *ComputeBlob;
-};
 
 std::string GetEntryPointFromProfile(const std::string& Profile)
 {

@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include "gpu/gpu_command_buffer.hpp"
+
 void GuiInit();
 void GuiBeginFrame();
-void GuiEndFrame();
+void GuiEndFrame(gpu_command_buffer *Buffer);
 void GuiExit();

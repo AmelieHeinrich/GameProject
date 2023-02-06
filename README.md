@@ -15,7 +15,6 @@ xmake run
 - Refactor to D3D12
     - Command buffers
     - Pipelines
-    - Images
 - Start rendering
     - Render graph
     - Skybox renderer

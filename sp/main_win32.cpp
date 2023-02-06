@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
     WindowInit();
     ApuInit();
     GpuInit();
-    // GuiInit();
+    GuiInit();
     GameInit();
 
     while (IsWindowVisible(Win32.Window))
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 
     ShaderLibraryFree();
     GameExit();
-    // GuiExit();
+    GuiExit();
     GpuExit();
     ApuExit();
     WindowExit();
