@@ -102,6 +102,17 @@ void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer)
     }
 }
 
+void GpuCommandBufferClearColor(gpu_command_buffer *Command, gpu_image *Image, float Red, float Green, float Blue, float Alpha)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_image *ImagePrivate = (dx12_image*)Image->Private;
+
+    float Clear[4] = { Red, Green, Blue, Alpha };
+
+    auto CPUHandle = Dx12DescriptorHeapCPU(&DX12.RTVHeap, ImagePrivate->RTV);
+    Private->List->ClearRenderTargetView(CPUHandle, Clear, 0, nullptr);
+}
+
 void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float Height, float X, float Y)
 {
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
