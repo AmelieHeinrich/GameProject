@@ -98,6 +98,23 @@ void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer)
     }
 }
 
+void GpuCommandBufferBindRenderTarget(gpu_command_buffer *Command, gpu_image *Image, gpu_image *Depth)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_image *ImagePrivate = (dx12_image*)Image->Private;
+
+    D3D12_CPU_DESCRIPTOR_HANDLE RTV = Dx12DescriptorHeapCPU(&DX12.RTVHeap, ImagePrivate->RTV);
+    D3D12_CPU_DESCRIPTOR_HANDLE DSV;
+
+    if (Depth)
+    {
+        dx12_image *DepthPrivate = (dx12_image*)Depth->Private;
+        DSV = Dx12DescriptorHeapCPU(&DX12.DSVHeap, DepthPrivate->DSV);
+    }
+
+    Private->List->OMSetRenderTargets(1, &RTV, false, Depth != nullptr ? &DSV : nullptr);
+}
+
 void GpuCommandBufferClearColor(gpu_command_buffer *Command, gpu_image *Image, float Red, float Green, float Blue, float Alpha)
 {
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
@@ -167,6 +184,7 @@ void GpuCommandBufferImageBarrier(gpu_command_buffer *Command, gpu_image *Image,
     Barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
     Image->Layout = New;
+    ImagePrivate->State = GetStateFromImageLayout(Image->Layout);
 
     Private->List->ResourceBarrier(1, &Barrier);
 }

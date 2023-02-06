@@ -61,6 +61,7 @@ void GetHardwareAdapter(IDXGIFactory3 *Factory, IDXGIAdapter1 **RetAdapter, bool
 
 void GpuInit()
 {
+    DX12.FrameIndex = 0;
     bool Debug = EgcB32(EgcFile, "debug_enabled");
     
     if (Debug)
@@ -127,6 +128,7 @@ void GpuInit()
     int BufferCount = EgcI32(EgcFile, "buffer_count");
 
     DX12.CommandBuffers.resize(BufferCount);
+    DX12.FrameSync.resize(BufferCount);
 
     for (int FrameIndex = 0; FrameIndex < BufferCount; FrameIndex++)
         GpuCommandBufferInit(&DX12.CommandBuffers[FrameIndex], gpu_command_buffer_type::Graphics);
@@ -166,10 +168,33 @@ void GpuExit()
     }
 }
 
+void GpuBeginFrame()
+{
+    DX12.FrameIndex = Dx12SwapchainImageIndex(&DX12.SwapChain);
+    Dx12FenceSync(&DX12.DeviceFence, DX12.FrameSync[DX12.FrameIndex]);
+}
+
+void GpuEndFrame()
+{
+    DX12.FrameSync[DX12.FrameIndex] = Dx12FenceSignal(&DX12.DeviceFence);
+}
+
 void GpuResize(uint32_t Width, uint32_t Height)
 {
-    Dx12FenceFlush(&DX12.DeviceFence);
     Dx12SwapchainResize(&DX12.SwapChain, Width, Height);
+}
+
+void GpuPresent()
+{
+    Dx12SwapchainPresent(&DX12.SwapChain);
+}
+
+hmm_v2 GpuGetDimensions()
+{
+    hmm_v2 Result;
+    Result.X = DX12.Width;
+    Result.Y = DX12.Height;
+    return (Result);
 }
 
 gpu_command_buffer* GpuGetImageCommandBuffer()

@@ -11,5 +11,11 @@
 
 void RendererInit();
 void RendererExit();
-void RendererUpdate();
+
+void RendererStartSync();
+void RendererConstructFrame();
+void RendererStartRender();
+void RendererEndRender();
+void RendererEndSync();
+
 void RendererResize(uint32_t Width, uint32_t Height);

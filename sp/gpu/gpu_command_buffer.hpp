@@ -28,6 +28,7 @@ void GpuCommandBufferFree(gpu_command_buffer *Buffer);
 void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer);
 // TODO(amelie.h): Bind pipeline
 // TODO(amelie.h): Bind descriptor
+void GpuCommandBufferBindRenderTarget(gpu_command_buffer *Command, gpu_image *Image, gpu_image *Depth);
 void GpuCommandBufferClearColor(gpu_command_buffer *Command, gpu_image *Image, float Red, float Green, float Blue, float Alpha);
 void GpuCommandBufferClearDepth(gpu_command_buffer *Command, gpu_image *Image, float Depth, float Stencil);
 void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float Height, float X, float Y);

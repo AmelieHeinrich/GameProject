@@ -57,14 +57,15 @@ void GuiInit()
 
 void GuiBeginFrame()
 {
-    ImGui_ImplWin32_NewFrame();
     ImGui_ImplDX12_NewFrame();
+    ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 }
 
 void GuiEndFrame(gpu_command_buffer *Buffer)
 {   
     dx12_command_buffer *Private = (dx12_command_buffer*)Buffer->Private;
+    Private->List->SetDescriptorHeaps(1, &DX12.CBVSRVUAVHeap.Heap);
 
     ImGuiIO& IO = ImGui::GetIO();
     IO.DisplaySize = ImVec2(DX12.Width, DX12.Height);

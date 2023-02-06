@@ -15,6 +15,7 @@
 #include "dx12_descriptor_heap.hpp"
 #include "dx12_swapchain.hpp"
 #include "dx12_fence.hpp"
+#include "math_types.hpp"
 #include "gpu/gpu_command_buffer.hpp"
 
 struct dx12_context
@@ -40,6 +41,7 @@ struct dx12_context
 
     dx12_swapchain SwapChain;
     std::vector<dx12_fence> FrameFences;
+    std::vector<uint64_t> FrameSync;
     uint32_t FrameIndex;
 };
 

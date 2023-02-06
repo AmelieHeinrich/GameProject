@@ -148,7 +148,6 @@ int main(int argc, char *argv[])
         }
 
         GameUpdate();
-        // DxRenderContextPresent();
     }
 
     ShaderLibraryFree();
