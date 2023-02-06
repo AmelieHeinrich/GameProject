@@ -11,14 +11,21 @@
 
 #include <stdlib.h>
 
+struct renderer_data
+{
+    forward_pass Forward;
+};
+
+renderer_data Renderer;
+
 void RendererInit()
 {
-    return;
+    ForwardPassInit(&Renderer.Forward);
 }
 
 void RendererExit()
 {
-    return;
+    ForwardPassExit(&Renderer.Forward);
 }
 
 void RendererStartSync()
@@ -28,7 +35,19 @@ void RendererStartSync()
 
 void RendererConstructFrame()
 {
-    // Execute render graph, and copy to swapchain
+    ForwardPassUpdate(&Renderer.Forward);
+
+    gpu_command_buffer *Buffer = GpuGetImageCommandBuffer();
+    gpu_image *Image = GpuGetSwapChainImage();
+
+    GpuCommandBufferBegin(Buffer);
+    GpuCommandBufferImageBarrier(Buffer, Image, gpu_image_layout::ImageLayoutCopyDest);
+    GpuCommandBufferImageBarrier(Buffer, &Renderer.Forward.RenderTarget, gpu_image_layout::ImageLayoutCopySource);
+    GpuCommandBufferBlit(Buffer, &Renderer.Forward.RenderTarget, Image);
+    GpuCommandBufferImageBarrier(Buffer, Image, gpu_image_layout::ImageLayoutCommon);
+    GpuCommandBufferImageBarrier(Buffer, &Renderer.Forward.RenderTarget, gpu_image_layout::ImageLayoutRenderTarget);
+    GpuCommandBufferEnd(Buffer);
+    GpuCommandBufferFlush(Buffer);
 }
 
 void RendererStartRender()
@@ -42,7 +61,6 @@ void RendererStartRender()
     GpuCommandBufferImageBarrier(Buffer, Image, gpu_image_layout::ImageLayoutRenderTarget);
     GpuCommandBufferSetViewport(Buffer, Dimensions.Width, Dimensions.Height, 0, 0);
     GpuCommandBufferBindRenderTarget(Buffer, Image, nullptr);
-    GpuCommandBufferClearColor(Buffer, Image, 0.2f, 0.3f, 0.4f, 1.0f);
 }
 
 void RendererEndRender()
@@ -62,5 +80,6 @@ void RendererEndSync()
 
 void RendererResize(uint32_t Width, uint32_t Height)
 {
+    ForwardPassResize(&Renderer.Forward, Width, Height);
     GpuResize(Width, Height);
 }

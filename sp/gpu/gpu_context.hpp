@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstdlib>
 
 #include "gpu_command_buffer.hpp"
 #include "gpu_image.hpp"

@@ -229,4 +229,6 @@ void GpuCommandBufferFlush(gpu_command_buffer *Command)
 
     ID3D12CommandList* CommandLists[] = { Private->List };
     DX12.CommandQueue->ExecuteCommandLists(1, CommandLists);
+
+    Dx12FenceFlush(&DX12.DeviceFence);
 }

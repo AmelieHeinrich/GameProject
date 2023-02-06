@@ -9,13 +9,13 @@
 
 #include <cstdint>
 
+#include "forward_pass.hpp"
+
 void RendererInit();
 void RendererExit();
-
 void RendererStartSync();
 void RendererConstructFrame();
 void RendererStartRender();
 void RendererEndRender();
 void RendererEndSync();
-
 void RendererResize(uint32_t Width, uint32_t Height);

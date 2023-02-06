@@ -27,7 +27,7 @@ D3D12_RESOURCE_FLAGS GetResourceFlag(gpu_image_usage Usage)
     switch (Usage)
     {
         case gpu_image_usage::ImageUsageRenderTarget:
-            return D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+            return D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
         case gpu_image_usage::ImageUsageDepthTarget:
             return D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
         case gpu_image_usage::ImageUsageStorage:
@@ -68,10 +68,6 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
 
     D3D12_HEAP_PROPERTIES HeapProperties = {};
     HeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-    HeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-    HeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-    HeapProperties.CreationNodeMask = 0;
-    HeapProperties.VisibleNodeMask = 0;
 
     D3D12_RESOURCE_DESC ResourceDesc = {};
     ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -83,7 +79,7 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
     ResourceDesc.Format = GetDXGIFormat(Format);
     ResourceDesc.SampleDesc.Count = 1;
     ResourceDesc.SampleDesc.Quality = 0;
-    ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     ResourceDesc.Flags = GetResourceFlag(Usage);
 
     HRESULT Result = DX12.Device->CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc, Private->State, nullptr, IID_PPV_ARGS(&Private->Resource));
@@ -93,15 +89,44 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
     switch (Usage)
     {
         case gpu_image_usage::ImageUsageRenderTarget:
+        {
             Private->RTV = Dx12DescriptorHeapAlloc(&DX12.RTVHeap);
+            
+            D3D12_RENDER_TARGET_VIEW_DESC Desc = {};
+            Desc.Format = ResourceDesc.Format;
+            Desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+            DX12.Device->CreateRenderTargetView(Private->Resource, &Desc, Dx12DescriptorHeapCPU(&DX12.RTVHeap, Private->RTV));
             break;
+        }
         case gpu_image_usage::ImageUsageDepthTarget:
+        {
             Private->DSV = Dx12DescriptorHeapAlloc(&DX12.DSVHeap);
+
+            D3D12_DEPTH_STENCIL_VIEW_DESC Desc = {};
+            Desc.Format = ResourceDesc.Format;
+            Desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+            DX12.Device->CreateDepthStencilView(Private->Resource, &Desc, Dx12DescriptorHeapCPU(&DX12.DSVHeap, Private->DSV));
             break;
+        }
         case gpu_image_usage::ImageUsageShaderResource:
-        case gpu_image_usage::ImageUsageStorage:
+        {
             Private->SRV_UAV = Dx12DescriptorHeapAlloc(&DX12.CBVSRVUAVHeap);
+
+            D3D12_SHADER_RESOURCE_VIEW_DESC Desc = {};
+            Desc.Format = ResourceDesc.Format;
+            Desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+            DX12.Device->CreateShaderResourceView(Private->Resource, &Desc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
+        }
+        case gpu_image_usage::ImageUsageStorage:
+        {
+            Private->SRV_UAV = Dx12DescriptorHeapAlloc(&DX12.CBVSRVUAVHeap);
+
+            D3D12_UNORDERED_ACCESS_VIEW_DESC Desc = {};
+            Desc.Format = ResourceDesc.Format;
+            Desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+            DX12.Device->CreateUnorderedAccessView(Private->Resource, nullptr, &Desc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
             break;
+        }
     }
 }
 
