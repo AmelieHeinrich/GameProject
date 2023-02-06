@@ -171,3 +171,13 @@ void GpuResize(uint32_t Width, uint32_t Height)
     Dx12FenceFlush(&DX12.DeviceFence);
     Dx12SwapchainResize(&DX12.SwapChain, Width, Height);
 }
+
+gpu_command_buffer* GpuGetImageCommandBuffer()
+{
+    return &DX12.CommandBuffers[DX12.FrameIndex];
+}
+
+gpu_image* GpuGetSwapChainImage()
+{
+    return &DX12.SwapChain.Images[DX12.FrameIndex];
+}

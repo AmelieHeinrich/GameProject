@@ -12,11 +12,14 @@
 #include <cstdint>
 #include <vector>
 
+#include "dx12_image.hpp"
+
 struct dx12_swapchain
 {
     IDXGISwapChain3 *SwapChain;
     std::vector<ID3D12Resource*> Buffers;
     std::vector<int> RenderTargets;
+    std::vector<gpu_image> Images;
 };
 
 void Dx12SwapchainInit(dx12_swapchain *SwapChain);

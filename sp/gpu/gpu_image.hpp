@@ -17,6 +17,7 @@ enum class gpu_image_format
 
 enum class gpu_image_layout
 {
+    ImageLayoutCommon,
     ImageLayoutShaderResource,
     ImageLayoutStorage,
     ImageLayoutDepth,

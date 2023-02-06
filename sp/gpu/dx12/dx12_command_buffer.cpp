@@ -32,6 +32,8 @@ D3D12_RESOURCE_STATES GetStateFromImageLayout(gpu_image_layout Layout)
 {
     switch (Layout)
     {
+        case gpu_image_layout::ImageLayoutCommon:
+            return D3D12_RESOURCE_STATE_COMMON;
         case gpu_image_layout::ImageLayoutCopyDest:
             return D3D12_RESOURCE_STATE_COPY_DEST;
         case gpu_image_layout::ImageLayoutCopySource:

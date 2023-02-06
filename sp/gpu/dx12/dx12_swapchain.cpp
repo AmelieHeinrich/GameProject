@@ -39,6 +39,7 @@ void Dx12SwapchainInit(dx12_swapchain *SwapChain)
     int BufferCount = EgcI32(EgcFile, "buffer_count");
     SwapChain->Buffers.resize(BufferCount);
     SwapChain->RenderTargets.resize(BufferCount);
+    SwapChain->Images.resize(BufferCount);
     
     for (int BufferIndex = 0; BufferIndex < BufferCount; BufferIndex++)
     {
@@ -47,6 +48,16 @@ void Dx12SwapchainInit(dx12_swapchain *SwapChain)
             LogError("D3D12: Failed to get swap chain buffer at index %d!", BufferIndex);
         SwapChain->RenderTargets[BufferIndex] = Dx12DescriptorHeapAlloc(&DX12.RTVHeap);
         DX12.Device->CreateRenderTargetView(SwapChain->Buffers[BufferIndex], nullptr, Dx12DescriptorHeapCPU(&DX12.RTVHeap, SwapChain->RenderTargets[BufferIndex]));
+    
+        SwapChain->Images[BufferIndex].Width = DX12.Width;
+        SwapChain->Images[BufferIndex].Height = DX12.Height;
+        SwapChain->Images[BufferIndex].Layout = gpu_image_layout::ImageLayoutCommon;
+        SwapChain->Images[BufferIndex].Usage = gpu_image_usage::ImageUsageRenderTarget;
+        SwapChain->Images[BufferIndex].Private = new dx12_image;
+
+        dx12_image *Image = (dx12_image*)SwapChain->Images[BufferIndex].Private;
+        Image->Resource = SwapChain->Buffers[BufferIndex];
+        Image->RTV = SwapChain->RenderTargets[BufferIndex];
     }
 }
 
@@ -55,6 +66,7 @@ void Dx12SwapchainFree(dx12_swapchain *SwapChain)
     int BufferCount = EgcI32(EgcFile, "buffer_count");
     for (int BufferIndex = 0; BufferIndex < BufferCount; BufferIndex++)
     {
+        delete SwapChain->Images[BufferIndex].Private;
         SafeRelease(SwapChain->Buffers[BufferIndex]);
         Dx12DescriptorHeapFreeSpace(&DX12.RTVHeap, SwapChain->RenderTargets[BufferIndex]);
     }
