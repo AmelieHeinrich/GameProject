@@ -10,6 +10,7 @@
 #include "gpu_buffer.hpp"
 #include "gpu_image.hpp"
 #include "gpu_pipeline.hpp"
+#include "gpu_sampler.hpp"
 
 enum class gpu_command_buffer_type
 {
@@ -31,7 +32,7 @@ void GpuCommandBufferBindPipeline(gpu_command_buffer *Command, gpu_pipeline *Pip
 void GpuCommandBufferBindConstantBuffer(gpu_command_buffer *Command, gpu_pipeline_type Type, gpu_buffer *Buffer, int Offset);
 // TODO(amelie.h): Bind shader resource view
 // TODO(amelie.h): Bind unordered access view
-// TODO(amelie.h): Bind sampler
+void GpuCommandBufferBindSampler(gpu_command_buffer *Command, gpu_pipeline_type Type, gpu_sampler *Sampler, int Offset);
 void GpuCommandBufferBindRenderTarget(gpu_command_buffer *Command, gpu_image *Image, gpu_image *Depth);
 void GpuCommandBufferClearColor(gpu_command_buffer *Command, gpu_image *Image, float Red, float Green, float Blue, float Alpha);
 void GpuCommandBufferClearDepth(gpu_command_buffer *Command, gpu_image *Image, float Depth, float Stencil);

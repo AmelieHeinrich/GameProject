@@ -13,6 +13,7 @@
 #include "dx12_context.hpp"
 #include "dx12_image.hpp"
 #include "dx12_pipeline.hpp"
+#include "dx12_sampler.hpp"
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"
 
@@ -130,6 +131,22 @@ void GpuCommandBufferBindConstantBuffer(gpu_command_buffer *Command, gpu_pipelin
             break;
         case gpu_pipeline_type::Compute:
             Private->List->SetComputeRootConstantBufferView(Offset, BufferPrivate->Resource->GetGPUVirtualAddress());
+            break;
+    }
+}
+
+void GpuCommandBufferBindSampler(gpu_command_buffer *Command, gpu_pipeline_type Type, gpu_sampler *Sampler, int Offset)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_sampler *SamplerPrivate = (dx12_sampler*)Sampler->Private;
+
+    switch (Type)
+    {
+        case gpu_pipeline_type::Graphics:
+            Private->List->SetGraphicsRootDescriptorTable(Offset, Dx12DescriptorHeapGPU(&DX12.SamplerHeap, SamplerPrivate->Descriptor));
+            break;
+        case gpu_pipeline_type::Compute:
+            Private->List->SetComputeRootDescriptorTable(Offset, Dx12DescriptorHeapGPU(&DX12.SamplerHeap, SamplerPrivate->Descriptor));
             break;
     }
 }
