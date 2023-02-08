@@ -21,6 +21,7 @@
 #include "systems/log_system.hpp"
 
 #include <ImGui/imgui.h>
+#include <chrono>
 
 struct game_state
 {
@@ -77,7 +78,8 @@ void GameInit()
     TimerInit(&GameState.Timer);
     NoClipCameraInit(&GameState.Camera);
 
-    ApuSourceInitFile(&GameState.Source, "assets/bgm/test.wav", true);
+    ApuSourceInitFile(&GameState.Source, "assets/bgm/TITLE.wav", true);
+    ApuSourceSetLoop(&GameState.Source, true);
     ApuSourcePlay(&GameState.Source);
 }
 
