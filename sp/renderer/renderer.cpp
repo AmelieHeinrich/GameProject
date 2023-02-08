@@ -8,6 +8,7 @@
 #include "renderer.hpp"
 
 #include "gpu/gpu_context.hpp"
+#include "systems/event_system.hpp"
 
 #include <stdlib.h>
 
@@ -18,8 +19,17 @@ struct renderer_data
 
 renderer_data Renderer;
 
+bool RendererShaderRecompile(event_type Type, void *Sender, void *Listener, event_data Data)
+{
+    GpuWait();
+    ForwardPassExit(&Renderer.Forward);
+    ForwardPassInit(&Renderer.Forward);
+    return false;
+}
+
 void RendererInit()
 {
+    EventSystemRegister(event_type::ShaderRecompile, nullptr, RendererShaderRecompile);
     ForwardPassInit(&Renderer.Forward);
 }
 
@@ -33,9 +43,9 @@ void RendererStartSync()
     GpuBeginFrame();
 }
 
-void RendererConstructFrame()
+void RendererConstructFrame(camera_data *Camera)
 {
-    ForwardPassUpdate(&Renderer.Forward);
+    ForwardPassUpdate(&Renderer.Forward, Camera);
 
     gpu_command_buffer *Buffer = GpuGetImageCommandBuffer();
     gpu_image *Image = GpuGetSwapChainImage();

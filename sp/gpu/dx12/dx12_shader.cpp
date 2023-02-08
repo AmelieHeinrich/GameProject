@@ -38,7 +38,7 @@ ID3DBlob* CompileBlob(const std::string& Source, const char *Profile)
                D3D_COMPILE_STANDARD_FILE_INCLUDE, 
                GetEntryPointFromProfile(Profile).c_str(), 
                Profile, 
-               0, 
+               D3DCOMPILE_ALL_RESOURCES_BOUND, 
                0, 
                &ShaderBlob, 
                &ErrorBlob);

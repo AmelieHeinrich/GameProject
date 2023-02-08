@@ -14,7 +14,7 @@
 void RendererInit();
 void RendererExit();
 void RendererStartSync();
-void RendererConstructFrame();
+void RendererConstructFrame(camera_data *Camera);
 void RendererStartRender();
 void RendererEndRender();
 void RendererEndSync();

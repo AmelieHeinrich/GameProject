@@ -9,4 +9,9 @@
 
 #include "entity.hpp"
 
-
+struct camera_data
+{
+    hmm_mat4 View;
+    hmm_mat4 Projection;
+    hmm_vec3 Position;
+};

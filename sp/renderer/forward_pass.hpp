@@ -12,6 +12,8 @@
 #include "gpu/gpu_shader.hpp"
 #include "gpu/gpu_pipeline.hpp"
 
+#include "scene/scene.hpp"
+
 struct forward_pass
 {
     gpu_image RenderTarget;
@@ -24,5 +26,5 @@ struct forward_pass
 
 void ForwardPassInit(forward_pass *Pass);
 void ForwardPassExit(forward_pass *Pass);
-void ForwardPassUpdate(forward_pass *Pass);
+void ForwardPassUpdate(forward_pass *Pass, camera_data *Camera);
 void ForwardPassResize(forward_pass *Pass, uint32_t Width, uint32_t Height);

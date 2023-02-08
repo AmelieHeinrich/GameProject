@@ -17,7 +17,8 @@ enum class event_type : uint16_t
     KeyPressed,
     KeyReleased,
     MouseButtonPressed,
-    MouseButtonReleased
+    MouseButtonReleased,
+    ShaderRecompile
 };
 
 struct event_data

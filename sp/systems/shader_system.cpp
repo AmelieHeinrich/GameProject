@@ -7,6 +7,7 @@
 
 #include "shader_system.hpp"
 #include "log_system.hpp"
+#include "event_system.hpp"
 #include "timer.hpp"
 
 shader_library Library;
@@ -66,6 +67,9 @@ void ShaderLibraryRecompile(const std::string& ShaderName)
     const char* PS = Entry->PS.empty() ? nullptr : Entry->PS.c_str();
     const char* CS = Entry->CS.empty() ? nullptr : Entry->CS.c_str();
     GpuShaderInit(&Entry->Shader, VS, PS, CS);
+
+    event_data Data = {};
+    EventSystemFire(event_type::ShaderRecompile, nullptr, Data);
 
     LogInfo("Recompiled shader %s in %f seconds", ShaderName.c_str(), ToSeconds(TimerGetElapsed(&Timer)));
 }

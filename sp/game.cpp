@@ -94,9 +94,14 @@ void GameUpdate()
     NoClipCameraUpdate(&GameState.Camera, DT);
     NoClipCameraUpdateFrustum(&GameState.Camera);
 
+    camera_data Data;
+    Data.View = GameState.Camera.View;
+    Data.Projection = GameState.Camera.Projection;
+    Data.Position = GameState.Camera.Position;
+
     RendererStartSync();
 
-    RendererConstructFrame();
+    RendererConstructFrame(&Data);
 
     RendererStartRender();
     GuiBeginFrame();

@@ -11,6 +11,7 @@
 
 #include "systems/shader_system.hpp"
 #include "systems/log_system.hpp"
+#include "systems/event_system.hpp"
 
 void ForwardPassInit(forward_pass *Pass)
 {
@@ -52,11 +53,14 @@ void ForwardPassExit(forward_pass *Pass)
     GpuImageFree(&Pass->RenderTarget);
 }
 
-void ForwardPassUpdate(forward_pass *Pass)
+void ForwardPassUpdate(forward_pass *Pass, camera_data *Camera)
 {
     hmm_v2 Dimensions = GpuGetDimensions();
 
     gpu_command_buffer *Buffer = GpuGetImageCommandBuffer();
+
+    hmm_mat4 UploadMatrices[2] = { Camera->View, Camera->Projection };
+    GpuBufferUpload(&Pass->CameraBuffer, UploadMatrices, sizeof(UploadMatrices));
 
     GpuCommandBufferBegin(Buffer);
     GpuCommandBufferSetViewport(Buffer, Dimensions.Width, Dimensions.Height, 0, 0);

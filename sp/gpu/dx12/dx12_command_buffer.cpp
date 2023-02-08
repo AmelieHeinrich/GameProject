@@ -112,6 +112,7 @@ void GpuCommandBufferBindPipeline(gpu_command_buffer *Command, gpu_pipeline *Pip
             Private->List->SetComputeRootSignature(PipelinePrivate->Signature);
             break;
         case gpu_pipeline_type::Graphics:
+            Private->List->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             Private->List->SetGraphicsRootSignature(PipelinePrivate->Signature);
             break;
     }
@@ -182,7 +183,14 @@ void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float
     Viewport.MinDepth = 0.0f;
     Viewport.MaxDepth = 1.0f;
 
+    D3D12_RECT Rect;
+    Rect.left = 0;
+    Rect.top = 0;
+    Rect.right = Width;
+    Rect.bottom = Height;
+
     Private->List->RSSetViewports(1, &Viewport);
+    Private->List->RSSetScissorRects(1, &Rect);
 }
 
 void GpuCommandBufferDraw(gpu_command_buffer *Command, int VertexCount)

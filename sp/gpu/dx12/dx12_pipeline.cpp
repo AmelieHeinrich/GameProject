@@ -82,7 +82,6 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
     PixelReflection->GetDesc(&PixelDesc);
 
     // Reflect vertex root signature
-    LogInfo("%d, %d", VertexDesc.BoundResources, PixelDesc.BoundResources);
     for (int BoundResourceIndex = 0; BoundResourceIndex < VertexDesc.BoundResources; BoundResourceIndex++)
     {
         D3D12_SHADER_INPUT_BIND_DESC ShaderInputBindDesc = {};
