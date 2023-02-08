@@ -119,6 +119,7 @@ void WindowInit(void)
 
     Win32.Window = CreateWindowA(Win32.WindowClass.lpszClassName, "Game Project | <Direct3D 12>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, nullptr, nullptr, Win32.Instance, nullptr);
     ShowWindow(Win32.Window, SW_SHOWMAXIMIZED);
+    SetWindowLong(Win32.Window, GWL_STYLE, GetWindowLong(Win32.Window, GWL_STYLE) & ~WS_MINIMIZEBOX); 
 }
 
 void WindowExit()
