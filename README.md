@@ -13,8 +13,9 @@ xmake run
 ## The plan
 
 - Refactor to D3D12
-    - Command buffers
     - Pipelines
+    - Samplers
+    - Staging buffers/textures
 - Start rendering
     - Render graph
     - Skybox renderer
