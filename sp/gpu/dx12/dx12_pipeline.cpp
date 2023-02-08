@@ -13,6 +13,8 @@
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"
 
+#include <d3dcompiler.h>
+
 D3D12_FILL_MODE GetDx12FillMode(fill_mode Mode)
 {
     switch (Mode)
@@ -60,8 +62,18 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
     dx12_pipeline *PipelinePrivate = (dx12_pipeline*)Pipeline->Private;
     dx12_shader *ShaderPrivate = (dx12_shader*)Pipeline->Info.Shader->Private;
 
+    ID3D12ShaderReflection* VertexReflection = nullptr;
+    ID3D12ShaderReflection* PixelReflection = nullptr;
+
+    HRESULT Result = D3DReflect(ShaderPrivate->VertexBlob->GetBufferPointer(), ShaderPrivate->VertexBlob->GetBufferSize(), IID_PPV_ARGS(&VertexReflection));
+    if (FAILED(Result))
+        LogError("D3D12: Failed to reflect vertex shader!");
+
+    Result = D3DReflect(ShaderPrivate->PixelBlob->GetBufferPointer(), ShaderPrivate->PixelBlob->GetBufferSize(), IID_PPV_ARGS(&VertexReflection));
+    if (FAILED(Result))
+        LogError("D3D12: Failed to reflect pixel shader!");
+
     D3D12_GRAPHICS_PIPELINE_STATE_DESC Desc = {};
-    // TODO(amelie.h): Reflect input layout and root signature
     Desc.VS.pShaderBytecode = ShaderPrivate->VertexBlob->GetBufferPointer();
     Desc.VS.BytecodeLength = ShaderPrivate->VertexBlob->GetBufferSize();
     Desc.PS.pShaderBytecode = ShaderPrivate->PixelBlob->GetBufferPointer();
@@ -110,8 +122,14 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
     dx12_pipeline *PipelinePrivate = (dx12_pipeline*)Pipeline->Private;
     dx12_shader *ShaderPrivate = (dx12_shader*)Pipeline->Info.Shader->Private;
 
+    dx12_shader *ShaderPrivate = (dx12_shader*)Pipeline->Info.Shader->Private;
+    ID3D12ShaderReflection* ComputeReflection = nullptr;
+
+    HRESULT Result = D3DReflect(ShaderPrivate->ComputeBlob->GetBufferPointer(), ShaderPrivate->ComputeBlob->GetBufferSize(), IID_PPV_ARGS(&ComputeReflection));
+    if (FAILED(Result))
+        LogError("D3D12: Failed to reflect vertex shader!");
+
     D3D12_COMPUTE_PIPELINE_STATE_DESC Desc = {};
-    // TODO(amelie.h): Reflect and root signature
     Desc.CS.pShaderBytecode = ShaderPrivate->ComputeBlob->GetBufferPointer();
     Desc.CS.BytecodeLength = ShaderPrivate->ComputeBlob->GetBufferSize();
 
