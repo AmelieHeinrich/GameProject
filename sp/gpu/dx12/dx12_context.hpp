@@ -38,6 +38,7 @@ struct dx12_context
     dx12_descriptor_heap RTVHeap;
     dx12_descriptor_heap DSVHeap;
     dx12_descriptor_heap CBVSRVUAVHeap;
+    dx12_descriptor_heap SamplerHeap;
 
     dx12_swapchain SwapChain;
     std::vector<dx12_fence> FrameFences;
