@@ -310,3 +310,9 @@ void GpuPipelineFree(gpu_pipeline *Pipeline)
     SafeRelease(PipelinePrivate->Pipeline);
     delete Pipeline->Private;
 }
+
+int GpuPipelineGetDescriptor(gpu_pipeline *Pipeline, const std::string& Name)
+{
+    dx12_pipeline *PipelinePrivate = (dx12_pipeline*)Pipeline->Private;
+    return PipelinePrivate->Bindings[Name];
+}

@@ -117,6 +117,22 @@ void GpuCommandBufferBindPipeline(gpu_command_buffer *Command, gpu_pipeline *Pip
     }
 }
 
+void GpuCommandBufferBindConstantBuffer(gpu_command_buffer *Command, gpu_pipeline_type Type, gpu_buffer *Buffer, int Offset)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_buffer *BufferPrivate = (dx12_buffer*)Buffer->Reserved;
+
+    switch (Type)
+    {
+        case gpu_pipeline_type::Graphics:
+            Private->List->SetGraphicsRootConstantBufferView(Offset, BufferPrivate->Resource->GetGPUVirtualAddress());
+            break;
+        case gpu_pipeline_type::Compute:
+            Private->List->SetComputeRootConstantBufferView(Offset, BufferPrivate->Resource->GetGPUVirtualAddress());
+            break;
+    }
+}
+
 void GpuCommandBufferBindRenderTarget(gpu_command_buffer *Command, gpu_image *Image, gpu_image *Depth)
 {
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
