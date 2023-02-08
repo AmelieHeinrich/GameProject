@@ -12,7 +12,7 @@
 
 struct dx12_fence
 {
-    ID3D12Fence* Fence;
+    ID3D12Fence *Fence;
     uint64_t Value;
 };
 

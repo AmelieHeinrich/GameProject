@@ -12,6 +12,7 @@
 #include "dx12_buffer.hpp"
 #include "dx12_context.hpp"
 #include "dx12_image.hpp"
+#include "dx12_pipeline.hpp"
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"
 
@@ -92,8 +93,26 @@ void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer)
             break;
         case gpu_buffer_type::Index:
             Private->List->IASetIndexBuffer(&BufferPrivate->IndexView);
+            break;
         default:
             LogWarn("D3D12: Trying to bind a buffer that isn't gpu_buffer_type::Vertex or gpu_buffer_type::Index!");
+            break;
+    }
+}
+
+void GpuCommandBufferBindPipeline(gpu_command_buffer *Command, gpu_pipeline *Pipeline)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_pipeline *PipelinePrivate = (dx12_pipeline*)Pipeline->Private;
+
+    Private->List->SetPipelineState(PipelinePrivate->Pipeline);
+    switch (Pipeline->Info.Type)
+    {
+        case gpu_pipeline_type::Compute:
+            Private->List->SetComputeRootSignature(PipelinePrivate->Signature);
+            break;
+        case gpu_pipeline_type::Graphics:
+            Private->List->SetGraphicsRootSignature(PipelinePrivate->Signature);
             break;
     }
 }

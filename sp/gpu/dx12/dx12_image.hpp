@@ -13,10 +13,12 @@
 
 struct dx12_image
 {
-    ID3D12Resource* Resource;
+    ID3D12Resource *Resource;
     D3D12_RESOURCE_STATES State;
 
     uint32_t RTV;
     uint32_t DSV;
     uint32_t SRV_UAV;
 };
+
+DXGI_FORMAT GetDXGIFormat(gpu_image_format Format);

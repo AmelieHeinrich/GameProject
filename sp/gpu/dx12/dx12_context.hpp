@@ -23,12 +23,12 @@ struct dx12_context
     uint32_t Width;
     uint32_t Height;
 
-    ID3D12Device* Device;
-    ID3D12Debug1* Debug;
-    ID3D12DebugDevice* DebugDevice;
-    IDXGIDevice* DXGI;
-    IDXGIFactory3* Factory;
-    IDXGIAdapter1* Adapter;
+    ID3D12Device *Device;
+    ID3D12Debug1 *Debug;
+    ID3D12DebugDevice *DebugDevice;
+    IDXGIDevice *DXGI;
+    IDXGIFactory3 *Factory;
+    IDXGIAdapter1 *Adapter;
 
     ID3D12CommandQueue* CommandQueue;
     std::vector<gpu_command_buffer> CommandBuffers;

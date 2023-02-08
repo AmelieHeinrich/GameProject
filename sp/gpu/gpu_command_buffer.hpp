@@ -9,6 +9,7 @@
 
 #include "gpu_buffer.hpp"
 #include "gpu_image.hpp"
+#include "gpu_pipeline.hpp"
 
 enum class gpu_command_buffer_type
 {
@@ -26,7 +27,7 @@ struct gpu_command_buffer
 void GpuCommandBufferInit(gpu_command_buffer *Buffer, gpu_command_buffer_type Type);
 void GpuCommandBufferFree(gpu_command_buffer *Buffer);
 void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer);
-// TODO(amelie.h): Bind pipeline
+void GpuCommandBufferBindPipeline(gpu_command_buffer *Command, gpu_pipeline *Pipeline);
 // TODO(amelie.h): Bind descriptor
 void GpuCommandBufferBindRenderTarget(gpu_command_buffer *Command, gpu_image *Image, gpu_image *Depth);
 void GpuCommandBufferClearColor(gpu_command_buffer *Command, gpu_image *Image, float Red, float Green, float Blue, float Alpha);
