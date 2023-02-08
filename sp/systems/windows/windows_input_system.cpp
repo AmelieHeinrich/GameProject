@@ -12,7 +12,7 @@
 
 bool IsKeyPressed(keyboard_key Key)
 {
-    return GetAsyncKeyState(static_cast<uint16_t>(Key)) == -32768;   
+    return (GetAsyncKeyState(static_cast<uint16_t>(Key)) == -32768) && GetForegroundWindow() == Win32.Window;   
 }
 
 bool IsKeyReleased(keyboard_key Key)
