@@ -14,7 +14,6 @@
 #include "windows/windows_data.hpp"
 
 #include <d3dcompiler.h>
-#include <ranges>
 
 D3D12_FILL_MODE GetDx12FillMode(fill_mode Mode)
 {
@@ -65,6 +64,7 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
 
     ID3D12ShaderReflection* VertexReflection = nullptr;
     D3D12_SHADER_DESC VertexDesc;
+    std::vector<D3D12_ROOT_PARAMETER> Parameters;
     std::vector<D3D12_INPUT_ELEMENT_DESC> InputElementDescs;
     std::vector<std::string> InputElementSemanticNames;
 
@@ -80,6 +80,60 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
     if (FAILED(Result))
         LogError("D3D12: Failed to reflect pixel shader!");
     PixelReflection->GetDesc(&PixelDesc);
+
+    // Reflect vertex root signature
+    for (int BoundResourceIndex = 0; BoundResourceIndex < VertexDesc.BoundResources; BoundResourceIndex++)
+    {
+        D3D12_SHADER_INPUT_BIND_DESC ShaderInputBindDesc = {};
+        VertexReflection->GetResourceBindingDesc(BoundResourceIndex, &ShaderInputBindDesc);
+
+        if (ShaderInputBindDesc.Type == D3D_SIT_CBUFFER)
+        {
+            PipelinePrivate->Bindings[ShaderInputBindDesc.Name] = static_cast<int>(Parameters.size());
+            ID3D12ShaderReflectionConstantBuffer* ConstantBuffer = VertexReflection->GetConstantBufferByIndex(BoundResourceIndex);
+            D3D12_SHADER_BUFFER_DESC ConstantBufferDesc = {};
+            ConstantBuffer->GetDesc(&ConstantBufferDesc);
+
+            D3D12_ROOT_PARAMETER RootParameter = {};
+            RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+            RootParameter.Descriptor.ShaderRegister = ShaderInputBindDesc.BindPoint;
+            RootParameter.Descriptor.RegisterSpace = ShaderInputBindDesc.Space;
+            RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+
+            Parameters.push_back(RootParameter);
+        }
+    }
+
+    // Reflect pixel root signature
+    for (int BoundResourceIndex = 0; BoundResourceIndex < PixelDesc.BoundResources; BoundResourceIndex++)
+    {
+        D3D12_SHADER_INPUT_BIND_DESC ShaderInputBindDesc = {};
+        PixelReflection->GetResourceBindingDesc(BoundResourceIndex, &ShaderInputBindDesc);
+        PipelinePrivate->Bindings[ShaderInputBindDesc.Name] = static_cast<int>(Parameters.size());
+
+        D3D12_ROOT_PARAMETER RootParameter = {};
+        RootParameter.ParameterType = ShaderInputBindDesc.Type == D3D_SIT_CBUFFER ? D3D12_ROOT_PARAMETER_TYPE_CBV : D3D12_ROOT_PARAMETER_TYPE_SRV;
+        RootParameter.Descriptor.ShaderRegister = ShaderInputBindDesc.BindPoint;
+        RootParameter.Descriptor.RegisterSpace = ShaderInputBindDesc.Space;
+        RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+        Parameters.push_back(RootParameter);
+    }
+
+    D3D12_ROOT_SIGNATURE_DESC RootSignatureDesc = {};
+    RootSignatureDesc.NumParameters = Parameters.size();
+    RootSignatureDesc.pParameters = Parameters.data();
+    RootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+    ID3DBlob *RootSignatureBlob;
+    ID3DBlob *ErrorBlob;
+    D3D12SerializeRootSignature(&RootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_1, &RootSignatureBlob, &ErrorBlob);
+    if (ErrorBlob)
+        LogError("D3D12: Failed to serialize root signature! %s", ErrorBlob->GetBufferPointer());
+    Result = DX12.Device->CreateRootSignature(0, RootSignatureBlob->GetBufferPointer(), RootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&PipelinePrivate->Signature));
+    if (FAILED(Result))
+        LogError("D3D12: Failed to create root signature!");
+    RootSignatureBlob->Release();
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC Desc = {};
     Desc.VS.pShaderBytecode = ShaderPrivate->VertexBlob->GetBufferPointer();
@@ -162,10 +216,14 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
     }
     Desc.InputLayout.pInputElementDescs = InputElementDescs.data();
     Desc.InputLayout.NumElements = static_cast<uint32_t>(InputElementDescs.size());
+    Desc.pRootSignature = PipelinePrivate->Signature;
 
-    HRESULT Result = DX12.Device->CreateGraphicsPipelineState(&Desc, IID_PPV_ARGS(&PipelinePrivate->Pipeline));
+    Result = DX12.Device->CreateGraphicsPipelineState(&Desc, IID_PPV_ARGS(&PipelinePrivate->Pipeline));
     if (FAILED(Result)) 
         LogError("D3D12: Failed to create graphics pipeline state!");
+
+    SafeRelease(PixelReflection);
+    SafeRelease(VertexReflection);
 }
 
 void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *Info)
@@ -176,18 +234,71 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
     dx12_pipeline *PipelinePrivate = (dx12_pipeline*)Pipeline->Private;
     dx12_shader *ShaderPrivate = (dx12_shader*)Pipeline->Info.Shader->Private;
 
-    dx12_shader *ShaderPrivate = (dx12_shader*)Pipeline->Info.Shader->Private;
     ID3D12ShaderReflection* ComputeReflection = nullptr;
+    D3D12_SHADER_DESC ComputeDesc;
+    std::vector<D3D12_ROOT_PARAMETER> Parameters;
 
     HRESULT Result = D3DReflect(ShaderPrivate->ComputeBlob->GetBufferPointer(), ShaderPrivate->ComputeBlob->GetBufferSize(), IID_PPV_ARGS(&ComputeReflection));
     if (FAILED(Result))
         LogError("D3D12: Failed to reflect vertex shader!");
 
+    for (int BoundResourceIndex = 0; BoundResourceIndex < ComputeDesc.BoundResources; BoundResourceIndex++)
+    {
+        D3D12_SHADER_INPUT_BIND_DESC ShaderInputBindDesc = {};
+        ComputeReflection->GetResourceBindingDesc(BoundResourceIndex, &ShaderInputBindDesc);
+        PipelinePrivate->Bindings[ShaderInputBindDesc.Name] = static_cast<int>(Parameters.size());
+
+        D3D12_ROOT_PARAMETER RootParameter = {};
+        if (ShaderInputBindDesc.Type == D3D_SIT_CBUFFER)
+            RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        if (ShaderInputBindDesc.Type == D3D_SIT_TEXTURE)
+            RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+        if (ShaderInputBindDesc.Type == D3D_SIT_UAV_RWTYPED)
+            RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV;
+        if (ShaderInputBindDesc.Type == D3D_SIT_SAMPLER)
+            RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        if (ShaderInputBindDesc.Type != D3D10_SIT_SAMPLER)
+        {
+            RootParameter.Descriptor.ShaderRegister = ShaderInputBindDesc.BindPoint;
+            RootParameter.Descriptor.RegisterSpace = ShaderInputBindDesc.Space;
+        }
+        else
+        {
+            D3D12_DESCRIPTOR_RANGE Range = {};
+            Range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
+            Range.NumDescriptors = 1;
+            Range.RegisterSpace = ShaderInputBindDesc.Space;
+            Range.BaseShaderRegister = ShaderInputBindDesc.BindPoint;
+            
+            RootParameter.DescriptorTable.pDescriptorRanges = &Range;
+            RootParameter.DescriptorTable.NumDescriptorRanges = 1;
+        }
+        RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+        Parameters.push_back(RootParameter);
+    }
+
+    D3D12_ROOT_SIGNATURE_DESC RootSignatureDesc = {};
+    RootSignatureDesc.NumParameters = Parameters.size();
+    RootSignatureDesc.pParameters = Parameters.data();
+    RootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+    ID3DBlob *RootSignatureBlob;
+    ID3DBlob *ErrorBlob;
+    D3D12SerializeRootSignature(&RootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_1, &RootSignatureBlob, &ErrorBlob);
+    if (ErrorBlob)
+        LogError("D3D12: Failed to serialize root signature! %s", ErrorBlob->GetBufferPointer());
+    Result = DX12.Device->CreateRootSignature(0, RootSignatureBlob->GetBufferPointer(), RootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&PipelinePrivate->Signature));
+    if (FAILED(Result))
+        LogError("D3D12: Failed to create root signature!");
+    RootSignatureBlob->Release();
+
     D3D12_COMPUTE_PIPELINE_STATE_DESC Desc = {};
     Desc.CS.pShaderBytecode = ShaderPrivate->ComputeBlob->GetBufferPointer();
     Desc.CS.BytecodeLength = ShaderPrivate->ComputeBlob->GetBufferSize();
+    Desc.pRootSignature = PipelinePrivate->Signature;
 
-    HRESULT Result = DX12.Device->CreateComputePipelineState(&Desc, IID_PPV_ARGS(&PipelinePrivate->Pipeline));
+    Result = DX12.Device->CreateComputePipelineState(&Desc, IID_PPV_ARGS(&PipelinePrivate->Pipeline));
     if (FAILED(Result)) 
         LogError("D3D12: Failed to create compute pipeline state!");
 }
@@ -195,6 +306,7 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
 void GpuPipelineFree(gpu_pipeline *Pipeline)
 {
     dx12_pipeline *PipelinePrivate = (dx12_pipeline*)Pipeline->Private;
+    SafeRelease(PipelinePrivate->Signature);
     SafeRelease(PipelinePrivate->Pipeline);
     delete Pipeline->Private;
 }

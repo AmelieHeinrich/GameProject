@@ -17,4 +17,6 @@ struct dx12_pipeline
 {
     ID3D12RootSignature *Signature;
     ID3D12PipelineState *Pipeline;
+    
+    std::unordered_map<std::string, int> Bindings;
 };
