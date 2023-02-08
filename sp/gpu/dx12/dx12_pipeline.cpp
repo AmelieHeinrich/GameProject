@@ -82,6 +82,7 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
     PixelReflection->GetDesc(&PixelDesc);
 
     // Reflect vertex root signature
+    LogInfo("%d, %d", VertexDesc.BoundResources, PixelDesc.BoundResources);
     for (int BoundResourceIndex = 0; BoundResourceIndex < VertexDesc.BoundResources; BoundResourceIndex++)
     {
         D3D12_SHADER_INPUT_BIND_DESC ShaderInputBindDesc = {};
@@ -90,9 +91,6 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
         if (ShaderInputBindDesc.Type == D3D_SIT_CBUFFER)
         {
             PipelinePrivate->Bindings[ShaderInputBindDesc.Name] = static_cast<int>(Parameters.size());
-            ID3D12ShaderReflectionConstantBuffer* ConstantBuffer = VertexReflection->GetConstantBufferByIndex(BoundResourceIndex);
-            D3D12_SHADER_BUFFER_DESC ConstantBufferDesc = {};
-            ConstantBuffer->GetDesc(&ConstantBufferDesc);
 
             D3D12_ROOT_PARAMETER RootParameter = {};
             RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;

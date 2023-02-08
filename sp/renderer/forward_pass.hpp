@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "gpu/gpu_buffer.hpp"
 #include "gpu/gpu_image.hpp"
 #include "gpu/gpu_shader.hpp"
 #include "gpu/gpu_pipeline.hpp"
@@ -16,7 +17,9 @@ struct forward_pass
     gpu_image RenderTarget;
     gpu_image DepthTarget;
 
+    gpu_buffer CameraBuffer;
     gpu_pipeline Pipeline;
+    gpu_buffer TriangleBuffer;
 };
 
 void ForwardPassInit(forward_pass *Pass);

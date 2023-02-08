@@ -30,10 +30,23 @@ void ForwardPassInit(forward_pass *Pass)
     Pass->Pipeline.Info.HasDepth = true;
     Pass->Pipeline.Info.Type = gpu_pipeline_type::Graphics;
     GpuPipelineCreateGraphics(&Pass->Pipeline);
+    
+    float Vertices[] = {
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    GpuBufferInit(&Pass->TriangleBuffer, sizeof(Vertices), sizeof(float) * 6, gpu_buffer_type::Vertex);
+    GpuBufferUpload(&Pass->TriangleBuffer, Vertices, sizeof(Vertices));
+
+    GpuBufferInit(&Pass->CameraBuffer, 256, 0, gpu_buffer_type::Uniform);
 }
 
 void ForwardPassExit(forward_pass *Pass)
 {
+    GpuBufferFree(&Pass->CameraBuffer);
+    GpuBufferFree(&Pass->TriangleBuffer);
     GpuPipelineFree(&Pass->Pipeline);
     GpuImageFree(&Pass->DepthTarget);
     GpuImageFree(&Pass->RenderTarget);
@@ -50,6 +63,10 @@ void ForwardPassUpdate(forward_pass *Pass)
     GpuCommandBufferBindRenderTarget(Buffer, &Pass->RenderTarget, &Pass->DepthTarget);
     GpuCommandBufferClearColor(Buffer, &Pass->RenderTarget, 0.3f, 0.2f, 0.1f, 1.0f);
     GpuCommandBufferClearDepth(Buffer, &Pass->DepthTarget, 1.0f, 0.0f);
+    GpuCommandBufferBindPipeline(Buffer, &Pass->Pipeline);
+    GpuCommandBufferBindBuffer(Buffer, &Pass->TriangleBuffer);
+    GpuCommandBufferBindConstantBuffer(Buffer, gpu_pipeline_type::Graphics, &Pass->CameraBuffer, GpuPipelineGetDescriptor(&Pass->Pipeline, "SceneBuffer"));
+    GpuCommandBufferDraw(Buffer, 3);
     GpuCommandBufferEnd(Buffer);
     GpuCommandBufferFlush(Buffer);
 }
