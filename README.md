@@ -13,7 +13,6 @@ xmake run
 ## The plan
 
 - Refactor to D3D12
-    - Pipelines
     - Samplers
     - Staging buffers/textures
 - Start rendering
