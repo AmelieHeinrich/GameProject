@@ -9,6 +9,7 @@
 
 #include "gpu/gpu_context.hpp"
 
+#include "systems/shader_system.hpp"
 #include "systems/log_system.hpp"
 
 void ForwardPassInit(forward_pass *Pass)
@@ -17,10 +18,23 @@ void ForwardPassInit(forward_pass *Pass)
 
     GpuImageInit(&Pass->RenderTarget, Dimensions.Width, Dimensions.Height, gpu_image_format::RGBA8, gpu_image_usage::ImageUsageRenderTarget);
     GpuImageInit(&Pass->DepthTarget, Dimensions.Width, Dimensions.Height, gpu_image_format::R32Depth, gpu_image_usage::ImageUsageDepthTarget);
+
+    ShaderLibraryPush("Forward", "shaders/forward/Vertex.hlsl", "shaders/forward/Pixel.hlsl");
+    Pass->Pipeline.Info.Formats.resize(1);
+    Pass->Pipeline.Info.Shader = ShaderLibraryGet("Forward");
+    Pass->Pipeline.Info.CullMode = cull_mode::None;
+    Pass->Pipeline.Info.DepthFormat = gpu_image_format::R32Depth;
+    Pass->Pipeline.Info.Formats[0] = gpu_image_format::RGBA8;
+    Pass->Pipeline.Info.DepthFunc = depth_func::Less;
+    Pass->Pipeline.Info.FillMode = fill_mode::Solid;
+    Pass->Pipeline.Info.HasDepth = true;
+    Pass->Pipeline.Info.Type = gpu_pipeline_type::Graphics;
+    GpuPipelineCreateGraphics(&Pass->Pipeline);
 }
 
 void ForwardPassExit(forward_pass *Pass)
 {
+    GpuPipelineFree(&Pass->Pipeline);
     GpuImageFree(&Pass->DepthTarget);
     GpuImageFree(&Pass->RenderTarget);
 }

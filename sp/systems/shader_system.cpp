@@ -80,3 +80,8 @@ void ShaderLibraryRecompileAll()
 
     LogInfo("Recompiled all shaders in %f seconds", ToSeconds(TimerGetElapsed(&Timer)));
 }
+
+gpu_shader *ShaderLibraryGet(const std::string& Name)
+{
+    return &Library.Entries[Name].Shader;
+}

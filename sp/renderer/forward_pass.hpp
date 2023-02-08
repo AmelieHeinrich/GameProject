@@ -8,11 +8,15 @@
 #pragma once
 
 #include "gpu/gpu_image.hpp"
+#include "gpu/gpu_shader.hpp"
+#include "gpu/gpu_pipeline.hpp"
 
 struct forward_pass
 {
     gpu_image RenderTarget;
     gpu_image DepthTarget;
+
+    gpu_pipeline Pipeline;
 };
 
 void ForwardPassInit(forward_pass *Pass);

@@ -17,7 +17,7 @@ struct VertexOut
     float3 Color : COLOR;
 };
 
-cbuffer SceneData : register(b0, space0)
+cbuffer SceneData : register(b0)
 {
     row_major float4x4 View;
     row_major float4x4 Projection;

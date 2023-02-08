@@ -59,7 +59,7 @@ struct gpu_pipeline
     void *Private;
 };
 
-void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline, gpu_pipeline_create_info *Info);
-void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *Info);
+void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline);
+void GpuPipelineCreateCompute(gpu_pipeline *Pipeline);
 void GpuPipelineFree(gpu_pipeline *Pipeline);
 int GpuPipelineGetDescriptor(gpu_pipeline *Pipeline, const std::string& Name);

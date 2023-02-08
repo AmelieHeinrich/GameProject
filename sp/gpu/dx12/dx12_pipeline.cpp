@@ -76,7 +76,7 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
         LogError("D3D12: Failed to reflect vertex shader!");
     VertexReflection->GetDesc(&VertexDesc);
 
-    Result = D3DReflect(ShaderPrivate->PixelBlob->GetBufferPointer(), ShaderPrivate->PixelBlob->GetBufferSize(), IID_PPV_ARGS(&VertexReflection));
+    Result = D3DReflect(ShaderPrivate->PixelBlob->GetBufferPointer(), ShaderPrivate->PixelBlob->GetBufferSize(), IID_PPV_ARGS(&PixelReflection));
     if (FAILED(Result))
         LogError("D3D12: Failed to reflect pixel shader!");
     PixelReflection->GetDesc(&PixelDesc);
@@ -127,7 +127,7 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
 
     ID3DBlob *RootSignatureBlob;
     ID3DBlob *ErrorBlob;
-    D3D12SerializeRootSignature(&RootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_1, &RootSignatureBlob, &ErrorBlob);
+    D3D12SerializeRootSignature(&RootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &RootSignatureBlob, &ErrorBlob);
     if (ErrorBlob)
         LogError("D3D12: Failed to serialize root signature! %s", ErrorBlob->GetBufferPointer());
     Result = DX12.Device->CreateRootSignature(0, RootSignatureBlob->GetBufferPointer(), RootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&PipelinePrivate->Signature));
@@ -152,6 +152,7 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
         Desc.BlendState.RenderTarget[RTVIndex].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
         Desc.RTVFormats[RTVIndex] = GetDXGIFormat(Pipeline->Info.Formats[RTVIndex]);
+        Desc.NumRenderTargets = Pipeline->Info.Formats.size();
     }
     Desc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
     Desc.RasterizerState.FillMode = GetDx12FillMode(Pipeline->Info.FillMode);

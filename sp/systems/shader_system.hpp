@@ -31,3 +31,4 @@ void ShaderLibraryErase(const std::string& ShaderName);
 void ShaderLibraryFree();
 void ShaderLibraryRecompile(const std::string& ShaderName);
 void ShaderLibraryRecompileAll();
+gpu_shader *ShaderLibraryGet(const std::string& Name);
