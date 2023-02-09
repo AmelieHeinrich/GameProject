@@ -13,6 +13,7 @@
 #include "dx12_context.hpp"
 #include "dx12_image.hpp"
 #include "dx12_pipeline.hpp"
+#include "dx12_pipeline_profiler.hpp"
 #include "dx12_sampler.hpp"
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"
@@ -229,6 +230,49 @@ void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z)
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
 
     Private->List->Dispatch(X, Y, Z);
+}
+
+void GpuCommandBufferBeginPipelineStatistics(gpu_command_buffer *Command, gpu_pipeline_profiler *Profiler)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_pipeline_profiler *ProfilerPrivate = (dx12_pipeline_profiler*)Profiler->Private;
+
+    Private->List->BeginQuery(ProfilerPrivate->Heap, D3D12_QUERY_TYPE_PIPELINE_STATISTICS, 0);
+}
+
+void GpuCommandBufferEndPipelineStatistics(gpu_command_buffer *Command, gpu_pipeline_profiler *Profiler)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_pipeline_profiler *ProfilerPrivate = (dx12_pipeline_profiler*)Profiler->Private;
+    ID3D12Resource *TargetResource = (ID3D12Resource*)(((dx12_buffer*)ProfilerPrivate->Buffer.Reserved)->Resource);
+
+    Private->List->EndQuery(ProfilerPrivate->Heap, D3D12_QUERY_TYPE_PIPELINE_STATISTICS, 0);
+    
+    D3D12_RESOURCE_BARRIER Barrier = {};
+    Barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    Barrier.Transition.pResource = TargetResource;
+    Barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
+    Barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+    Barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+    Private->List->ResourceBarrier(1, &Barrier);
+
+    Private->List->ResolveQueryData(ProfilerPrivate->Heap, D3D12_QUERY_TYPE_PIPELINE_STATISTICS, 0, 1, TargetResource, 0);
+
+    Barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    Barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COMMON;
+
+    Private->List->ResourceBarrier(1, &Barrier);
+
+    D3D12_RANGE WriteRange;
+    WriteRange.Begin = 0;
+    WriteRange.End = sizeof(gpu_pipeline_statistics);
+    gpu_pipeline_statistics *Stats = &Profiler->Stats;
+    TargetResource->Map(0, &WriteRange, (void**)&Stats);
+
+    WriteRange.End = 0;
+
+    TargetResource->Unmap(0, &WriteRange);
 }
 
 void GpuCommandBufferImageBarrier(gpu_command_buffer *Command, gpu_image *Image, gpu_image_layout New)

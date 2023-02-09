@@ -10,6 +10,7 @@
 #include "gpu_buffer.hpp"
 #include "gpu_image.hpp"
 #include "gpu_pipeline.hpp"
+#include "gpu_pipeline_profiler.hpp"
 #include "gpu_sampler.hpp"
 
 enum class gpu_command_buffer_type
@@ -40,6 +41,8 @@ void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float
 void GpuCommandBufferDraw(gpu_command_buffer *Command, int VertexCount);
 void GpuCommandBufferDrawIndexed(gpu_command_buffer *Command, int IndexCount);
 void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z);
+void GpuCommandBufferBeginPipelineStatistics(gpu_command_buffer *Command, gpu_pipeline_profiler *Profiler);
+void GpuCommandBufferEndPipelineStatistics(gpu_command_buffer *Command, gpu_pipeline_profiler *Profiler);
 // TODO(amelie.h): Barrier buffer
 void GpuCommandBufferImageBarrier(gpu_command_buffer *Command, gpu_image *Image, gpu_image_layout New);
 void GpuCommandBufferBlit(gpu_command_buffer *Command, gpu_image *Source, gpu_image *Dest);
