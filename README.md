@@ -13,9 +13,7 @@ xmake run
 ## The plan
 
 - Refactor to D3D12
-    - Staging buffers/textures
-    - Loading textures
-    - Loading floating point textures
+    - Staging buffers
 - Start rendering
     - Render graph
     - Skybox renderer
