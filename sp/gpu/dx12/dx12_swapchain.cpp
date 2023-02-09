@@ -30,7 +30,7 @@ void Dx12SwapchainInit(dx12_swapchain *SwapChain)
     Desc.Height = DX12.Height;
 
     IDXGISwapChain1 *Temp;
-    HRESULT Result = DX12.Factory->CreateSwapChainForHwnd(DX12.CommandQueue, Win32.Window, &Desc, nullptr, nullptr, &Temp);
+    HRESULT Result = DX12.Factory->CreateSwapChainForHwnd(DX12.GraphicsQueue, Win32.Window, &Desc, nullptr, nullptr, &Temp);
     if (FAILED(Result))
         LogError("D3D12: Failed to create swap chain!");
     Temp->QueryInterface(IID_PPV_ARGS(&SwapChain->SwapChain));

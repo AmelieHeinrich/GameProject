@@ -24,10 +24,10 @@ void Dx12FenceFree(dx12_fence *Fence)
     SafeRelease(Fence->Fence);
 }
 
-uint64_t Dx12FenceSignal(dx12_fence *Fence)
+uint64_t Dx12FenceSignal(dx12_fence *Fence, ID3D12CommandQueue *Queue)
 {
     Fence->Value++;
-    DX12.CommandQueue->Signal(Fence->Fence, Fence->Value);
+    Queue->Signal(Fence->Fence, Fence->Value);
     return Fence->Value;
 }
 
@@ -43,7 +43,7 @@ void Dx12FenceSync(dx12_fence *Fence, uint64_t Value)
     }
 }
 
-void Dx12FenceFlush(dx12_fence *Fence)
+void Dx12FenceFlush(dx12_fence *Fence, ID3D12CommandQueue *Queue)
 {
-    Dx12FenceSync(Fence, Dx12FenceSignal(Fence));
+    Dx12FenceSync(Fence, Dx12FenceSignal(Fence, Queue));
 }

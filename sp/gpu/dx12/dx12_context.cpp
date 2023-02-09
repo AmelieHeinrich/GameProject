@@ -122,9 +122,20 @@ void GpuInit()
 
     D3D12_COMMAND_QUEUE_DESC QueueDesc = {};
     QueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-    Result = DX12.Device->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(&DX12.CommandQueue));
+
+    Result = DX12.Device->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(&DX12.GraphicsQueue));
     if (FAILED(Result))
-        LogError("D3D12: Failed to create command queue!");
+        LogError("D3D12: Failed to create graphics queue!");
+
+    QueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+    Result = DX12.Device->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(&DX12.ComputeQueue));
+    if (FAILED(Result))
+        LogError("D3D12: Failed to create compute queue!");
+
+    QueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COPY;
+    Result = DX12.Device->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(&DX12.UploadQueue));
+    if (FAILED(Result))
+        LogError("D3D12: Failed to create upload queue!");
 
     int BufferCount = EgcI32(EgcFile, "buffer_count");
 
@@ -135,6 +146,8 @@ void GpuInit()
         GpuCommandBufferInit(&DX12.CommandBuffers[FrameIndex], gpu_command_buffer_type::Graphics);
 
     Dx12FenceInit(&DX12.DeviceFence);
+    Dx12FenceInit(&DX12.ComputeFence);
+    Dx12FenceInit(&DX12.UploadFence);
 
     Dx12DescriptorHeapInit(&DX12.RTVHeap, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1024);
     Dx12DescriptorHeapInit(&DX12.DSVHeap, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1024);
@@ -144,9 +157,16 @@ void GpuInit()
     Dx12SwapchainInit(&DX12.SwapChain);
 }
 
+void GpuWait()
+{
+    Dx12FenceFlush(&DX12.DeviceFence, DX12.GraphicsQueue);
+    Dx12FenceFlush(&DX12.DeviceFence, DX12.ComputeQueue);
+    Dx12FenceFlush(&DX12.DeviceFence, DX12.UploadQueue);
+}
+
 void GpuExit()
 {
-    Dx12FenceFlush(&DX12.DeviceFence);
+    GpuWait();
 
     bool Debug = EgcB32(EgcFile, "debug_enabled");
     int BufferCount = EgcI32(EgcFile, "buffer_count");
@@ -158,8 +178,12 @@ void GpuExit()
     Dx12DescriptorHeapFree(&DX12.RTVHeap);
     for (int FrameIndex = 0; FrameIndex < BufferCount; FrameIndex++)
         GpuCommandBufferFree(&DX12.CommandBuffers[FrameIndex]);
+    Dx12FenceFree(&DX12.UploadFence);
+    Dx12FenceFree(&DX12.ComputeFence);
     Dx12FenceFree(&DX12.DeviceFence);
-    SafeRelease(DX12.CommandQueue);
+    SafeRelease(DX12.UploadQueue);
+    SafeRelease(DX12.ComputeQueue);
+    SafeRelease(DX12.GraphicsQueue);
     SafeRelease(DX12.Device);
     SafeRelease(DX12.Factory);
     SafeRelease(DX12.Adapter);
@@ -179,12 +203,7 @@ void GpuBeginFrame()
 
 void GpuEndFrame()
 {
-    DX12.FrameSync[DX12.FrameIndex] = Dx12FenceSignal(&DX12.DeviceFence);
-}
-
-void GpuWait()
-{
-    Dx12FenceFlush(&DX12.DeviceFence);
+    DX12.FrameSync[DX12.FrameIndex] = Dx12FenceSignal(&DX12.DeviceFence, DX12.GraphicsQueue);
 }
 
 void GpuResize(uint32_t Width, uint32_t Height)
@@ -192,7 +211,7 @@ void GpuResize(uint32_t Width, uint32_t Height)
     DX12.Width = Width;
     DX12.Height = Height;
 
-    Dx12FenceFlush(&DX12.DeviceFence);
+    GpuWait();
     Dx12SwapchainResize(&DX12.SwapChain, Width, Height);
 }
 

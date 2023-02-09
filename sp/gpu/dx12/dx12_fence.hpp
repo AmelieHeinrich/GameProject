@@ -18,7 +18,7 @@ struct dx12_fence
 
 void Dx12FenceInit(dx12_fence *Fence);
 void Dx12FenceFree(dx12_fence *Fence);
-uint64_t Dx12FenceSignal(dx12_fence *Fence);
+uint64_t Dx12FenceSignal(dx12_fence *Fence, ID3D12CommandQueue *Queue);
 bool Dx12FenceReached(dx12_fence *Fence, uint64_t Value);
 void Dx12FenceSync(dx12_fence *Fence, uint64_t Value);
-void Dx12FenceFlush(dx12_fence *Fence);
+void Dx12FenceFlush(dx12_fence *Fence, ID3D12CommandQueue *Queue);

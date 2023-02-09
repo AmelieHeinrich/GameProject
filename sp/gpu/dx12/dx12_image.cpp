@@ -64,7 +64,7 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
             break;
         case gpu_image_usage::ImageUsageShaderResource:
             Image->Layout = gpu_image_layout::ImageLayoutShaderResource;
-            Private->State = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+            Private->State = D3D12_RESOURCE_STATE_COPY_DEST;
             break;
         case gpu_image_usage::ImageUsageStorage:
             Image->Layout = gpu_image_layout::ImageLayoutStorage;
@@ -150,12 +150,10 @@ void GpuImageInitFromCPU(gpu_image *Image, cpu_image *CPU)
     GpuBufferUpload(&Temp, CPU->Data, CPU->Width * CPU->Height * SizeType * 4);
 
     gpu_command_buffer CommandBuffer;
-    GpuCommandBufferInit(&CommandBuffer, gpu_command_buffer_type::Graphics);
+    GpuCommandBufferInit(&CommandBuffer, gpu_command_buffer_type::Upload);
     GpuCommandBufferBegin(&CommandBuffer);
-    GpuCommandBufferImageBarrier(&CommandBuffer, Image, gpu_image_layout::ImageLayoutCopyDest);
     GpuCommandBufferBufferBarrier(&CommandBuffer, &Temp, gpu_buffer_layout::ImageLayoutCommon, gpu_buffer_layout::ImageLayoutCopySource);
     GpuCommandBufferCopyBufferToTexture(&CommandBuffer, &Temp, Image);
-    GpuCommandBufferImageBarrier(&CommandBuffer, Image, gpu_image_layout::ImageLayoutShaderResource);
     GpuCommandBufferEnd(&CommandBuffer);
     GpuCommandBufferFlush(&CommandBuffer);
     GpuCommandBufferFree(&CommandBuffer);

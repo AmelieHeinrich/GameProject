@@ -30,10 +30,16 @@ struct dx12_context
     IDXGIFactory3 *Factory;
     IDXGIAdapter1 *Adapter;
 
-    ID3D12CommandQueue* CommandQueue;
-    std::vector<gpu_command_buffer> CommandBuffers;
-
+    ID3D12CommandQueue* GraphicsQueue;
     dx12_fence DeviceFence;
+
+    ID3D12CommandQueue* ComputeQueue;
+    dx12_fence ComputeFence;
+
+    ID3D12CommandQueue* UploadQueue;
+    dx12_fence UploadFence;
+
+    std::vector<gpu_command_buffer> CommandBuffers;
 
     dx12_descriptor_heap RTVHeap;
     dx12_descriptor_heap DSVHeap;

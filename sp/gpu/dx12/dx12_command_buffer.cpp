@@ -373,8 +373,25 @@ void GpuCommandBufferFlush(gpu_command_buffer *Command)
 {
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
 
-    ID3D12CommandList* CommandLists[] = { Private->List };
-    DX12.CommandQueue->ExecuteCommandLists(1, CommandLists);
+    ID3D12CommandQueue* Queue = nullptr;
+    dx12_fence *Fence = nullptr;
+    switch (Command->Type)
+    {
+        case gpu_command_buffer_type::Graphics:
+            Queue = DX12.GraphicsQueue;
+            Fence = &DX12.DeviceFence;
+            break;
+        case gpu_command_buffer_type::Compute:
+            Queue = DX12.ComputeQueue;
+            Fence = &DX12.ComputeFence;
+            break;
+        case gpu_command_buffer_type::Upload:
+            Queue = DX12.UploadQueue;
+            Fence = &DX12.UploadFence;
+            break;
+    }
 
-    Dx12FenceFlush(&DX12.DeviceFence);
+    ID3D12CommandList* CommandLists[] = { Private->List };
+    Queue->ExecuteCommandLists(1, CommandLists);
+    Dx12FenceFlush(Fence, Queue);
 }
