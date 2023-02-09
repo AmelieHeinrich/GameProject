@@ -30,9 +30,9 @@ target("Game Project")
     set_languages("c11", "c++17")
     set_rundir(".")
     add_deps("ImGui", "dr_libs", "stb")
-    add_files("sp/*.cpp", "sp/cameras/*.cpp", "sp/gui/*.cpp", "sp/renderer/*.cpp", "sp/scene/*.cpp", "sp/systems/*.cpp")
-    add_headerfiles("sp/**.hpp")
-    add_includedirs("sp", "external", { public = true })
+    add_files("src/*.cpp", "src/cameras/*.cpp", "src/gui/*.cpp", "src/renderer/*.cpp", "src/scene/*.cpp", "src/systems/*.cpp")
+    add_headerfiles("src/**.hpp")
+    add_includedirs("src", "external", { public = true })
     add_linkdirs("bin/")
 
     if is_mode("debug") then
@@ -48,8 +48,8 @@ target("Game Project")
 
     if is_plat("windows") then
         add_syslinks("user32", "dsound", "gdi32", "kernel32", "d3d12", "d3dcompiler", "dxgi", "assimp-vc143-mtd")
-        add_files("sp/apu/dsound/*.cpp", "sp/gpu/dx12/*.cpp", "sp/gui/dx12/*.cpp", "sp/systems/windows/*.cpp", "sp/windows/*.cpp")
-        add_files("sp/main_win32.cpp")
+        add_files("src/apu/dsound/*.cpp", "src/gpu/dx12/*.cpp", "src/gui/dx12/*.cpp", "src/systems/windows/*.cpp", "src/windows/*.cpp")
+        add_files("src/main_win32.cpp")
     end
     -- TODO(amelie.h): MacOS
     -- TODO(amelie.h): Linux
