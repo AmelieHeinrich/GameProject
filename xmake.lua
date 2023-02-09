@@ -7,6 +7,12 @@
 
 add_rules("mode.debug", "mode.release")
 
+target("stb")
+    set_kind("static")
+    add_files("external/stb/stb.c")
+    add_headerfiles("external/stb/*.h")
+    add_includedirs("external/stb")
+
 target("dr_libs")
     set_kind("static")
     add_files("external/dr_libs/*.cpp")
@@ -23,7 +29,7 @@ target("ImGui")
 target("Game Project")
     set_languages("c11", "c++17")
     set_rundir(".")
-    add_deps("ImGui", "dr_libs")
+    add_deps("ImGui", "dr_libs", "stb")
     add_files("sp/*.cpp", "sp/cameras/*.cpp", "sp/gui/*.cpp", "sp/renderer/*.cpp", "sp/scene/*.cpp", "sp/systems/*.cpp")
     add_headerfiles("sp/**.hpp")
     add_includedirs("sp", "external", { public = true })

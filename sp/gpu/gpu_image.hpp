@@ -9,9 +9,12 @@
 
 #include <cstdint>
 
+#include "renderer/cpu_image.hpp"
+
 enum class gpu_image_format
 {
     RGBA8,
+    RGBA32Float,
     R32Depth
 };
 
@@ -26,6 +29,8 @@ enum class gpu_image_layout
     ImageLayoutCopyDest,
     ImageLayoutPresent
 };
+
+typedef gpu_image_layout gpu_buffer_layout;
 
 enum class gpu_image_usage
 {
@@ -46,4 +51,5 @@ struct gpu_image
 };
 
 void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_format Format, gpu_image_usage Usage);
+void GpuImageInitFromCPU(gpu_image *Image, cpu_image *CPU);
 void GpuImageFree(gpu_image *Image);

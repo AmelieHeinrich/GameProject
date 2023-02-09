@@ -15,6 +15,14 @@
 
 void ForwardPassInit(forward_pass *Pass)
 {
+    // Test
+    cpu_image CpuImage;
+    gpu_image GpuImage;
+    CpuImageLoad(&CpuImage, "assets/gfx/texture.jpg");
+    GpuImageInitFromCPU(&GpuImage, &CpuImage);
+    GpuImageFree(&GpuImage);
+    CpuImageFree(&CpuImage);
+
     hmm_v2 Dimensions = GpuGetDimensions();
 
     GpuImageInit(&Pass->RenderTarget, Dimensions.Width, Dimensions.Height, gpu_image_format::RGBA8, gpu_image_usage::ImageUsageRenderTarget);

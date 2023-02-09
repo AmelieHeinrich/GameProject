@@ -11,6 +11,7 @@
 #include "gpu/gpu_image.hpp"
 #include "gpu/gpu_shader.hpp"
 #include "gpu/gpu_pipeline.hpp"
+#include "cpu_image.hpp"
 
 #include "scene/scene.hpp"
 

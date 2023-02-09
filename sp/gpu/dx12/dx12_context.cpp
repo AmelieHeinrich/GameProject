@@ -121,6 +121,7 @@ void GpuInit()
     LogInfo("D3D12: Using GPU %s", DeviceName.c_str());
 
     D3D12_COMMAND_QUEUE_DESC QueueDesc = {};
+    QueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
     Result = DX12.Device->CreateCommandQueue(&QueueDesc, IID_PPV_ARGS(&DX12.CommandQueue));
     if (FAILED(Result))
         LogError("D3D12: Failed to create command queue!");

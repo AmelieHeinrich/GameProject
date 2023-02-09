@@ -43,9 +43,10 @@ void GpuCommandBufferDrawIndexed(gpu_command_buffer *Command, int IndexCount);
 void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z);
 void GpuCommandBufferBeginPipelineStatistics(gpu_command_buffer *Command, gpu_pipeline_profiler *Profiler);
 void GpuCommandBufferEndPipelineStatistics(gpu_command_buffer *Command, gpu_pipeline_profiler *Profiler);
-// TODO(amelie.h): Barrier buffer
+void GpuCommandBufferBufferBarrier(gpu_command_buffer *Command, gpu_buffer *Buffer, gpu_buffer_layout Old, gpu_buffer_layout New);
 void GpuCommandBufferImageBarrier(gpu_command_buffer *Command, gpu_image *Image, gpu_image_layout New);
 void GpuCommandBufferBlit(gpu_command_buffer *Command, gpu_image *Source, gpu_image *Dest);
+void GpuCommandBufferCopyBufferToTexture(gpu_command_buffer *Command, gpu_buffer *Source, gpu_image *Dest);
 void GpuCommandBufferBegin(gpu_command_buffer *Command);
 void GpuCommandBufferEnd(gpu_command_buffer *Command);
 void GpuCommandBufferFlush(gpu_command_buffer *Command);

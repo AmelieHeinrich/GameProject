@@ -7,7 +7,11 @@
 
 #include "dx12_image.hpp"
 
+#include <d3dx12/d3dx12.h>
+
 #include "dx12_context.hpp"
+#include "dx12_command_buffer.hpp"
+#include "gpu/gpu_command_buffer.hpp"
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"
 
@@ -17,6 +21,8 @@ DXGI_FORMAT GetDXGIFormat(gpu_image_format Format)
     {
         case gpu_image_format::RGBA8:
             return DXGI_FORMAT_R8G8B8A8_UNORM;
+        case gpu_image_format::RGBA32Float:
+            return DXGI_FORMAT_R32G32B32A32_FLOAT;
         case gpu_image_format::R32Depth:
             return DXGI_FORMAT_D32_FLOAT;
     }
@@ -115,7 +121,10 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
             D3D12_SHADER_RESOURCE_VIEW_DESC Desc = {};
             Desc.Format = ResourceDesc.Format;
             Desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+            Desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+            Desc.Texture2D.MipLevels = 1;
             DX12.Device->CreateShaderResourceView(Private->Resource, &Desc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
+            break;
         }
         case gpu_image_usage::ImageUsageStorage:
         {
@@ -128,6 +137,30 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
             break;
         }
     }
+}
+
+void GpuImageInitFromCPU(gpu_image *Image, cpu_image *CPU)
+{
+    GpuImageInit(Image, CPU->Width, CPU->Height, CPU->Float ? gpu_image_format::RGBA32Float : gpu_image_format::RGBA8, gpu_image_usage::ImageUsageShaderResource);
+    
+    float SizeType = CPU->Float ? 4 : 1;
+
+    gpu_buffer Temp;
+    GpuBufferInit(&Temp, CPU->Width * CPU->Height * SizeType * 4, 0, gpu_buffer_type::Vertex);
+    GpuBufferUpload(&Temp, CPU->Data, CPU->Width * CPU->Height * SizeType * 4);
+
+    gpu_command_buffer CommandBuffer;
+    GpuCommandBufferInit(&CommandBuffer, gpu_command_buffer_type::Graphics);
+    GpuCommandBufferBegin(&CommandBuffer);
+    GpuCommandBufferImageBarrier(&CommandBuffer, Image, gpu_image_layout::ImageLayoutCopyDest);
+    GpuCommandBufferBufferBarrier(&CommandBuffer, &Temp, gpu_buffer_layout::ImageLayoutCommon, gpu_buffer_layout::ImageLayoutCopySource);
+    GpuCommandBufferCopyBufferToTexture(&CommandBuffer, &Temp, Image);
+    GpuCommandBufferImageBarrier(&CommandBuffer, Image, gpu_image_layout::ImageLayoutShaderResource);
+    GpuCommandBufferEnd(&CommandBuffer);
+    GpuCommandBufferFlush(&CommandBuffer);
+    GpuCommandBufferFree(&CommandBuffer);
+
+    GpuBufferFree(&Temp);
 }
 
 void GpuImageFree(gpu_image *Image)

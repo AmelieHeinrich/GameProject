@@ -275,6 +275,21 @@ void GpuCommandBufferEndPipelineStatistics(gpu_command_buffer *Command, gpu_pipe
     TargetResource->Unmap(0, &WriteRange);
 }
 
+void GpuCommandBufferBufferBarrier(gpu_command_buffer *Command, gpu_buffer *Buffer, gpu_buffer_layout Old, gpu_buffer_layout New)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_buffer *BufferPrivate = (dx12_buffer*)Buffer->Reserved;
+
+    D3D12_RESOURCE_BARRIER Barrier = {};
+    Barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    Barrier.Transition.pResource = BufferPrivate->Resource;
+    Barrier.Transition.StateBefore = GetStateFromImageLayout(Old);
+    Barrier.Transition.StateAfter = GetStateFromImageLayout(New);
+    Barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+    Private->List->ResourceBarrier(1, &Barrier);
+}
+
 void GpuCommandBufferImageBarrier(gpu_command_buffer *Command, gpu_image *Image, gpu_image_layout New)
 {
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
@@ -310,6 +325,33 @@ void GpuCommandBufferBlit(gpu_command_buffer *Command, gpu_image *Source, gpu_im
     BlitDest.SubresourceIndex = 0;
 
     Private->List->CopyTextureRegion(&BlitDest, 0, 0, 0, &BlitSource, nullptr);
+}
+
+void GpuCommandBufferCopyBufferToTexture(gpu_command_buffer *Command, gpu_buffer *Source, gpu_image *Dest)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_buffer *SourcePrivate = (dx12_buffer*)Source->Reserved;
+    dx12_image *DestPrivate = (dx12_image*)Dest->Private;
+
+    float Multiplier = Dest->Format == gpu_image_format::RGBA32Float ? 4 : 1;
+
+    D3D12_TEXTURE_COPY_LOCATION CopySource = {};
+    CopySource.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+    CopySource.pResource = SourcePrivate->Resource;
+    CopySource.PlacedFootprint.Offset = 0;
+    CopySource.PlacedFootprint.Footprint.Format = GetDXGIFormat(Dest->Format);
+    CopySource.PlacedFootprint.Footprint.Width = Dest->Width;
+    CopySource.PlacedFootprint.Footprint.Height = Dest->Height;
+    CopySource.PlacedFootprint.Footprint.Depth = 1;
+    CopySource.PlacedFootprint.Footprint.RowPitch = Dest->Width * 4 * Multiplier;
+    CopySource.SubresourceIndex = 0;
+
+    D3D12_TEXTURE_COPY_LOCATION CopyDest = {};
+    CopyDest.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    CopyDest.pResource = DestPrivate->Resource;
+    CopyDest.SubresourceIndex = 0;
+
+    Private->List->CopyTextureRegion(&CopyDest, 0, 0, 0, &CopySource, nullptr);
 }
 
 void GpuCommandBufferBegin(gpu_command_buffer *Command)
