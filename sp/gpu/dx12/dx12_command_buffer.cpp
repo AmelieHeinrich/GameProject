@@ -136,6 +136,38 @@ void GpuCommandBufferBindConstantBuffer(gpu_command_buffer *Command, gpu_pipelin
     }
 }
 
+void GpuCommandBufferBindShaderResource(gpu_command_buffer *Command, gpu_pipeline_type Type, gpu_image *Image, int Offset)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_image *ImagePrivate = (dx12_image*)Image->Private;
+
+    switch (Type)
+    {
+        case gpu_pipeline_type::Graphics:
+            Private->List->SetGraphicsRootShaderResourceView(Offset, ImagePrivate->Resource->GetGPUVirtualAddress());
+            break;
+        case gpu_pipeline_type::Compute:
+            Private->List->SetComputeRootShaderResourceView(Offset, ImagePrivate->Resource->GetGPUVirtualAddress());
+            break;
+    }
+}
+
+void GpuCommandBufferBindStorageImage(gpu_command_buffer *Command, gpu_pipeline_type Type, gpu_image *Image, int Offset)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_image *ImagePrivate = (dx12_image*)Image->Private;
+
+    Private->List->SetComputeRootUnorderedAccessView(Offset, ImagePrivate->Resource->GetGPUVirtualAddress());
+}
+
+void GpuCommandBufferBindStorageBuffer(gpu_command_buffer *Command, gpu_pipeline_type Type, gpu_buffer *Buffer, int Offset)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_buffer *BufferPrivate = (dx12_buffer*)Buffer->Reserved;
+
+    Private->List->SetComputeRootUnorderedAccessView(Offset, BufferPrivate->Resource->GetGPUVirtualAddress());
+}
+
 void GpuCommandBufferBindSampler(gpu_command_buffer *Command, gpu_pipeline_type Type, gpu_sampler *Sampler, int Offset)
 {
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
