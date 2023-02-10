@@ -128,10 +128,10 @@ void GpuCommandBufferBindConstantBuffer(gpu_command_buffer *Command, gpu_pipelin
     switch (Type)
     {
         case gpu_pipeline_type::Graphics:
-            Private->List->SetGraphicsRootConstantBufferView(Offset, BufferPrivate->Resource->GetGPUVirtualAddress());
+            Private->List->SetGraphicsRootDescriptorTable(Offset, Dx12DescriptorHeapGPU(&DX12.CBVSRVUAVHeap, BufferPrivate->HeapIndex));
             break;
         case gpu_pipeline_type::Compute:
-            Private->List->SetComputeRootConstantBufferView(Offset, BufferPrivate->Resource->GetGPUVirtualAddress());
+            Private->List->SetComputeRootDescriptorTable(Offset, Dx12DescriptorHeapGPU(&DX12.CBVSRVUAVHeap, BufferPrivate->HeapIndex));
             break;
     }
 }

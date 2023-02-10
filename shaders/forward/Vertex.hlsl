@@ -25,7 +25,7 @@ struct SceneData
     row_major float4x4 Projection;
 };
 
-ConstantBuffer<SceneData> SceneBuffer : register(b0);
+ConstantBuffer<SceneData> SceneBuffer : register(b0, space0);
 
 VertexOut VSMain(VertexIn Input)
 {
