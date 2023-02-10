@@ -15,6 +15,7 @@
 
 #include <d3dcompiler.h>
 #include <algorithm>
+#include <array>
 
 D3D12_FILL_MODE GetDx12FillMode(fill_mode Mode)
 {
@@ -70,11 +71,18 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
 
     ID3D12ShaderReflection* VertexReflection = nullptr;
     D3D12_SHADER_DESC VertexDesc;
-    std::vector<D3D12_ROOT_PARAMETER> Parameters;
-    std::vector<D3D12_SHADER_INPUT_BIND_DESC> ShaderBinds;
+    
     std::vector<D3D12_INPUT_ELEMENT_DESC> InputElementDescs;
-    std::vector<D3D12_DESCRIPTOR_RANGE> Ranges;
     std::vector<std::string> InputElementSemanticNames;
+
+    std::array<D3D12_ROOT_PARAMETER, 64> Parameters;
+    int ParameterCount = 0;
+
+    std::array<D3D12_DESCRIPTOR_RANGE, 64> Ranges;
+    int RangeCount = 0;
+
+    std::array<D3D12_SHADER_INPUT_BIND_DESC, 64> ShaderBinds;
+    int BindCount = 0;
 
     ID3D12ShaderReflection* PixelReflection = nullptr;
     D3D12_SHADER_DESC PixelDesc;
@@ -93,28 +101,28 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
     {
         D3D12_SHADER_INPUT_BIND_DESC ShaderInputBindDesc = {};
         VertexReflection->GetResourceBindingDesc(BoundResourceIndex, &ShaderInputBindDesc);
-        ShaderBinds.push_back(ShaderInputBindDesc);
+        ShaderBinds[BindCount] = ShaderInputBindDesc;
+        BindCount++;
     }
 
     for (int BoundResourceIndex = 0; BoundResourceIndex < PixelDesc.BoundResources; BoundResourceIndex++)
     {
         D3D12_SHADER_INPUT_BIND_DESC ShaderInputBindDesc = {};
         PixelReflection->GetResourceBindingDesc(BoundResourceIndex, &ShaderInputBindDesc);
-        ShaderBinds.push_back(ShaderInputBindDesc);
+        ShaderBinds[BindCount] = ShaderInputBindDesc;
+        BindCount++;
     }
 
-    std::sort(ShaderBinds.begin(), ShaderBinds.end(), CompareShaderInput);
+    std::sort(ShaderBinds.begin(), ShaderBinds.begin() + BindCount, CompareShaderInput);
 
-    for (auto ShaderInputBindDesc : ShaderBinds)
+    for (int ShaderBindIndex = 0; ShaderBindIndex < BindCount; ShaderBindIndex++)
     {
-        PipelinePrivate->Bindings[ShaderInputBindDesc.Name] = static_cast<int>(Parameters.size());
+        auto ShaderInputBindDesc = ShaderBinds[ShaderBindIndex];
 
         D3D12_ROOT_PARAMETER RootParameter = {};
-        ZeroMemory(&RootParameter, sizeof(RootParameter));
         RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 
         D3D12_DESCRIPTOR_RANGE Range = {};
-        ZeroMemory(&Range, sizeof(Range));
         Range.NumDescriptors = 1;
         Range.BaseShaderRegister = ShaderInputBindDesc.BindPoint;
 
@@ -137,16 +145,19 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
                 continue;
         }
         
-        Ranges.push_back(Range);
+        Ranges[RangeCount] = Range;
 
-        RootParameter.DescriptorTable.pDescriptorRanges = &Ranges.back();
         RootParameter.DescriptorTable.NumDescriptorRanges = 1;
+        RootParameter.DescriptorTable.pDescriptorRanges = &Ranges[RangeCount];
         RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-        Parameters.push_back(RootParameter);
+        Parameters[ParameterCount] = RootParameter;
+
+        ParameterCount++;
+        RangeCount++;
     }
 
     D3D12_ROOT_SIGNATURE_DESC RootSignatureDesc = {};
-    RootSignatureDesc.NumParameters = Parameters.size();
+    RootSignatureDesc.NumParameters = ParameterCount;
     RootSignatureDesc.pParameters = Parameters.data();
     RootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
@@ -262,9 +273,15 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
 
     ID3D12ShaderReflection* ComputeReflection = nullptr;
     D3D12_SHADER_DESC ComputeDesc;
+
     std::vector<D3D12_ROOT_PARAMETER> Parameters;
+    int ParameterCount = 0;
+
     std::vector<D3D12_SHADER_INPUT_BIND_DESC> ShaderBinds;
+    int BindCount = 0;
+    
     std::vector<D3D12_DESCRIPTOR_RANGE> Ranges;
+    int RangeCount = 0;
 
     HRESULT Result = D3DReflect(ShaderPrivate->ComputeBlob->GetBufferPointer(), ShaderPrivate->ComputeBlob->GetBufferSize(), IID_PPV_ARGS(&ComputeReflection));
     if (FAILED(Result))
@@ -274,14 +291,15 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
     {
         D3D12_SHADER_INPUT_BIND_DESC ShaderInputBindDesc = {};
         ComputeReflection->GetResourceBindingDesc(BoundResourceIndex, &ShaderInputBindDesc);
-        ShaderBinds.push_back(ShaderInputBindDesc);
+        ShaderBinds[BindCount] = ShaderInputBindDesc;
+        BindCount++;
     }
 
-    std::sort(ShaderBinds.begin(), ShaderBinds.end(), CompareShaderInput);
+    std::sort(ShaderBinds.begin(), ShaderBinds.begin() + BindCount, CompareShaderInput);
 
-    for (auto ShaderInputBindDesc : ShaderBinds)
+    for (int ShaderBindIndex = 0; ShaderBindIndex < BindCount; ShaderBindIndex++)
     {
-        PipelinePrivate->Bindings[ShaderInputBindDesc.Name] = static_cast<int>(Parameters.size());
+        auto ShaderInputBindDesc = ShaderBinds[ShaderBindIndex];
 
         D3D12_ROOT_PARAMETER RootParameter = {};
         RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
@@ -309,12 +327,15 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
                 continue;
         }
         
-        Ranges.push_back(Range);
+        Ranges[RangeCount] = Range;
 
-        RootParameter.DescriptorTable.pDescriptorRanges = &Ranges.back();
         RootParameter.DescriptorTable.NumDescriptorRanges = 1;
+        RootParameter.DescriptorTable.pDescriptorRanges = &Ranges[RangeCount];
         RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-        Parameters.push_back(RootParameter);
+        Parameters[ParameterCount] = RootParameter;
+
+        ParameterCount++;
+        RangeCount++;
     }
 
     D3D12_ROOT_SIGNATURE_DESC RootSignatureDesc = {};
