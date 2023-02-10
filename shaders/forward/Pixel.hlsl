@@ -8,10 +8,14 @@
 struct FragmentIn
 {
     float4 Position : SV_POSITION;
-    float3 Color : COLOR;
+    float3 Normal : NORMAL;
+    float2 TextureCoords: TEXCOORD;
 };
+
+Texture2D Texture : register(t1);
+SamplerState Sampler : register(s2);
 
 float4 PSMain(FragmentIn Input) : SV_TARGET
 {
-    return float4(Input.Color, 1.0);
+    return Texture.Sample(Sampler, Input.TextureCoords);
 }

@@ -44,6 +44,7 @@ void GpuSamplerInit(gpu_sampler *Sampler, gpu_texture_address Address, gpu_textu
     Sampler->Private = new dx12_sampler;
     dx12_sampler *Private = (dx12_sampler*)Sampler->Private;
 
+    Private->Desc = {};
     Private->Desc.AddressU = Dx12AddressMode(Address);
     Private->Desc.AddressV = Private->Desc.AddressU;
     Private->Desc.AddressW = Private->Desc.AddressV;

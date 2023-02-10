@@ -9,6 +9,7 @@
 
 #include "gpu/gpu_buffer.hpp"
 #include "gpu/gpu_image.hpp"
+#include "gpu/gpu_sampler.hpp"
 #include "gpu/gpu_shader.hpp"
 #include "gpu/gpu_pipeline.hpp"
 #include "cpu_image.hpp"
@@ -22,7 +23,10 @@ struct forward_pass
 
     gpu_buffer CameraBuffer;
     gpu_pipeline Pipeline;
-    gpu_buffer TriangleBuffer;
+    gpu_buffer VertexBuffer;
+    gpu_buffer IndexBuffer;
+    gpu_image Texture;
+    gpu_sampler Sampler;
 };
 
 void ForwardPassInit(forward_pass *Pass);

@@ -15,13 +15,12 @@
 
 void ForwardPassInit(forward_pass *Pass)
 {
-    // Test
     cpu_image CpuImage;
-    gpu_image GpuImage;
     CpuImageLoad(&CpuImage, "assets/gfx/texture.jpg");
-    GpuImageInitFromCPU(&GpuImage, &CpuImage);
-    GpuImageFree(&GpuImage);
+    GpuImageInitFromCPU(&Pass->Texture, &CpuImage);
     CpuImageFree(&CpuImage);
+
+    GpuSamplerInit(&Pass->Sampler, gpu_texture_address::Wrap, gpu_texture_filter::Nearest);
 
     hmm_v2 Dimensions = GpuGetDimensions();
 
@@ -41,21 +40,32 @@ void ForwardPassInit(forward_pass *Pass)
     GpuPipelineCreateGraphics(&Pass->Pipeline);
     
     float Vertices[] = {
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+         0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+         0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f
     };
 
-    GpuBufferInit(&Pass->TriangleBuffer, sizeof(Vertices), sizeof(float) * 6, gpu_buffer_type::Vertex);
-    GpuBufferUpload(&Pass->TriangleBuffer, Vertices, sizeof(Vertices));
+    uint32_t Indices[] = {
+        0, 1, 3,
+        1, 2, 3  
+    };
+
+    GpuBufferInit(&Pass->VertexBuffer, sizeof(Vertices), sizeof(float) * 8, gpu_buffer_type::Vertex);
+    GpuBufferUpload(&Pass->VertexBuffer, Vertices, sizeof(Vertices));
+    GpuBufferInit(&Pass->IndexBuffer, sizeof(Indices), sizeof(uint32_t), gpu_buffer_type::Index);
+    GpuBufferUpload(&Pass->IndexBuffer, Indices, sizeof(Indices));
 
     GpuBufferInit(&Pass->CameraBuffer, 256, 0, gpu_buffer_type::Uniform);
 }
 
 void ForwardPassExit(forward_pass *Pass)
 {
+    GpuSamplerFree(&Pass->Sampler);
+    GpuImageFree(&Pass->Texture);
+    GpuBufferFree(&Pass->IndexBuffer);
     GpuBufferFree(&Pass->CameraBuffer);
-    GpuBufferFree(&Pass->TriangleBuffer);
+    GpuBufferFree(&Pass->VertexBuffer);
     GpuPipelineFree(&Pass->Pipeline);
     GpuImageFree(&Pass->DepthTarget);
     GpuImageFree(&Pass->RenderTarget);
@@ -76,9 +86,12 @@ void ForwardPassUpdate(forward_pass *Pass, camera_data *Camera)
     GpuCommandBufferClearColor(Buffer, &Pass->RenderTarget, 0.3f, 0.2f, 0.1f, 1.0f);
     GpuCommandBufferClearDepth(Buffer, &Pass->DepthTarget, 1.0f, 0.0f);
     GpuCommandBufferBindPipeline(Buffer, &Pass->Pipeline);
-    GpuCommandBufferBindBuffer(Buffer, &Pass->TriangleBuffer);
-    GpuCommandBufferBindConstantBuffer(Buffer, gpu_pipeline_type::Graphics, &Pass->CameraBuffer, GpuPipelineGetDescriptor(&Pass->Pipeline, "SceneBuffer"));
-    GpuCommandBufferDraw(Buffer, 3);
+    GpuCommandBufferBindBuffer(Buffer, &Pass->VertexBuffer);
+    GpuCommandBufferBindBuffer(Buffer, &Pass->IndexBuffer);
+    GpuCommandBufferBindConstantBuffer(Buffer, gpu_pipeline_type::Graphics, &Pass->CameraBuffer, 0);
+    GpuCommandBufferBindShaderResource(Buffer, gpu_pipeline_type::Graphics, &Pass->Texture, 1);
+    GpuCommandBufferBindSampler(Buffer, gpu_pipeline_type::Graphics, &Pass->Sampler, 2);
+    GpuCommandBufferDrawIndexed(Buffer, 6);
     GpuCommandBufferEnd(Buffer);
     GpuCommandBufferFlush(Buffer);
 }

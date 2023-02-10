@@ -8,13 +8,15 @@
 struct VertexIn
 {
     float3 Position : POSITION;
-    float3 Color : COLOR;
+    float3 Normal : NORMAL;
+    float2 TextureCoords: TEXCOORD;
 };
 
 struct VertexOut
 {
     float4 Position : SV_POSITION;
-    float3 Color : COLOR;
+    float3 Normal : NORMAL;
+    float2 TextureCoords: TEXCOORD;
 };
 
 struct SceneData
@@ -30,6 +32,7 @@ VertexOut VSMain(VertexIn Input)
     VertexOut Output = (VertexOut)0;
     Output.Position = mul(float4(Input.Position, 1.0f), SceneBuffer.View);
     Output.Position = mul(Output.Position, SceneBuffer.Projection);
-    Output.Color = Input.Color;
+    Output.Normal = Input.Normal;
+    Output.TextureCoords = Input.TextureCoords;
     return Output;
 }

@@ -108,13 +108,52 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
         PixelReflection->GetResourceBindingDesc(BoundResourceIndex, &ShaderInputBindDesc);
         PipelinePrivate->Bindings[ShaderInputBindDesc.Name] = static_cast<int>(Parameters.size());
 
-        D3D12_ROOT_PARAMETER RootParameter = {};
-        RootParameter.ParameterType = ShaderInputBindDesc.Type == D3D_SIT_CBUFFER ? D3D12_ROOT_PARAMETER_TYPE_CBV : D3D12_ROOT_PARAMETER_TYPE_SRV;
-        RootParameter.Descriptor.ShaderRegister = ShaderInputBindDesc.BindPoint;
-        RootParameter.Descriptor.RegisterSpace = ShaderInputBindDesc.Space;
-        RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        if (ShaderInputBindDesc.Type == D3D_SIT_CBUFFER)
+        {
+            D3D12_ROOT_PARAMETER RootParameter = {};
+            RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+            RootParameter.Descriptor.ShaderRegister = ShaderInputBindDesc.BindPoint;
+            RootParameter.Descriptor.RegisterSpace = ShaderInputBindDesc.Space;
+            RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
 
-        Parameters.push_back(RootParameter);
+            Parameters.push_back(RootParameter);
+            continue;
+        }
+        else
+        {
+            D3D12_ROOT_PARAMETER RootParameter = {};
+            RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+            RootParameter.Descriptor.ShaderRegister = ShaderInputBindDesc.BindPoint;
+            RootParameter.Descriptor.RegisterSpace = ShaderInputBindDesc.Space;
+
+            D3D12_DESCRIPTOR_RANGE Range = {};
+            Range.NumDescriptors = 1;
+            Range.RegisterSpace = ShaderInputBindDesc.BindPoint;
+            Range.BaseShaderRegister = ShaderInputBindDesc.Space;
+
+            switch (ShaderInputBindDesc.Type)
+            {
+                case D3D_SIT_SAMPLER:
+                    Range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
+                    break;
+                case D3D_SIT_TEXTURE:
+                    Range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+                    break;
+                case D3D_SIT_UAV_RWTYPED:
+                    Range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+                    break;
+                default:
+                    LogWarn("D3D12: Unsupported shader resource!");
+                    continue;
+            }
+            
+            RootParameter.DescriptorTable.pDescriptorRanges = &Range;
+            RootParameter.DescriptorTable.NumDescriptorRanges = 1;
+            RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+            
+            Parameters.push_back(RootParameter);
+            continue;
+        }
     }
 
     D3D12_ROOT_SIGNATURE_DESC RootSignatureDesc = {};
@@ -271,7 +310,7 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
             RootParameter.DescriptorTable.pDescriptorRanges = &Range;
             RootParameter.DescriptorTable.NumDescriptorRanges = 1;
         }
-        RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+        RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
         Parameters.push_back(RootParameter);
     }

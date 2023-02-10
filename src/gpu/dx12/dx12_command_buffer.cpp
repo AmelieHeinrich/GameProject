@@ -144,10 +144,10 @@ void GpuCommandBufferBindShaderResource(gpu_command_buffer *Command, gpu_pipelin
     switch (Type)
     {
         case gpu_pipeline_type::Graphics:
-            Private->List->SetGraphicsRootShaderResourceView(Offset, ImagePrivate->Resource->GetGPUVirtualAddress());
+            Private->List->SetGraphicsRootDescriptorTable(Offset, Dx12DescriptorHeapGPU(&DX12.CBVSRVUAVHeap, ImagePrivate->SRV_UAV));
             break;
         case gpu_pipeline_type::Compute:
-            Private->List->SetComputeRootShaderResourceView(Offset, ImagePrivate->Resource->GetGPUVirtualAddress());
+            Private->List->SetComputeRootDescriptorTable(Offset, Dx12DescriptorHeapGPU(&DX12.CBVSRVUAVHeap, ImagePrivate->SRV_UAV));
             break;
     }
 }
@@ -157,7 +157,7 @@ void GpuCommandBufferBindStorageImage(gpu_command_buffer *Command, gpu_pipeline_
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
     dx12_image *ImagePrivate = (dx12_image*)Image->Private;
 
-    Private->List->SetComputeRootUnorderedAccessView(Offset, ImagePrivate->Resource->GetGPUVirtualAddress());
+    Private->List->SetComputeRootDescriptorTable(Offset, Dx12DescriptorHeapGPU(&DX12.CBVSRVUAVHeap, ImagePrivate->SRV_UAV));
 }
 
 void GpuCommandBufferBindStorageBuffer(gpu_command_buffer *Command, gpu_pipeline_type Type, gpu_buffer *Buffer, int Offset)
@@ -165,7 +165,7 @@ void GpuCommandBufferBindStorageBuffer(gpu_command_buffer *Command, gpu_pipeline
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
     dx12_buffer *BufferPrivate = (dx12_buffer*)Buffer->Reserved;
 
-    Private->List->SetComputeRootUnorderedAccessView(Offset, BufferPrivate->Resource->GetGPUVirtualAddress());
+    Private->List->SetComputeRootDescriptorTable(Offset, Dx12DescriptorHeapGPU(&DX12.CBVSRVUAVHeap, BufferPrivate->HeapIndex));
 }
 
 void GpuCommandBufferBindSampler(gpu_command_buffer *Command, gpu_pipeline_type Type, gpu_sampler *Sampler, int Offset)
@@ -392,6 +392,12 @@ void GpuCommandBufferBegin(gpu_command_buffer *Command)
 
     Private->Allocator->Reset();
     Private->List->Reset(Private->Allocator, nullptr);
+
+    if (Command->Type != gpu_command_buffer_type::Upload)
+    {
+        ID3D12DescriptorHeap* Heaps[] = { DX12.CBVSRVUAVHeap.Heap, DX12.SamplerHeap.Heap };
+        Private->List->SetDescriptorHeaps(2, Heaps);
+    }
 }
 
 void GpuCommandBufferEnd(gpu_command_buffer *Command)
