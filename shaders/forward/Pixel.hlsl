@@ -12,8 +12,8 @@ struct FragmentIn
     float2 TextureCoords: TEXCOORD;
 };
 
-Texture2D Texture : register(t1, space0);
-SamplerState Sampler : register(s2, space0);
+Texture2D Texture : register(t1);
+SamplerState Sampler : register(s2);
 
 float4 PSMain(FragmentIn Input) : SV_TARGET
 {

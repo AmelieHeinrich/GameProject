@@ -15,11 +15,13 @@ void CpuImageLoad(cpu_image* Image, const std::string& Path)
     std::string Extension = Path.substr(Path.find_last_of(".") + 1);
     if (Extension != "hdr")
     {
+        stbi_set_flip_vertically_on_load(true);
         Image->Data = stbi_load(Path.c_str(), &Image->Width, &Image->Height, &Image->Channels, STBI_rgb_alpha);
         Image->Float = false;
     }
     else
     {
+        stbi_set_flip_vertically_on_load(false);
         Image->Data = stbi_loadf(Path.c_str(), &Image->Width, &Image->Height, &Image->Channels, STBI_rgb_alpha);
         Image->Float = true;
     }

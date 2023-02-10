@@ -73,6 +73,7 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
     std::vector<D3D12_ROOT_PARAMETER> Parameters;
     std::vector<D3D12_SHADER_INPUT_BIND_DESC> ShaderBinds;
     std::vector<D3D12_INPUT_ELEMENT_DESC> InputElementDescs;
+    std::vector<D3D12_DESCRIPTOR_RANGE> Ranges;
     std::vector<std::string> InputElementSemanticNames;
 
     ID3D12ShaderReflection* PixelReflection = nullptr;
@@ -109,9 +110,11 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
         PipelinePrivate->Bindings[ShaderInputBindDesc.Name] = static_cast<int>(Parameters.size());
 
         D3D12_ROOT_PARAMETER RootParameter = {};
+        ZeroMemory(&RootParameter, sizeof(RootParameter));
         RootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 
         D3D12_DESCRIPTOR_RANGE Range = {};
+        ZeroMemory(&Range, sizeof(Range));
         Range.NumDescriptors = 1;
         Range.BaseShaderRegister = ShaderInputBindDesc.BindPoint;
 
@@ -134,7 +137,9 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
                 continue;
         }
         
-        RootParameter.DescriptorTable.pDescriptorRanges = &Range;
+        Ranges.push_back(Range);
+
+        RootParameter.DescriptorTable.pDescriptorRanges = &Ranges.back();
         RootParameter.DescriptorTable.NumDescriptorRanges = 1;
         RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
         Parameters.push_back(RootParameter);
@@ -259,6 +264,7 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
     D3D12_SHADER_DESC ComputeDesc;
     std::vector<D3D12_ROOT_PARAMETER> Parameters;
     std::vector<D3D12_SHADER_INPUT_BIND_DESC> ShaderBinds;
+    std::vector<D3D12_DESCRIPTOR_RANGE> Ranges;
 
     HRESULT Result = D3DReflect(ShaderPrivate->ComputeBlob->GetBufferPointer(), ShaderPrivate->ComputeBlob->GetBufferSize(), IID_PPV_ARGS(&ComputeReflection));
     if (FAILED(Result))
@@ -303,7 +309,9 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
                 continue;
         }
         
-        RootParameter.DescriptorTable.pDescriptorRanges = &Range;
+        Ranges.push_back(Range);
+
+        RootParameter.DescriptorTable.pDescriptorRanges = &Ranges.back();
         RootParameter.DescriptorTable.NumDescriptorRanges = 1;
         RootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
         Parameters.push_back(RootParameter);
