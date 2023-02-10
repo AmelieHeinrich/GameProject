@@ -20,4 +20,5 @@ struct cpu_image
 };
 
 void CpuImageLoad(cpu_image* Image, const std::string& Path);
+void CpuImageInitColor(cpu_image *Image, uint32_t Width, uint32_t Height, uint32_t Color);
 void CpuImageFree(cpu_image *Image);

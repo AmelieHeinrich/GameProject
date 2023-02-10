@@ -27,6 +27,15 @@ void CpuImageLoad(cpu_image* Image, const std::string& Path)
         LogError("CpuImage: Failed to load image at path %s", Path.c_str());
 }
 
+void CpuImageInitColor(cpu_image *Image, uint32_t Width, uint32_t Height, uint32_t Color)
+{
+    Image->Width = Width;
+    Image->Height = Height;
+    Image->Channels = 4;
+    Image->Data = new char[Width * Height];
+    memset(Image->Data, Color, Width * Height);
+}
+
 void CpuImageFree(cpu_image *Image)
 {
     stbi_image_free(Image->Data);
