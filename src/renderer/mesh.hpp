@@ -12,6 +12,7 @@
 
 #include "math_types.hpp"
 #include "gpu/gpu_buffer.hpp"
+#include "gpu/gpu_image.hpp"
 
 struct mesh_vertex
 {
@@ -26,6 +27,8 @@ struct mesh
     gpu_buffer IndexBuffer;
     int VertexCount;
     int IndexCount;
+
+    gpu_image Albedo;
 };
 
 struct loaded_model

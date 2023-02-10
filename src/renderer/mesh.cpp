@@ -63,7 +63,18 @@ mesh ProcessMesh(loaded_model *Model, aiMesh *Mesh, const aiScene *Scene)
     GpuBufferInit(&Out.IndexBuffer, Indices.size() * sizeof(uint32_t), sizeof(uint32_t), gpu_buffer_type::Index);
     GpuBufferUpload(&Out.IndexBuffer, Indices.data(), Indices.size() * sizeof(uint32_t));
 
-    // TODO(amelie.h): Texture loading
+    aiMaterial *Material = Scene->mMaterials[Mesh->mMaterialIndex];
+    aiString String;
+    Material->GetTexture(aiTextureType_DIFFUSE, 0, &String);
+    if (String.length)
+    {
+        std::string TexturePath = Model->WorkingDirectory + '/' + String.C_Str();
+        
+        cpu_image Image;
+        CpuImageLoad(&Image, TexturePath);
+        GpuImageInitFromCPU(&Out.Albedo, &Image);
+        CpuImageFree(&Image);
+    }
 
     return Out;
 }
@@ -97,6 +108,7 @@ void ModelFree(loaded_model *Model)
 {
     for (auto Mesh : Model->Meshes)
     {
+        GpuImageFree(&Mesh.Albedo);
         GpuBufferFree(&Mesh.VertexBuffer);
         GpuBufferFree(&Mesh.IndexBuffer);
     }
