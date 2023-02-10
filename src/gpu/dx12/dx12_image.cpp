@@ -139,6 +139,88 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
     }
 }
 
+void GpuImageInitCubeMap(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_format Format, gpu_image_usage Usage)
+{
+    if (Usage == gpu_image_usage::ImageUsageRenderTarget || Usage == gpu_image_usage::ImageUsageDepthTarget) 
+    {
+        LogError("D3D12: Cube map cannot be a render target or depth target!");
+        return;
+    }
+
+    Image->Width = Width;
+    Image->Height = Height;
+    Image->Format = Format;
+    Image->Usage = Usage;
+    Image->Private = new dx12_image;
+    dx12_image *Private = (dx12_image*)Image->Private;
+
+    switch (Usage)
+    {
+        case gpu_image_usage::ImageUsageRenderTarget:
+            Image->Layout = gpu_image_layout::ImageLayoutRenderTarget;
+            Private->State = D3D12_RESOURCE_STATE_RENDER_TARGET;
+            break;
+        case gpu_image_usage::ImageUsageDepthTarget:
+            Image->Layout = gpu_image_layout::ImageLayoutDepth;
+            Private->State = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+            break;
+        case gpu_image_usage::ImageUsageShaderResource:
+            Image->Layout = gpu_image_layout::ImageLayoutShaderResource;
+            Private->State = D3D12_RESOURCE_STATE_COPY_DEST;
+            break;
+        case gpu_image_usage::ImageUsageStorage:
+            Image->Layout = gpu_image_layout::ImageLayoutStorage;
+            Private->State = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+            break;
+    }
+
+    D3D12_HEAP_PROPERTIES HeapProperties = {};
+    HeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    D3D12_RESOURCE_DESC ResourceDesc = {};
+    ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    ResourceDesc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
+    ResourceDesc.Width = Width;
+    ResourceDesc.Height = Height;
+    ResourceDesc.DepthOrArraySize = 6;
+    ResourceDesc.MipLevels = 1;
+    ResourceDesc.Format = GetDXGIFormat(Format);
+    ResourceDesc.SampleDesc.Count = 1;
+    ResourceDesc.SampleDesc.Quality = 0;
+    ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    ResourceDesc.Flags = GetResourceFlag(Usage);
+
+    HRESULT Result = DX12.Device->CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc, Private->State, nullptr, IID_PPV_ARGS(&Private->Resource));
+    if (FAILED(Result))
+        LogError("D3D12: Failed to create GPU image!");
+
+    switch (Usage)
+    {
+        case gpu_image_usage::ImageUsageShaderResource:
+        {
+            Private->SRV_UAV = Dx12DescriptorHeapAlloc(&DX12.CBVSRVUAVHeap);
+
+            D3D12_SHADER_RESOURCE_VIEW_DESC Desc = {};
+            Desc.Format = ResourceDesc.Format;
+            Desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+            Desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+            Desc.Texture2D.MipLevels = 1;
+            DX12.Device->CreateShaderResourceView(Private->Resource, &Desc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
+            break;
+        }
+        case gpu_image_usage::ImageUsageStorage:
+        {
+            Private->SRV_UAV = Dx12DescriptorHeapAlloc(&DX12.CBVSRVUAVHeap);
+
+            D3D12_UNORDERED_ACCESS_VIEW_DESC Desc = {};
+            Desc.Format = ResourceDesc.Format;
+            Desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+            DX12.Device->CreateUnorderedAccessView(Private->Resource, nullptr, &Desc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
+            break;
+        }
+    }
+}
+
 void GpuImageInitFromCPU(gpu_image *Image, cpu_image *CPU)
 {
     GpuImageInit(Image, CPU->Width, CPU->Height, CPU->Float ? gpu_image_format::RGBA32Float : gpu_image_format::RGBA8, gpu_image_usage::ImageUsageShaderResource);
