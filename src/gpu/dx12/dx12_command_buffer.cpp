@@ -479,11 +479,12 @@ void GpuCommandBufferScreenshot(gpu_command_buffer *Command, gpu_image *Image, g
 
     auto OldState = Image->Layout;
 
+    GpuCommandBufferBegin(Command);
     GpuCommandBufferImageBarrier(Command, Image, gpu_image_layout::ImageLayoutCopySource);
     GpuCommandBufferCopyTextureToBuffer(Command, Image, Temporary);
     GpuCommandBufferImageBarrier(Command, Image, OldState);
-    
-    Dx12FenceFlush(&DX12.DeviceFence, DX12.GraphicsQueue);
+    GpuCommandBufferEnd(Command);
+    GpuCommandBufferFlush(Command);
 
     D3D12_RANGE Range = {};
     Range.Begin = 0;

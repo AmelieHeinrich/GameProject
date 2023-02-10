@@ -21,25 +21,9 @@ struct renderer_data
 renderer_data Renderer;
 
 bool RendererOnKeyPressed(event_type Type, void *Sender, void *Listener, event_data Data)
-{
-    gpu_image *Image = GpuGetSwapChainImage();
-    
+{   
     if (Data.data.u32[0] == (uint32_t)keyboard_key::F2)
-    {
-        gpu_buffer Temporary;
-        GpuBufferInitForCopy(&Temporary, Image->Width * Image->Height * 4);
-
-        gpu_command_buffer Buffer;
-        GpuCommandBufferInit(&Buffer, gpu_command_buffer_type::Graphics);
-        GpuCommandBufferBegin(&Buffer);
-        GpuCommandBufferScreenshot(&Buffer, Image, &Temporary);
-        GpuCommandBufferEnd(&Buffer);
-        GpuCommandBufferFlush(&Buffer);
-        GpuCommandBufferFree(&Buffer);
-
-        GpuBufferFree(&Temporary);
-    }
-
+        RendererScreenshot();
     return false;
 }
 
@@ -117,4 +101,21 @@ void RendererResize(uint32_t Width, uint32_t Height)
 {
     GpuResize(Width, Height);
     ForwardPassResize(&Renderer.Forward, Width, Height);
+}
+
+void RendererScreenshot()
+{
+    GpuWait();
+
+    gpu_image *Image = GpuGetSwapChainImage();
+
+    gpu_buffer Temporary;
+    GpuBufferInitForCopy(&Temporary, Image->Width * Image->Height * 4);
+
+    gpu_command_buffer Buffer;
+    GpuCommandBufferInit(&Buffer, gpu_command_buffer_type::Graphics);
+    GpuCommandBufferScreenshot(&Buffer, Image, &Temporary);
+    GpuCommandBufferFree(&Buffer);
+
+    GpuBufferFree(&Temporary);
 }

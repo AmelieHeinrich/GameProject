@@ -9,6 +9,7 @@
 
 #include "systems/shader_system.hpp"
 #include "game_data.hpp"
+#include "renderer/renderer.hpp"
 
 #include <stdio.h>
 #include <stdarg.h>
