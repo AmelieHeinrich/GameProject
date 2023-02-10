@@ -194,31 +194,19 @@ void GpuImageInitCubeMap(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_
     if (FAILED(Result))
         LogError("D3D12: Failed to create GPU image!");
 
-    switch (Usage)
-    {
-        case gpu_image_usage::ImageUsageShaderResource:
-        {
-            Private->SRV_UAV = Dx12DescriptorHeapAlloc(&DX12.CBVSRVUAVHeap);
+    Private->SRV_UAV = Dx12DescriptorHeapAlloc(&DX12.CBVSRVUAVHeap);
 
-            D3D12_SHADER_RESOURCE_VIEW_DESC Desc = {};
-            Desc.Format = ResourceDesc.Format;
-            Desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-            Desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-            Desc.Texture2D.MipLevels = 1;
-            DX12.Device->CreateShaderResourceView(Private->Resource, &Desc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
-            break;
-        }
-        case gpu_image_usage::ImageUsageStorage:
-        {
-            Private->SRV_UAV = Dx12DescriptorHeapAlloc(&DX12.CBVSRVUAVHeap);
+    D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+    SRVDesc.Format = ResourceDesc.Format;
+    SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+    SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    SRVDesc.Texture2D.MipLevels = 1;
+    DX12.Device->CreateShaderResourceView(Private->Resource, &SRVDesc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
 
-            D3D12_UNORDERED_ACCESS_VIEW_DESC Desc = {};
-            Desc.Format = ResourceDesc.Format;
-            Desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
-            DX12.Device->CreateUnorderedAccessView(Private->Resource, nullptr, &Desc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
-            break;
-        }
-    }
+    D3D12_UNORDERED_ACCESS_VIEW_DESC UAVDesc = {};
+    UAVDesc.Format = ResourceDesc.Format;
+    UAVDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+    DX12.Device->CreateUnorderedAccessView(Private->Resource, nullptr, &UAVDesc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
 }
 
 void GpuImageInitFromCPU(gpu_image *Image, cpu_image *CPU)

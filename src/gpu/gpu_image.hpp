@@ -51,6 +51,6 @@ struct gpu_image
 };
 
 void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_format Format, gpu_image_usage Usage);
-void GpuImageInitCubeMap(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_format Format, gpu_image_usage Usage);
+void GpuImageInitCubeMap(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_format Format);
 void GpuImageInitFromCPU(gpu_image *Image, cpu_image *CPU);
 void GpuImageFree(gpu_image *Image);
