@@ -11,6 +11,8 @@
 #include "systems/log_system.hpp"
 #include "windows/windows_data.hpp"
 
+#include <exception>
+
 void Dx12FenceInit(dx12_fence *Fence)
 {
     Fence->Value = 0;
@@ -46,4 +48,19 @@ void Dx12FenceSync(dx12_fence *Fence, uint64_t Value)
 void Dx12FenceFlush(dx12_fence *Fence, ID3D12CommandQueue *Queue)
 {
     Dx12FenceSync(Fence, Dx12FenceSignal(Fence, Queue));
+}
+
+void Dx12FenceWait(dx12_fence *Fence, uint64_t TargetValue, uint32_t Timeout)
+{
+    if (Fence->Fence->GetCompletedValue() < TargetValue)
+    {
+        HANDLE Event = CreateEvent(nullptr, false, false, nullptr);
+        Fence->Fence->SetEventOnCompletion(TargetValue, Event);
+        if (!Event)
+        {
+            LogError("D3D12: fence timeout!");
+            throw std::exception();
+        }
+        WaitForSingleObject(Event, Timeout);
+    }
 }

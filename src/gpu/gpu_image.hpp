@@ -34,6 +34,7 @@ typedef gpu_image_layout gpu_buffer_layout;
 
 enum class gpu_image_usage
 {
+    ImageUsageCopy,
     ImageUsageRenderTarget,
     ImageUsageDepthTarget,
     ImageUsageStorage,
@@ -51,6 +52,7 @@ struct gpu_image
 };
 
 void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_format Format, gpu_image_usage Usage);
+void GpuImageInitCopy(gpu_image *Image, uint32_t Width, uint32_t Height);
 void GpuImageInitCubeMap(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_format Format);
 void GpuImageInitFromCPU(gpu_image *Image, cpu_image *CPU);
 void GpuImageFree(gpu_image *Image);

@@ -8,6 +8,10 @@
 #include "dx12_command_buffer.hpp"
 
 #include <d3d12.h>
+#include <time.h>
+#include <stb/stb_image_write.h>
+#include <sstream>
+#include <algorithm>
 
 #include "dx12_buffer.hpp"
 #include "dx12_context.hpp"
@@ -386,6 +390,31 @@ void GpuCommandBufferCopyBufferToTexture(gpu_command_buffer *Command, gpu_buffer
     Private->List->CopyTextureRegion(&CopyDest, 0, 0, 0, &CopySource, nullptr);
 }
 
+void GpuCommandBufferCopyTextureToBuffer(gpu_command_buffer *Command, gpu_image *Source, gpu_buffer *Dest)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_buffer *DestPrivate = (dx12_buffer*)Dest->Reserved;
+    dx12_image *SourcePrivate = (dx12_image*)Source->Private;
+
+    D3D12_TEXTURE_COPY_LOCATION CopySource = {};
+    CopySource.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    CopySource.pResource = SourcePrivate->Resource;
+    CopySource.SubresourceIndex = 0;
+
+    D3D12_TEXTURE_COPY_LOCATION CopyDest = {};
+    CopyDest.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+    CopyDest.pResource = DestPrivate->Resource;
+    CopyDest.PlacedFootprint.Offset = 0;
+    CopyDest.PlacedFootprint.Footprint.Format = GetDXGIFormat(Source->Format);
+    CopyDest.PlacedFootprint.Footprint.Width = Source->Width;
+    CopyDest.PlacedFootprint.Footprint.Height = Source->Height;
+    CopyDest.PlacedFootprint.Footprint.Depth = 1;
+    CopyDest.PlacedFootprint.Footprint.RowPitch = Source->Width * 4;
+    CopyDest.SubresourceIndex = 0;
+
+    Private->List->CopyTextureRegion(&CopyDest, 0, 0, 0, &CopySource, nullptr);
+}
+
 void GpuCommandBufferBegin(gpu_command_buffer *Command)
 {
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
@@ -432,4 +461,41 @@ void GpuCommandBufferFlush(gpu_command_buffer *Command)
     ID3D12CommandList* CommandLists[] = { Private->List };
     Queue->ExecuteCommandLists(1, CommandLists);
     Dx12FenceFlush(Fence, Queue);
+}
+
+void GpuCommandBufferScreenshot(gpu_command_buffer *Command, gpu_image *Image, gpu_buffer *Temporary)
+{
+    std::stringstream Stream;
+    time_t RawTime;
+    time(&RawTime);
+    tm *TimeInfo = localtime(&RawTime);
+    Stream << "screenshots/" << "Screenshot " << asctime(TimeInfo);
+    std::string String = Stream.str();
+    std::replace(String.begin(), String.end(), ':', '_');
+    String.replace(String.size() - 1, 4, ".png");
+
+    uint8_t *Result = new uint8_t[Image->Width * Image->Height * 4];
+    memset(Result, 0xffffffff, Image->Width * Image->Height * 4);
+
+    auto OldState = Image->Layout;
+
+    GpuCommandBufferImageBarrier(Command, Image, gpu_image_layout::ImageLayoutCopySource);
+    GpuCommandBufferCopyTextureToBuffer(Command, Image, Temporary);
+    GpuCommandBufferImageBarrier(Command, Image, OldState);
+    
+    Dx12FenceFlush(&DX12.DeviceFence, DX12.GraphicsQueue);
+
+    D3D12_RANGE Range = {};
+    Range.Begin = 0;
+    Range.End = Image->Width * Image->Height * 4;
+
+    dx12_buffer *Private = (dx12_buffer*)Temporary->Reserved;
+    void *Pointer;
+    Private->Resource->Map(0, &Range, &Pointer);
+    memcpy(Result, Pointer, Image->Width * Image->Height * 4);
+    Range.End = 0;
+    Private->Resource->Unmap(0, &Range);
+
+    stbi_write_png(String.c_str(), Image->Width, Image->Height, 4, Result, Image->Width * 4);
+    LogInfo("Saved screenshot at path %s", String.c_str());
 }

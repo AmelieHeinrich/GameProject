@@ -7,8 +7,6 @@
 
 #include "dx12_image.hpp"
 
-#include <d3dx12/d3dx12.h>
-
 #include "dx12_context.hpp"
 #include "dx12_command_buffer.hpp"
 #include "gpu/gpu_command_buffer.hpp"
@@ -139,6 +137,36 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
     }
 }
 
+void GpuImageInitCopy(gpu_image *Image, uint32_t Width, uint32_t Height)
+{
+    Image->Width = Width;
+    Image->Height = Height;
+    Image->Format = gpu_image_format::RGBA8;
+    Image->Private = new dx12_image;
+    Image->Layout = gpu_image_layout::ImageLayoutCommon;
+    dx12_image *Private = (dx12_image*)Image->Private;
+
+    D3D12_HEAP_PROPERTIES HeapProperties = {};
+    HeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+    D3D12_RESOURCE_DESC ResourceDesc = {};
+    ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    ResourceDesc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
+    ResourceDesc.Width = Width;
+    ResourceDesc.Height = Height;
+    ResourceDesc.DepthOrArraySize = 1;
+    ResourceDesc.MipLevels = 1;
+    ResourceDesc.Format = GetDXGIFormat(Image->Format);
+    ResourceDesc.SampleDesc.Count = 1;
+    ResourceDesc.SampleDesc.Quality = 0;
+    ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    ResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    HRESULT Result = DX12.Device->CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc, Private->State, nullptr, IID_PPV_ARGS(&Private->Resource));
+    if (FAILED(Result))
+        LogError("D3D12: Failed to create GPU image!");
+}
+
 void GpuImageInitCubeMap(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_format Format, gpu_image_usage Usage)
 {
     if (Usage == gpu_image_usage::ImageUsageRenderTarget || Usage == gpu_image_usage::ImageUsageDepthTarget) 
@@ -237,6 +265,8 @@ void GpuImageFree(gpu_image *Image)
 
     switch (Image->Usage)
     {
+        case gpu_image_usage::ImageUsageCopy:
+            break;
         case gpu_image_usage::ImageUsageRenderTarget:
             Dx12DescriptorHeapFreeSpace(&DX12.RTVHeap, Private->RTV);
             break;

@@ -1,8 +1,6 @@
 # Build directories
 
 build
-assets/bgm
-assets/models
 
 # Useless game files
 
@@ -14,3 +12,9 @@ imgui.ini
 .vs
 .vscode
 .xmake
+
+# Game files
+
+assets/bgm
+assets/models
+screenshots

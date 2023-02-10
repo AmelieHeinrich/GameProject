@@ -26,6 +26,8 @@ struct gpu_command_buffer
     gpu_command_buffer_type Type;
 };
 
+//~ NOTE(amelie.h): Raw functions
+
 void GpuCommandBufferInit(gpu_command_buffer *Buffer, gpu_command_buffer_type Type);
 void GpuCommandBufferFree(gpu_command_buffer *Buffer);
 void GpuCommandBufferBindBuffer(gpu_command_buffer *Command, gpu_buffer *Buffer);
@@ -48,6 +50,8 @@ void GpuCommandBufferBufferBarrier(gpu_command_buffer *Command, gpu_buffer *Buff
 void GpuCommandBufferImageBarrier(gpu_command_buffer *Command, gpu_image *Image, gpu_image_layout New);
 void GpuCommandBufferBlit(gpu_command_buffer *Command, gpu_image *Source, gpu_image *Dest);
 void GpuCommandBufferCopyBufferToTexture(gpu_command_buffer *Command, gpu_buffer *Source, gpu_image *Dest);
+void GpuCommandBufferCopyTextureToBuffer(gpu_command_buffer *Command, gpu_image *Source, gpu_buffer *Dest);
 void GpuCommandBufferBegin(gpu_command_buffer *Command);
 void GpuCommandBufferEnd(gpu_command_buffer *Command);
 void GpuCommandBufferFlush(gpu_command_buffer *Command);
+void GpuCommandBufferScreenshot(gpu_command_buffer *Command, gpu_image *Image, gpu_buffer *Temporary);

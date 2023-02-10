@@ -9,6 +9,7 @@
 
 #include "gpu/gpu_context.hpp"
 #include "systems/event_system.hpp"
+#include "systems/input_types.hpp"
 
 #include <stdlib.h>
 
@@ -18,6 +19,29 @@ struct renderer_data
 };
 
 renderer_data Renderer;
+
+bool RendererOnKeyPressed(event_type Type, void *Sender, void *Listener, event_data Data)
+{
+    gpu_image *Image = GpuGetSwapChainImage();
+    
+    if (Data.data.u32[0] == (uint32_t)keyboard_key::F2)
+    {
+        gpu_buffer Temporary;
+        GpuBufferInitForCopy(&Temporary, Image->Width * Image->Height * 4);
+
+        gpu_command_buffer Buffer;
+        GpuCommandBufferInit(&Buffer, gpu_command_buffer_type::Graphics);
+        GpuCommandBufferBegin(&Buffer);
+        GpuCommandBufferScreenshot(&Buffer, Image, &Temporary);
+        GpuCommandBufferEnd(&Buffer);
+        GpuCommandBufferFlush(&Buffer);
+        GpuCommandBufferFree(&Buffer);
+
+        GpuBufferFree(&Temporary);
+    }
+
+    return false;
+}
 
 bool RendererShaderRecompile(event_type Type, void *Sender, void *Listener, event_data Data)
 {
@@ -30,6 +54,7 @@ bool RendererShaderRecompile(event_type Type, void *Sender, void *Listener, even
 void RendererInit()
 {
     EventSystemRegister(event_type::ShaderRecompile, nullptr, RendererShaderRecompile);
+    EventSystemRegister(event_type::KeyPressed, nullptr, RendererOnKeyPressed);
     ForwardPassInit(&Renderer.Forward);
 }
 

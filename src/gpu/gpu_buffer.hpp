@@ -26,5 +26,6 @@ struct gpu_buffer
 };
 
 void GpuBufferInit(gpu_buffer *Buffer, uint64_t Size, uint64_t Stride, gpu_buffer_type Type);
+void GpuBufferInitForCopy(gpu_buffer *Buffer, uint64_t Size);
 void GpuBufferFree(gpu_buffer *Buffer);
 void GpuBufferUpload(gpu_buffer *Buffer, const void *Data, uint64_t Size);
