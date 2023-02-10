@@ -29,6 +29,7 @@ struct mesh
     int IndexCount;
 
     gpu_image Albedo;
+    hmm_mat4 Transform;
 };
 
 struct loaded_model

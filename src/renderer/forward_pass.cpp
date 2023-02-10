@@ -15,11 +15,6 @@
 
 void ForwardPassInit(forward_pass *Pass)
 {
-    cpu_image CpuImage;
-    CpuImageLoad(&CpuImage, "assets/gfx/texture.jpg");
-    GpuImageInitFromCPU(&Pass->Texture, &CpuImage);
-    CpuImageFree(&CpuImage);
-
     GpuSamplerInit(&Pass->Sampler, gpu_texture_address::Wrap, gpu_texture_filter::Nearest);
 
     hmm_v2 Dimensions = GpuGetDimensions();
@@ -38,34 +33,16 @@ void ForwardPassInit(forward_pass *Pass)
     Pass->Pipeline.Info.HasDepth = true;
     Pass->Pipeline.Info.Type = gpu_pipeline_type::Graphics;
     GpuPipelineCreateGraphics(&Pass->Pipeline);
-    
-    float Vertices[] = {
-         0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-         0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f
-    };
 
-    uint32_t Indices[] = {
-        0, 1, 3,
-        1, 2, 3  
-    };
-
-    GpuBufferInit(&Pass->VertexBuffer, sizeof(Vertices), sizeof(float) * 8, gpu_buffer_type::Vertex);
-    GpuBufferUpload(&Pass->VertexBuffer, Vertices, sizeof(Vertices));
-    GpuBufferInit(&Pass->IndexBuffer, sizeof(Indices), sizeof(uint32_t), gpu_buffer_type::Index);
-    GpuBufferUpload(&Pass->IndexBuffer, Indices, sizeof(Indices));
-
+    ModelLoad(&Pass->Model, "assets/models/DamagedHelmet.gltf");
     GpuBufferInit(&Pass->CameraBuffer, 256, 0, gpu_buffer_type::Uniform);
 }
 
 void ForwardPassExit(forward_pass *Pass)
 {
     GpuSamplerFree(&Pass->Sampler);
-    GpuImageFree(&Pass->Texture);
-    GpuBufferFree(&Pass->IndexBuffer);
+    ModelFree(&Pass->Model);
     GpuBufferFree(&Pass->CameraBuffer);
-    GpuBufferFree(&Pass->VertexBuffer);
     GpuPipelineFree(&Pass->Pipeline);
     GpuImageFree(&Pass->DepthTarget);
     GpuImageFree(&Pass->RenderTarget);
@@ -77,21 +54,24 @@ void ForwardPassUpdate(forward_pass *Pass, camera_data *Camera)
 
     gpu_command_buffer *Buffer = GpuGetImageCommandBuffer();
 
-    hmm_mat4 UploadMatrices[2] = { Camera->View, Camera->Projection };
-    GpuBufferUpload(&Pass->CameraBuffer, UploadMatrices, sizeof(UploadMatrices));
-
     GpuCommandBufferBegin(Buffer);
     GpuCommandBufferSetViewport(Buffer, Dimensions.Width, Dimensions.Height, 0, 0);
     GpuCommandBufferBindRenderTarget(Buffer, &Pass->RenderTarget, &Pass->DepthTarget);
     GpuCommandBufferClearColor(Buffer, &Pass->RenderTarget, 0.3f, 0.2f, 0.1f, 1.0f);
     GpuCommandBufferClearDepth(Buffer, &Pass->DepthTarget, 1.0f, 0.0f);
     GpuCommandBufferBindPipeline(Buffer, &Pass->Pipeline);
-    GpuCommandBufferBindBuffer(Buffer, &Pass->VertexBuffer);
-    GpuCommandBufferBindBuffer(Buffer, &Pass->IndexBuffer);
     GpuCommandBufferBindConstantBuffer(Buffer, gpu_pipeline_type::Graphics, &Pass->CameraBuffer, 0);
-    GpuCommandBufferBindShaderResource(Buffer, gpu_pipeline_type::Graphics, &Pass->Texture, 1);
     GpuCommandBufferBindSampler(Buffer, gpu_pipeline_type::Graphics, &Pass->Sampler, 2);
-    GpuCommandBufferDrawIndexed(Buffer, 6);
+    for (auto Mesh : Pass->Model.Meshes)
+    {
+        hmm_mat4 UploadMatrices[3] = { Camera->View, Camera->Projection, Mesh.Transform };
+        GpuBufferUpload(&Pass->CameraBuffer, UploadMatrices, sizeof(UploadMatrices));
+
+        GpuCommandBufferBindBuffer(Buffer, &Mesh.VertexBuffer);
+        GpuCommandBufferBindBuffer(Buffer, &Mesh.IndexBuffer);
+        GpuCommandBufferBindShaderResource(Buffer, gpu_pipeline_type::Graphics, &Mesh.Albedo, 1);
+        GpuCommandBufferDrawIndexed(Buffer, Mesh.IndexCount);
+    }
     GpuCommandBufferEnd(Buffer);
     GpuCommandBufferFlush(Buffer);
 }

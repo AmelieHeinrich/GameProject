@@ -23,6 +23,7 @@ struct SceneData
 {
     row_major float4x4 View;
     row_major float4x4 Projection;
+    row_major float4x4 Transform;
 };
 
 ConstantBuffer<SceneData> SceneBuffer : register(b0);
@@ -30,7 +31,8 @@ ConstantBuffer<SceneData> SceneBuffer : register(b0);
 VertexOut VSMain(VertexIn Input)
 {
     VertexOut Output = (VertexOut)0;
-    Output.Position = mul(float4(Input.Position, 1.0f), SceneBuffer.View);
+    Output.Position = mul(float4(Input.Position, 1.0f), SceneBuffer.Transform);
+    Output.Position = mul(Output.Position, SceneBuffer.View);
     Output.Position = mul(Output.Position, SceneBuffer.Projection);
     Output.Normal = Input.Normal;
     Output.TextureCoords = Input.TextureCoords;

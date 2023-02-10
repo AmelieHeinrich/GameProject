@@ -15,6 +15,7 @@
 #include "cpu_image.hpp"
 
 #include "scene/scene.hpp"
+#include "mesh.hpp"
 
 struct forward_pass
 {
@@ -23,10 +24,8 @@ struct forward_pass
 
     gpu_buffer CameraBuffer;
     gpu_pipeline Pipeline;
-    gpu_buffer VertexBuffer;
-    gpu_buffer IndexBuffer;
-    gpu_image Texture;
     gpu_sampler Sampler;
+    loaded_model Model;
 };
 
 void ForwardPassInit(forward_pass *Pass);

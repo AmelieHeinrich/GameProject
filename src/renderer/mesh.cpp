@@ -13,10 +13,10 @@
 
 #include "systems/log_system.hpp"
 
-mesh ProcessMesh(loaded_model *Model, aiMesh *Mesh, const aiScene *Scene)
+mesh ProcessMesh(loaded_model *Model, aiMesh *Mesh, const aiScene *Scene, aiMatrix4x4* Matrix)
 {
     mesh Out;
-
+    
     std::vector<mesh_vertex> Vertices;
     std::vector<uint32_t> Indices;
 
@@ -37,8 +37,8 @@ mesh ProcessMesh(loaded_model *Model, aiMesh *Mesh, const aiScene *Scene)
 
         if (Mesh->mTextureCoords[0])
         {
-            Vertex.UV.X = Mesh->mTextureCoords[VertexIndex]->x;
-            Vertex.UV.Y = Mesh->mTextureCoords[VertexIndex]->y;
+            Vertex.UV.X = Mesh->mTextureCoords[0][VertexIndex].x;
+            Vertex.UV.Y = Mesh->mTextureCoords[0][VertexIndex].y;
         } 
         else
         {
@@ -84,7 +84,8 @@ void ProcessNode(loaded_model *Model, aiNode *Node, const aiScene *Scene)
     for (int MeshIndex = 0; MeshIndex < Node->mNumMeshes; MeshIndex++)
     {
         aiMesh *Mesh = Scene->mMeshes[MeshIndex];
-        Model->Meshes.push_back(ProcessMesh(Model, Mesh, Scene));
+        auto MeshToPush = ProcessMesh(Model, Mesh, Scene, &Node->mTransformation);
+        Model->Meshes.push_back(MeshToPush);
     }
     for (int ChildIndex = 0; ChildIndex < Node->mNumChildren; ChildIndex++)
     {
@@ -95,7 +96,7 @@ void ProcessNode(loaded_model *Model, aiNode *Node, const aiScene *Scene)
 void ModelLoad(loaded_model *Model, const std::string& Path)
 {
     Assimp::Importer Importer;
-    const aiScene *Scene = Importer.ReadFile(Path, aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+    const aiScene *Scene = Importer.ReadFile(Path, aiProcess_CalcTangentSpace);
     if (!Scene || Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !Scene->mRootNode)
     {
         LogError("Failed to load assimp model! (%s)", Path.c_str());
