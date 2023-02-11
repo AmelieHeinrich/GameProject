@@ -115,7 +115,7 @@ void DevTerminalDraw(bool* Open, bool* Focused)
 {
     ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Developper Console", Open, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Developer Console", Open, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
