@@ -9,15 +9,27 @@
 
 #include <cmath>
 
+struct rng_state
+{
+    int FirstValue;
+    int SecondValue;
+    int ThirdValue;
+};
+
+rng_state RngState;
+
+void RngInit(float Value)
+{
+    RngState.FirstValue = 100 * Value;
+    RngState.SecondValue = round(Value / 100);
+    RngState.ThirdValue = RngState.SecondValue * 69;
+}
+
 double RngGenerate()
 {
-    static int FirstValue = 100;
-    static int SecondValue = 100;
-    static int ThirdValue = 100;
+    RngState.FirstValue =  (171 * RngState.FirstValue) % 30269;
+    RngState.SecondValue = (172 * RngState.SecondValue) % 30307;
+    RngState.ThirdValue =  (170 * RngState.ThirdValue) % 30323;
 
-    FirstValue = (171 * FirstValue) % 30269;
-    SecondValue = (172 * SecondValue) % 30307;
-    ThirdValue = (170 * ThirdValue) % 30323;
-
-    return fmod(FirstValue / 30269.0 + SecondValue / 30307.0 + ThirdValue / 30323, 1.0);
+    return fmod(RngState.FirstValue / 30269.0 + RngState.SecondValue / 30307.0 + RngState.ThirdValue / 30323, 1.0);
 }

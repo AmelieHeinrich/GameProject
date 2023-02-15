@@ -7,4 +7,5 @@
 
 #pragma once
 
+void RngInit(float Value);
 double RngGenerate();
