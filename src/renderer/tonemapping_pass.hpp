@@ -28,5 +28,5 @@ struct tonemapping_pass
 
 void TonemappingPassInit(tonemapping_pass *Pass, gpu_image *HDRImage);
 void TonemappingPassExit(tonemapping_pass *Pass);
-void TonemappingPassUpdate(tonemapping_pass *Pass);
+void TonemappingPassUpdate(tonemapping_pass *Pass, gpu_buffer *Settings);
 void TonemappingPassResize(tonemapping_pass *Pass, uint32_t Width, uint32_t Height);

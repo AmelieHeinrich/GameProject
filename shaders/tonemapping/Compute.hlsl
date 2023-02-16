@@ -5,6 +5,12 @@
  *  Create Time: 16/02/2023 17:52
  */
 
+struct RendererSettings
+{
+    int Tonemapper;
+    float Exposure;
+};
+
 float3 ACESFilm(float3 X)
 {
     float A = 2.51f;
@@ -15,8 +21,22 @@ float3 ACESFilm(float3 X)
     return saturate((X * (A * X + B)) / (X * (C * X + D) + E));
 }
 
+float3 Filmic(float3 X)
+{
+    X = max(float3(0.0, 0.0, 0.0), X - float3(0.004, 0.004, 0.004));
+    X = (X * (6.2 * X + 0.5)) / (X * (6.2 * X + 1.7) + 0.06);
+    return X;
+}
+
+float3 RomBinDaHouse(float3 X)
+{
+    X = exp(-1.0 / (2.72 * X + 0.15));
+	return X;
+}
+
 Texture2D<float4> HDRTexture : register(t0);
 RWTexture2D<float4> LDRTexture : register(u1);
+ConstantBuffer<RendererSettings> Settings : register(b2);
 
 [numthreads(16, 16, 1)]
 void CSMain(uint3 ThreadID : SV_DispatchThreadID)
@@ -27,6 +47,21 @@ void CSMain(uint3 ThreadID : SV_DispatchThreadID)
     if (ThreadID.x < Width && ThreadID.y < Height)
     {
         float4 HDRColor = HDRTexture[ThreadID.xy];
-        LDRTexture[ThreadID.xy] = float4(ACESFilm(HDRColor.xyz), HDRColor.a);
+        float3 MappedColor = HDRColor.xyz;
+        switch (Settings.Tonemapper)
+        {
+            case 0:
+                MappedColor = ACESFilm(MappedColor);
+                break;
+            case 1:
+                MappedColor = Filmic(MappedColor);
+                break;
+            case 2:
+                MappedColor = RomBinDaHouse(MappedColor);
+                break;
+        }
+        
+        MappedColor = pow(abs(MappedColor), float3(1.0 / Settings.Exposure, 1.0 / Settings.Exposure, 1.0 / Settings.Exposure));
+        LDRTexture[ThreadID.xy] = float4(MappedColor, HDRColor.a);
     }
 }

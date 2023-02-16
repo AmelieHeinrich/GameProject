@@ -32,7 +32,7 @@ void TonemappingPassExit(tonemapping_pass *Pass)
     GpuImageFree(&Pass->LDRImage);
 }
 
-void TonemappingPassUpdate(tonemapping_pass *Pass)
+void TonemappingPassUpdate(tonemapping_pass *Pass, gpu_buffer *Settings)
 {
     gpu_command_buffer *Buffer = GpuGetImageCommandBuffer();
 
@@ -46,6 +46,7 @@ void TonemappingPassUpdate(tonemapping_pass *Pass)
     GpuCommandBufferBindPipeline(Buffer, &Pass->Pipeline);
     GpuCommandBufferBindShaderResource(Buffer, gpu_pipeline_type::Compute, Pass->HDRImage, 0);
     GpuCommandBufferBindStorageImage(Buffer, gpu_pipeline_type::Compute, &Pass->LDRImage, 1);
+    GpuCommandBufferBindConstantBuffer(Buffer, gpu_pipeline_type::Compute, Settings, 2);
     GpuCommandBufferDispatch(Buffer, Dimensions.Width / 16, Dimensions.Height / 16, 1);
 
     GpuCommandBufferEnd(Buffer);

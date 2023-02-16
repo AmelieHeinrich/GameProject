@@ -17,6 +17,7 @@ struct renderer_data
 {
     forward_pass Forward;
     tonemapping_pass Tonemapping;
+    renderer_settings Settings;
 };
 
 renderer_data Renderer;
@@ -42,6 +43,11 @@ void RendererInit()
 {
     EventSystemRegister(event_type::ShaderRecompile, nullptr, RendererShaderRecompile);
     EventSystemRegister(event_type::KeyPressed, nullptr, RendererOnKeyPressed);
+ 
+    Renderer.Settings.Settings.Tonemapper = tonemapping_algorithm::ACES;
+    Renderer.Settings.Settings.Exposure = 2.2f;
+
+    RendererSettingsInit(&Renderer.Settings);
     ForwardPassInit(&Renderer.Forward);
     TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
 }
@@ -50,6 +56,7 @@ void RendererExit()
 {
     ForwardPassExit(&Renderer.Forward);
     TonemappingPassExit(&Renderer.Tonemapping);
+    RendererSettingsFree(&Renderer.Settings);
 }
 
 void RendererStartSync()
@@ -59,8 +66,9 @@ void RendererStartSync()
 
 void RendererConstructFrame(camera_data *Camera)
 {
+    RendererSettingsUpdate(&Renderer.Settings);
     ForwardPassUpdate(&Renderer.Forward, Camera);
-    TonemappingPassUpdate(&Renderer.Tonemapping);
+    TonemappingPassUpdate(&Renderer.Tonemapping, &Renderer.Settings.Buffer);
 
     gpu_command_buffer *Buffer = GpuGetImageCommandBuffer();
     gpu_image *Image = GpuGetSwapChainImage();

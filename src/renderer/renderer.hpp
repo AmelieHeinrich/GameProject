@@ -9,6 +9,7 @@
 
 #include <cstdint>
 
+#include "renderer_settings.hpp"
 #include "forward_pass.hpp"
 #include "tonemapping_pass.hpp"
 
