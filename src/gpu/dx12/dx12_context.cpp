@@ -226,6 +226,9 @@ void GpuResize(uint32_t Width, uint32_t Height)
 void GpuPresent()
 {
     Dx12SwapchainPresent(&DX12.SwapChain);
+
+    D3D12MA::TotalStatistics Stats;
+    DX12.Allocator->CalculateStatistics(&Stats);
 }
 
 hmm_v2 GpuGetDimensions()
