@@ -15,9 +15,10 @@
 #include "dx12_descriptor_heap.hpp"
 #include "dx12_swapchain.hpp"
 #include "dx12_fence.hpp"
-#include "dx12_allocator.hpp"
 #include "math_types.hpp"
 #include "gpu/gpu_command_buffer.hpp"
+
+#include <D3D12MA/D3D12MemAlloc.h>
 
 struct dx12_context
 {
@@ -31,20 +32,18 @@ struct dx12_context
     IDXGIFactory3 *Factory;
     IDXGIAdapter1 *Adapter;
 
-    ID3D12CommandQueue* GraphicsQueue;
+    ID3D12CommandQueue *GraphicsQueue;
     dx12_fence DeviceFence;
 
-    ID3D12CommandQueue* ComputeQueue;
+    ID3D12CommandQueue *ComputeQueue;
     dx12_fence ComputeFence;
 
-    ID3D12CommandQueue* UploadQueue;
+    ID3D12CommandQueue *UploadQueue;
     dx12_fence UploadFence;
 
     std::vector<gpu_command_buffer> CommandBuffers;
 
-    dx12_heap DefaultHeap; // 512mb
-    dx12_heap UploadHeap; // 128mb
-    dx12_heap ReadbackHeap; // 256mb
+    D3D12MA::Allocator *Allocator;
 
     dx12_descriptor_heap RTVHeap;
     dx12_descriptor_heap DSVHeap;

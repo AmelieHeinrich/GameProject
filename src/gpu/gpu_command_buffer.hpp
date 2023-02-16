@@ -51,6 +51,7 @@ void GpuCommandBufferImageBarrier(gpu_command_buffer *Command, gpu_image *Image,
 void GpuCommandBufferBlit(gpu_command_buffer *Command, gpu_image *Source, gpu_image *Dest);
 void GpuCommandBufferCopyBufferToTexture(gpu_command_buffer *Command, gpu_buffer *Source, gpu_image *Dest);
 void GpuCommandBufferCopyTextureToBuffer(gpu_command_buffer *Command, gpu_image *Source, gpu_buffer *Dest);
+void GpuCommandBufferCopyBufferToBuffer(gpu_command_buffer *Command, gpu_buffer *Source, gpu_buffer *Dest);
 void GpuCommandBufferBegin(gpu_command_buffer *Command);
 void GpuCommandBufferEnd(gpu_command_buffer *Command);
 void GpuCommandBufferFlush(gpu_command_buffer *Command);

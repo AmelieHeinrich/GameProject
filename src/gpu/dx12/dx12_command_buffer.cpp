@@ -415,6 +415,15 @@ void GpuCommandBufferCopyTextureToBuffer(gpu_command_buffer *Command, gpu_image 
     Private->List->CopyTextureRegion(&CopyDest, 0, 0, 0, &CopySource, nullptr);
 }
 
+void GpuCommandBufferCopyBufferToBuffer(gpu_command_buffer *Command, gpu_buffer *Source, gpu_buffer *Dest)
+{
+    dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;
+    dx12_buffer *DestPrivate = (dx12_buffer*)Dest->Reserved;
+    dx12_buffer *SourcePrivate = (dx12_buffer*)Source->Reserved;
+
+    Private->List->CopyResource(DestPrivate->Resource, SourcePrivate->Resource);
+}
+
 void GpuCommandBufferBegin(gpu_command_buffer *Command)
 {
     dx12_command_buffer *Private = (dx12_command_buffer*)Command->Private;

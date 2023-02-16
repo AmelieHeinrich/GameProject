@@ -21,8 +21,8 @@ void GpuBufferInit(gpu_buffer *Buffer, uint64_t Size, uint64_t Stride, gpu_buffe
     dx12_buffer *Private = (dx12_buffer*)Buffer->Reserved;
     Private->HeapIndex = -1;
 
-    D3D12_HEAP_PROPERTIES HeapProperties = {};
-    HeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+    D3D12MA::ALLOCATION_DESC AllocDesc = {};
+    AllocDesc.HeapType = D3D12_HEAP_TYPE_UPLOAD;
 
     D3D12_RESOURCE_DESC ResourceDesc = {};
     ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -37,9 +37,9 @@ void GpuBufferInit(gpu_buffer *Buffer, uint64_t Size, uint64_t Stride, gpu_buffe
     ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
     ResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-    HRESULT Result = DX12.Device->CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&Private->Resource));
+    HRESULT Result = DX12.Allocator->CreateResource(&AllocDesc, &ResourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, &Private->Allocation, IID_PPV_ARGS(&Private->Resource));
     if (FAILED(Result))
-        LogError("Failed to create buffer of size %d!", Size);
+        LogError("D3D12: Failed to allocate buffer of size %d!", Size);
 
     switch (Type)
     {
@@ -73,8 +73,8 @@ void GpuBufferInitForCopy(gpu_buffer *Buffer, uint64_t Size)
     dx12_buffer *Private = (dx12_buffer*)Buffer->Reserved;
     Private->HeapIndex = -1;
 
-    D3D12_HEAP_PROPERTIES HeapProperties = {};
-    HeapProperties.Type = D3D12_HEAP_TYPE_READBACK;
+    D3D12MA::ALLOCATION_DESC AllocDesc = {};
+    AllocDesc.HeapType = D3D12_HEAP_TYPE_READBACK;
 
     D3D12_RESOURCE_DESC ResourceDesc = {};
     ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -89,14 +89,15 @@ void GpuBufferInitForCopy(gpu_buffer *Buffer, uint64_t Size)
     ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
     ResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-    HRESULT Result = DX12.Device->CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&Private->Resource));
+    HRESULT Result = DX12.Allocator->CreateResource(&AllocDesc, &ResourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr, &Private->Allocation, IID_PPV_ARGS(&Private->Resource));
     if (FAILED(Result))
-        LogError("Failed to create buffer of size %d!", Size);
+        LogError("D3D12: Failed to allocate buffer of size %d!", Size);
 }
 
 void GpuBufferFree(gpu_buffer *Buffer)
 {
     dx12_buffer *Private = (dx12_buffer*)Buffer->Reserved;
+
     if (Private->HeapIndex != -1)
         Dx12DescriptorHeapFreeSpace(&DX12.CBVSRVUAVHeap, Private->HeapIndex);
     SafeRelease(Private->Resource);

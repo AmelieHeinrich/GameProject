@@ -12,6 +12,7 @@
 #define KILOBYTES(Bytes) (Bytes * 1024)
 #define MEGABYTES(Bytes) (Bytes * 1024 * 1024)
 #define GIGABYTES(Bytes) (Bytes * 1024 * 1024 * 1024)
+#define ALIGN(Size, Multiple) ((Size + Multiple - 1) / Multiple) * Multiple
 
 struct linear_allocator
 {

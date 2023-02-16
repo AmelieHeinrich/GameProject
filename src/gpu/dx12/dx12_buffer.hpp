@@ -10,10 +10,12 @@
 #include "gpu/gpu_buffer.hpp"
 
 #include <d3d12.h>
+#include <D3D12MA/D3D12MemAlloc.h>
 
 struct dx12_buffer
 {
-    ID3D12Resource *Resource;
+    ID3D12Resource* Resource;
+    D3D12MA::Allocation *Allocation;
 
     int HeapIndex;
     D3D12_VERTEX_BUFFER_VIEW VertexView;

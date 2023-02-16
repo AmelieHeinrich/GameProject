@@ -70,8 +70,8 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
             break;
     }
 
-    D3D12_HEAP_PROPERTIES HeapProperties = {};
-    HeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+    D3D12MA::ALLOCATION_DESC HeapProperties = {};
+    HeapProperties.HeapType = D3D12_HEAP_TYPE_DEFAULT;
 
     D3D12_RESOURCE_DESC ResourceDesc = {};
     ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -86,9 +86,9 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
     ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     ResourceDesc.Flags = GetResourceFlag(Usage);
 
-    HRESULT Result = DX12.Device->CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc, Private->State, nullptr, IID_PPV_ARGS(&Private->Resource));
+    HRESULT Result = DX12.Allocator->CreateResource(&HeapProperties, &ResourceDesc, Private->State, nullptr, &Private->Allocation, IID_PPV_ARGS(&Private->Resource));
     if (FAILED(Result))
-        LogError("D3D12: Failed to create GPU image!");
+        LogError("D3D12: Failed to allocate image!");
 
     switch (Usage)
     {
@@ -146,8 +146,8 @@ void GpuImageInitCopy(gpu_image *Image, uint32_t Width, uint32_t Height)
     Image->Layout = gpu_image_layout::ImageLayoutCommon;
     dx12_image *Private = (dx12_image*)Image->Private;
 
-    D3D12_HEAP_PROPERTIES HeapProperties = {};
-    HeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+    D3D12MA::ALLOCATION_DESC HeapProperties = {};
+    HeapProperties.HeapType = D3D12_HEAP_TYPE_UPLOAD;
 
     D3D12_RESOURCE_DESC ResourceDesc = {};
     ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -162,9 +162,9 @@ void GpuImageInitCopy(gpu_image *Image, uint32_t Width, uint32_t Height)
     ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     ResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-    HRESULT Result = DX12.Device->CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc, Private->State, nullptr, IID_PPV_ARGS(&Private->Resource));
+    HRESULT Result = DX12.Allocator->CreateResource(&HeapProperties, &ResourceDesc, Private->State, nullptr, &Private->Allocation, IID_PPV_ARGS(&Private->Resource));
     if (FAILED(Result))
-        LogError("D3D12: Failed to create GPU image!");
+        LogError("D3D12: Failed to allocate image!");
 }
 
 void GpuImageInitCubeMap(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_format Format, gpu_image_usage Usage)
@@ -202,8 +202,8 @@ void GpuImageInitCubeMap(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_
             break;
     }
 
-    D3D12_HEAP_PROPERTIES HeapProperties = {};
-    HeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+    D3D12MA::ALLOCATION_DESC HeapProperties = {};
+    HeapProperties.HeapType = D3D12_HEAP_TYPE_DEFAULT;
 
     D3D12_RESOURCE_DESC ResourceDesc = {};
     ResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -218,9 +218,9 @@ void GpuImageInitCubeMap(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_
     ResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     ResourceDesc.Flags = GetResourceFlag(Usage);
 
-    HRESULT Result = DX12.Device->CreateCommittedResource(&HeapProperties, D3D12_HEAP_FLAG_NONE, &ResourceDesc, Private->State, nullptr, IID_PPV_ARGS(&Private->Resource));
+    HRESULT Result = DX12.Allocator->CreateResource(&HeapProperties, &ResourceDesc, Private->State, nullptr, &Private->Allocation, IID_PPV_ARGS(&Private->Resource));
     if (FAILED(Result))
-        LogError("D3D12: Failed to create GPU image!");
+        LogError("D3D12: Failed to allocate image!");
 
     Private->SRV_UAV = Dx12DescriptorHeapAlloc(&DX12.CBVSRVUAVHeap);
 

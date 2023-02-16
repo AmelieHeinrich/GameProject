@@ -7,6 +7,11 @@
 
 add_rules("mode.debug", "mode.release")
 
+target("D3D12MA")
+    set_kind("static")
+    add_files("external/D3D12MA/*.cpp")
+    add_headerfiles("external/D3D12MA/*.h")
+
 target("stb")
     set_kind("static")
     add_files("external/stb/stb.c")
@@ -47,6 +52,7 @@ target("Game Project")
     end
 
     if is_plat("windows") then
+        add_deps("D3D12MA")
         add_syslinks("user32", "dsound", "gdi32", "kernel32", "d3d12", "d3dcompiler", "dxgi", "assimp-vc143-mtd")
         add_files("src/apu/dsound/*.cpp", "src/gpu/dx12/*.cpp", "src/gui/dx12/*.cpp", "src/systems/windows/*.cpp", "src/windows/*.cpp")
         add_files("src/main_win32.cpp")

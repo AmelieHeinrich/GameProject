@@ -12,8 +12,8 @@
 void LinearAllocatorInit(linear_allocator *Allocator, uint64_t Size)
 {
     Allocator->Size = Size;
-    Allocator->Current = 0;
     Allocator->Start = 0;
+    Allocator->Current = Allocator->Start;
     Allocator->End = Size;
 }
 
@@ -31,7 +31,7 @@ uint64_t LinearAllocatorAlloc(linear_allocator *Allocator, uint64_t Size)
         return 0;
     }
     Allocator->Current += Size;
-    return Allocator->Current;
+    return Pointer;
 }
 
 void LinearAllocatorFree(linear_allocator *Allocator, uint64_t Offset)
