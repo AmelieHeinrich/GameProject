@@ -107,10 +107,13 @@ void GameUpdate()
 
     RendererStartRender();
     GuiBeginFrame();
+
     if (GameState.TerminalOpen)
         DevTerminalDraw(&GameState.TerminalOpen, &GameState.TerminalFocus);
     if (GameState.SettingsOpen)
         SettingsPanelDraw(&GameState.SettingsOpen, &GameState.SettingsFocus);
+    
+    
     GuiEndFrame(GpuGetImageCommandBuffer());
     RendererEndRender();
 

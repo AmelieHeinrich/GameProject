@@ -18,5 +18,5 @@ SamplerState Sampler : register(s2);
 float4 PSMain(FragmentIn Input) : SV_TARGET
 {
     float4 Albedo = Texture.Sample(Sampler, Input.TextureCoords);
-    return float4(Input.Normal, 1.0f) * Albedo;
+    return Albedo;
 }

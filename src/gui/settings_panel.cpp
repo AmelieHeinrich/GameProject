@@ -10,6 +10,8 @@
 #include "game_data.hpp"
 #include <ImGui/imgui.h>
 
+#include "renderer/renderer.hpp"
+
 #define SETTINGS_GRAPHICS 0
 #define SETTINGS_MOUSE 1
 #define SETTINGS_AUDIO 2
@@ -21,9 +23,18 @@ struct settings_panel
 
 void SettingsDrawGraphics()
 {
+    renderer_settings *Settings = RendererGetSettings();
+
     bool VerticalSync = EgcB32(EgcFile, "vsync");
     ImGui::Checkbox("Vertical Sync", &VerticalSync);
     EgcB32(EgcFile, "vsync") = VerticalSync;
+
+    ImGui::SliderFloat("Exposure", &Settings->Settings.Exposure, 1.0f, 5.0f, "%.1f");
+
+    static const char* Tonemappers[] = { "ACES", "Filmic", "Rom Bin Da House" };
+    ImGui::Combo("Tonemapper", (int*)&Settings->Settings.Tonemapper, Tonemappers, 3);
+
+    ImGui::Separator();
 }
 
 void SettingsDrawMouse()
@@ -32,7 +43,8 @@ void SettingsDrawMouse()
 
     ImGui::SliderFloat("Sensitivity", &Sensitivity, 0.1f, 8.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
-    EgcF32(EgcFile, "mouse_sensitivity") = Sensitivity;;
+    EgcF32(EgcFile, "mouse_sensitivity") = Sensitivity;
+    ImGui::Separator();
 }
 
 void SettingsDrawAudio()
@@ -48,6 +60,7 @@ void SettingsDrawAudio()
     EgcF32(EgcFile, "music_volume") = Music;
     EgcF32(EgcFile, "sound_volume") = Sound;
     EgcF32(EgcFile, "voice_volume") = Voice;
+    ImGui::Separator();
 }
 
 void SettingsPanelDraw(bool *Closed, bool *Focused)

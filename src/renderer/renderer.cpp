@@ -132,3 +132,8 @@ void RendererScreenshot()
 
     GpuBufferFree(&Temporary);
 }
+
+renderer_settings *RendererGetSettings()
+{
+    return &Renderer.Settings;
+}
