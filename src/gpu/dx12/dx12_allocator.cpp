@@ -45,3 +45,9 @@ void Dx12HeapFreeBlock(dx12_heap *Heap, dx12_resource *Resource)
 {
     SafeRelease(Resource->Resource);
 }
+
+void Dx12HeapReset(dx12_heap *Heap)
+{
+    Dx12HeapFree(Heap);
+    Dx12HeapInit(Heap, Heap->Allocator.Size, Heap->Type);
+}

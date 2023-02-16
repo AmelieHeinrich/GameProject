@@ -15,6 +15,7 @@
 #include "dx12_descriptor_heap.hpp"
 #include "dx12_swapchain.hpp"
 #include "dx12_fence.hpp"
+#include "dx12_allocator.hpp"
 #include "math_types.hpp"
 #include "gpu/gpu_command_buffer.hpp"
 
@@ -40,6 +41,10 @@ struct dx12_context
     dx12_fence UploadFence;
 
     std::vector<gpu_command_buffer> CommandBuffers;
+
+    dx12_heap DefaultHeap; // 512mb
+    dx12_heap UploadHeap; // 128mb
+    dx12_heap ReadbackHeap; // 256mb
 
     dx12_descriptor_heap RTVHeap;
     dx12_descriptor_heap DSVHeap;

@@ -154,6 +154,10 @@ void GpuInit()
     Dx12DescriptorHeapInit(&DX12.CBVSRVUAVHeap, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1'000'000);
     Dx12DescriptorHeapInit(&DX12.SamplerHeap, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 2048);
 
+    Dx12HeapInit(&DX12.DefaultHeap, MEGABYTES(512), dx12_heap_type::Default);
+    Dx12HeapInit(&DX12.UploadHeap, MEGABYTES(128), dx12_heap_type::Upload);
+    Dx12HeapInit(&DX12.ReadbackHeap, MEGABYTES(256), dx12_heap_type::Readback);
+
     Dx12SwapchainInit(&DX12.SwapChain);
 }
 
@@ -172,6 +176,9 @@ void GpuExit()
     int BufferCount = EgcI32(EgcFile, "buffer_count");
 
     Dx12SwapchainFree(&DX12.SwapChain);
+    Dx12HeapFree(&DX12.DefaultHeap);
+    Dx12HeapFree(&DX12.UploadHeap);
+    Dx12HeapFree(&DX12.ReadbackHeap);
     Dx12DescriptorHeapFree(&DX12.SamplerHeap);
     Dx12DescriptorHeapFree(&DX12.CBVSRVUAVHeap);
     Dx12DescriptorHeapFree(&DX12.DSVHeap);

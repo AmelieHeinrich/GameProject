@@ -35,3 +35,4 @@ void Dx12HeapInit(dx12_heap *Heap, uint64_t Size, dx12_heap_type Type);
 void Dx12HeapFree(dx12_heap *Heap);
 void Dx12HeapAlloc(dx12_heap *Heap, D3D12_RESOURCE_DESC *ResourceDesc, D3D12_RESOURCE_STATES State, dx12_resource *Resource);
 void Dx12HeapFreeBlock(dx12_heap *Heap, dx12_resource *Resource);
+void Dx12HeapReset(dx12_heap *Heap);
