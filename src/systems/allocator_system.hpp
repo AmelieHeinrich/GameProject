@@ -9,6 +9,10 @@
 
 #include <cstdint>
 
+#define KILOBYTES(Bytes) (Bytes * 1024)
+#define MEGABYTES(Bytes) (Bytes * 1024 * 1024)
+#define GIGABYTES(Bytes) (Bytes * 1024 * 1024 * 1024)
+
 struct linear_allocator
 {
     uint64_t Start;
