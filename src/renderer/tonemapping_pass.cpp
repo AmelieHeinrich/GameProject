@@ -53,8 +53,9 @@ void TonemappingPassUpdate(tonemapping_pass *Pass, gpu_buffer *Settings)
     GpuCommandBufferFlush(Buffer);
 }
 
-void TonemappingPassResize(tonemapping_pass *Pass, uint32_t Width, uint32_t Height)
+void TonemappingPassResize(tonemapping_pass *Pass, uint32_t Width, uint32_t Height, gpu_image *HDRImage)
 {
+    Pass->HDRImage = HDRImage;
     hmm_v2 Dimensions = GpuGetDimensions();
 
     GpuImageFree(&Pass->LDRImage);

@@ -29,7 +29,7 @@ void SettingsDrawGraphics()
     ImGui::Checkbox("Vertical Sync", &VerticalSync);
     EgcB32(EgcFile, "vsync") = VerticalSync;
 
-    ImGui::SliderFloat("Exposure", &Settings->Settings.Exposure, 1.0f, 5.0f, "%.1f");
+    ImGui::SliderFloat("Exposure", &Settings->Settings.Exposure, 0.1f, 5.0f, "%.1f");
 
     static const char* Tonemappers[] = { "ACES", "Filmic", "Rom Bin Da House" };
     ImGui::Combo("Tonemapper", (int*)&Settings->Settings.Tonemapper, Tonemappers, 3);

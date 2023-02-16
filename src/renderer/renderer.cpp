@@ -32,8 +32,8 @@ bool RendererOnKeyPressed(event_type Type, void *Sender, void *Listener, event_d
 bool RendererShaderRecompile(event_type Type, void *Sender, void *Listener, event_data Data)
 {
     GpuWait();
-    ForwardPassExit(&Renderer.Forward);
     TonemappingPassExit(&Renderer.Tonemapping);
+    ForwardPassExit(&Renderer.Forward);
     ForwardPassInit(&Renderer.Forward);
     TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
     return false;
@@ -45,7 +45,7 @@ void RendererInit()
     EventSystemRegister(event_type::KeyPressed, nullptr, RendererOnKeyPressed);
  
     Renderer.Settings.Settings.Tonemapper = tonemapping_algorithm::ACES;
-    Renderer.Settings.Settings.Exposure = 2.2f;
+    Renderer.Settings.Settings.Exposure = 1.0f;
 
     RendererSettingsInit(&Renderer.Settings);
     ForwardPassInit(&Renderer.Forward);
@@ -114,6 +114,7 @@ void RendererResize(uint32_t Width, uint32_t Height)
 {
     GpuResize(Width, Height);
     ForwardPassResize(&Renderer.Forward, Width, Height);
+    TonemappingPassResize(&Renderer.Tonemapping, Width, Height, &Renderer.Forward.RenderTarget);
 }
 
 void RendererScreenshot()
