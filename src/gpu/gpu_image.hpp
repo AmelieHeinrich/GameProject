@@ -15,6 +15,7 @@ enum class gpu_image_format
 {
     RGBA8,
     RGBA32Float,
+    RGBA16Float,
     R32Depth
 };
 

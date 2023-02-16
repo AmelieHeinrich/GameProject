@@ -21,6 +21,8 @@ DXGI_FORMAT GetDXGIFormat(gpu_image_format Format)
             return DXGI_FORMAT_R8G8B8A8_UNORM;
         case gpu_image_format::RGBA32Float:
             return DXGI_FORMAT_R32G32B32A32_FLOAT;
+        case gpu_image_format::RGBA16Float:
+            return DXGI_FORMAT_R16G16B16A16_FLOAT;
         case gpu_image_format::R32Depth:
             return DXGI_FORMAT_D32_FLOAT;
     }
