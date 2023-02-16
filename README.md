@@ -12,17 +12,20 @@ xmake run
 
 ## The plan
 
-- Start rendering
+- Rendering
     - Skybox renderer
-    - Deferred renderer
+    - Forward+ Renderer
     - Opaque pass
     - Shadows
-    - Anti-aliasing (MSAA/FXAA)
-    - Bloom
+    - Anti-aliasing (FXAA)
     - Color correction
-    - Accessibility (color correction for daltonism)
-    - Blit
-    - UI
+    - Bloom
+    - Contrast adaptive sharpness
+    - Tonemapping (Done)
+    - Auto-exposure
+    - 2D (UI, sprites)
+    - Blit on back buffer
+    - Debug UI
 - Map system
 - Physics
 - Scripting
