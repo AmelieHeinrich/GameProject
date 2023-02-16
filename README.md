@@ -12,10 +12,7 @@ xmake run
 
 ## The plan
 
-- Refactor to D3D12
-    - Staging buffers
 - Start rendering
-    - Render graph
     - Skybox renderer
     - Deferred renderer
     - Opaque pass
