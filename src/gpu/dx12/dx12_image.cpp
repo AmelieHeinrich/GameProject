@@ -96,20 +96,34 @@ void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_f
         {
             Private->RTV = Dx12DescriptorHeapAlloc(&DX12.RTVHeap);
             
-            D3D12_RENDER_TARGET_VIEW_DESC Desc = {};
+            D3D12_RENDER_TARGET_VIEW_DESC RTVDesc = {};
+            RTVDesc.Format = ResourceDesc.Format;
+            RTVDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+            DX12.Device->CreateRenderTargetView(Private->Resource, &RTVDesc, Dx12DescriptorHeapCPU(&DX12.RTVHeap, Private->RTV));
+
+            Private->SRV_UAV = Dx12DescriptorHeapAlloc(&DX12.CBVSRVUAVHeap);
+
+            D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
+            SRVDesc.Format = ResourceDesc.Format;
+            SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+            SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+            SRVDesc.Texture2D.MipLevels = 1;
+            DX12.Device->CreateShaderResourceView(Private->Resource, &SRVDesc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
+
+            D3D12_UNORDERED_ACCESS_VIEW_DESC Desc = {};
             Desc.Format = ResourceDesc.Format;
-            Desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-            DX12.Device->CreateRenderTargetView(Private->Resource, &Desc, Dx12DescriptorHeapCPU(&DX12.RTVHeap, Private->RTV));
+            Desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+            DX12.Device->CreateUnorderedAccessView(Private->Resource, nullptr, &Desc, Dx12DescriptorHeapCPU(&DX12.CBVSRVUAVHeap, Private->SRV_UAV));
             break;
         }
         case gpu_image_usage::ImageUsageDepthTarget:
         {
             Private->DSV = Dx12DescriptorHeapAlloc(&DX12.DSVHeap);
 
-            D3D12_DEPTH_STENCIL_VIEW_DESC Desc = {};
-            Desc.Format = ResourceDesc.Format;
-            Desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-            DX12.Device->CreateDepthStencilView(Private->Resource, &Desc, Dx12DescriptorHeapCPU(&DX12.DSVHeap, Private->DSV));
+            D3D12_DEPTH_STENCIL_VIEW_DESC DSVDesc = {};
+            DSVDesc.Format = ResourceDesc.Format;
+            DSVDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+            DX12.Device->CreateDepthStencilView(Private->Resource, &DSVDesc, Dx12DescriptorHeapCPU(&DX12.DSVHeap, Private->DSV));
             break;
         }
         case gpu_image_usage::ImageUsageShaderResource:

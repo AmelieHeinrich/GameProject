@@ -263,7 +263,7 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
     SafeRelease(VertexReflection);
 }
 
-void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *Info)
+void GpuPipelineCreateCompute(gpu_pipeline *Pipeline)
 {
     Pipeline->Private = new dx12_pipeline;
     Pipeline->Info.Type = gpu_pipeline_type::Compute;
@@ -274,18 +274,19 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
     ID3D12ShaderReflection* ComputeReflection = nullptr;
     D3D12_SHADER_DESC ComputeDesc;
 
-    std::vector<D3D12_ROOT_PARAMETER> Parameters;
+    std::array<D3D12_ROOT_PARAMETER, 64> Parameters;
     int ParameterCount = 0;
 
-    std::vector<D3D12_SHADER_INPUT_BIND_DESC> ShaderBinds;
+    std::array<D3D12_SHADER_INPUT_BIND_DESC, 64> ShaderBinds;
     int BindCount = 0;
     
-    std::vector<D3D12_DESCRIPTOR_RANGE> Ranges;
+    std::array<D3D12_DESCRIPTOR_RANGE, 64> Ranges;
     int RangeCount = 0;
 
     HRESULT Result = D3DReflect(ShaderPrivate->ComputeBlob->GetBufferPointer(), ShaderPrivate->ComputeBlob->GetBufferSize(), IID_PPV_ARGS(&ComputeReflection));
     if (FAILED(Result))
-        LogError("D3D12: Failed to reflect vertex shader!");
+        LogError("D3D12: Failed to reflect compute shader!");
+    ComputeReflection->GetDesc(&ComputeDesc);
 
     for (int BoundResourceIndex = 0; BoundResourceIndex < ComputeDesc.BoundResources; BoundResourceIndex++)
     {
@@ -339,13 +340,13 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline, gpu_pipeline_create_info *
     }
 
     D3D12_ROOT_SIGNATURE_DESC RootSignatureDesc = {};
-    RootSignatureDesc.NumParameters = Parameters.size();
+    RootSignatureDesc.NumParameters = ParameterCount;
     RootSignatureDesc.pParameters = Parameters.data();
     RootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
     ID3DBlob *RootSignatureBlob;
     ID3DBlob *ErrorBlob;
-    D3D12SerializeRootSignature(&RootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_1, &RootSignatureBlob, &ErrorBlob);
+    D3D12SerializeRootSignature(&RootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &RootSignatureBlob, &ErrorBlob);
     if (ErrorBlob)
         LogError("D3D12: Failed to serialize root signature! %s", ErrorBlob->GetBufferPointer());
     Result = DX12.Device->CreateRootSignature(0, RootSignatureBlob->GetBufferPointer(), RootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&PipelinePrivate->Signature));

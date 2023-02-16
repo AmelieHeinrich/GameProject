@@ -55,6 +55,7 @@ void ForwardPassUpdate(forward_pass *Pass, camera_data *Camera)
     gpu_command_buffer *Buffer = GpuGetImageCommandBuffer();
 
     GpuCommandBufferBegin(Buffer);
+    GpuCommandBufferImageBarrier(Buffer, &Pass->RenderTarget, gpu_image_layout::ImageLayoutRenderTarget);
     GpuCommandBufferSetViewport(Buffer, Dimensions.Width, Dimensions.Height, 0, 0);
     GpuCommandBufferBindRenderTarget(Buffer, &Pass->RenderTarget, &Pass->DepthTarget);
     GpuCommandBufferClearColor(Buffer, &Pass->RenderTarget, 0.3f, 0.2f, 0.1f, 1.0f);

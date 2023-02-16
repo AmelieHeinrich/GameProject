@@ -16,6 +16,7 @@
 struct renderer_data
 {
     forward_pass Forward;
+    tonemapping_pass Tonemapping;
 };
 
 renderer_data Renderer;
@@ -31,7 +32,9 @@ bool RendererShaderRecompile(event_type Type, void *Sender, void *Listener, even
 {
     GpuWait();
     ForwardPassExit(&Renderer.Forward);
+    TonemappingPassExit(&Renderer.Tonemapping);
     ForwardPassInit(&Renderer.Forward);
+    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
     return false;
 }
 
@@ -40,11 +43,13 @@ void RendererInit()
     EventSystemRegister(event_type::ShaderRecompile, nullptr, RendererShaderRecompile);
     EventSystemRegister(event_type::KeyPressed, nullptr, RendererOnKeyPressed);
     ForwardPassInit(&Renderer.Forward);
+    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
 }
 
 void RendererExit()
 {
     ForwardPassExit(&Renderer.Forward);
+    TonemappingPassExit(&Renderer.Tonemapping);
 }
 
 void RendererStartSync()
@@ -55,16 +60,16 @@ void RendererStartSync()
 void RendererConstructFrame(camera_data *Camera)
 {
     ForwardPassUpdate(&Renderer.Forward, Camera);
+    TonemappingPassUpdate(&Renderer.Tonemapping);
 
     gpu_command_buffer *Buffer = GpuGetImageCommandBuffer();
     gpu_image *Image = GpuGetSwapChainImage();
 
     GpuCommandBufferBegin(Buffer);
     GpuCommandBufferImageBarrier(Buffer, Image, gpu_image_layout::ImageLayoutCopyDest);
-    GpuCommandBufferImageBarrier(Buffer, &Renderer.Forward.RenderTarget, gpu_image_layout::ImageLayoutCopySource);
-    GpuCommandBufferBlit(Buffer, &Renderer.Forward.RenderTarget, Image);
+    GpuCommandBufferImageBarrier(Buffer, &Renderer.Tonemapping.LDRImage, gpu_image_layout::ImageLayoutCopySource);
+    GpuCommandBufferBlit(Buffer, &Renderer.Tonemapping.LDRImage, Image);
     GpuCommandBufferImageBarrier(Buffer, Image, gpu_image_layout::ImageLayoutCommon);
-    GpuCommandBufferImageBarrier(Buffer, &Renderer.Forward.RenderTarget, gpu_image_layout::ImageLayoutRenderTarget);
     GpuCommandBufferEnd(Buffer);
     GpuCommandBufferFlush(Buffer);
 }

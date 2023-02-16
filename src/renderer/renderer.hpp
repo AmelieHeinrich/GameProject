@@ -10,6 +10,7 @@
 #include <cstdint>
 
 #include "forward_pass.hpp"
+#include "tonemapping_pass.hpp"
 
 void RendererInit();
 void RendererExit();

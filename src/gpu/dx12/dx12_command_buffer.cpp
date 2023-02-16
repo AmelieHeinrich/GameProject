@@ -340,6 +340,9 @@ void GpuCommandBufferImageBarrier(gpu_command_buffer *Command, gpu_image *Image,
     Barrier.Transition.StateAfter = GetStateFromImageLayout(New);
     Barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
+    if (Barrier.Transition.StateBefore == Barrier.Transition.StateAfter)
+        return;
+
     Image->Layout = New;
     ImagePrivate->State = GetStateFromImageLayout(Image->Layout);
 
