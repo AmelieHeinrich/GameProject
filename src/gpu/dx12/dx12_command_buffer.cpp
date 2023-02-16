@@ -55,6 +55,8 @@ D3D12_RESOURCE_STATES GetStateFromImageLayout(gpu_image_layout Layout)
             return D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
         case gpu_image_layout::ImageLayoutStorage:
             return D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        case gpu_image_layout::ImageLayoutGenericRead:
+            return D3D12_RESOURCE_STATE_GENERIC_READ;
     }
 }
 

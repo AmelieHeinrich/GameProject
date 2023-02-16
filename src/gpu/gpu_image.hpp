@@ -27,7 +27,8 @@ enum class gpu_image_layout
     ImageLayoutRenderTarget,
     ImageLayoutCopySource,
     ImageLayoutCopyDest,
-    ImageLayoutPresent
+    ImageLayoutPresent,
+    ImageLayoutGenericRead
 };
 
 typedef gpu_image_layout gpu_buffer_layout;
