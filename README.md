@@ -19,7 +19,6 @@ xmake run
     - Shadows
     - Anti-aliasing (FXAA)
     - Ambient occlusion (SSAO? HBAO?)
-    - Color correction
     - Bloom
     - Contrast adaptive sharpness
     - Tonemapping (Done)
