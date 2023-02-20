@@ -9,6 +9,8 @@
 
 #include "gpu/gpu_buffer.hpp"
 
+#include "math_types.hpp"
+
 enum class tonemapping_algorithm
 {
     ACES = 0,
@@ -23,6 +25,14 @@ struct renderer_settings
     struct {
         tonemapping_algorithm Tonemapper;
         float Exposure;
+        float Temperature;
+        float Tint;
+        V3 Contrast;
+        V3 LinearMidPoint;
+        V3 Brightness;
+        V3 ColorFilter;
+        float ColorFilterIntensity;
+        V3 Saturation;
     } Settings;
 };
 

@@ -46,7 +46,7 @@ void ColorCorrectionPassUpdate(color_correction_pass *Pass, gpu_buffer *Settings
     GpuCommandBufferBindPipeline(Buffer, &Pass->Pipeline);
     GpuCommandBufferBindShaderResource(Buffer, gpu_pipeline_type::Compute, Pass->HDRImage, 0);
     GpuCommandBufferBindStorageImage(Buffer, gpu_pipeline_type::Compute, &Pass->OutImage, 1);
-    //GpuCommandBufferBindConstantBuffer(Buffer, gpu_pipeline_type::Compute, Settings, 2);
+    GpuCommandBufferBindConstantBuffer(Buffer, gpu_pipeline_type::Compute, Settings, 2);
     GpuCommandBufferDispatch(Buffer, Dimensions.Width / 16, Dimensions.Height / 16, 1);
 
     GpuCommandBufferEnd(Buffer);

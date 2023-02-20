@@ -61,7 +61,6 @@ void CSMain(uint3 ThreadID : SV_DispatchThreadID)
                 break;
         }
         
-        MappedColor = pow(abs(MappedColor), float3(1.0 / Settings.Exposure, 1.0 / Settings.Exposure, 1.0 / Settings.Exposure));
         LDRTexture[ThreadID.xy] = float4(MappedColor, HDRColor.a);
     }
 }

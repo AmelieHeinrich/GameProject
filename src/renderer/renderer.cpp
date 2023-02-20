@@ -51,7 +51,15 @@ void RendererInit()
     EventSystemRegister(event_type::KeyPressed, nullptr, RendererOnKeyPressed);
  
     Renderer.Settings.Settings.Tonemapper = tonemapping_algorithm::ACES;
-    Renderer.Settings.Settings.Exposure = 1.0f;
+    Renderer.Settings.Settings.Exposure = 2.2f;
+    Renderer.Settings.Settings.Temperature = 0.0f;
+    Renderer.Settings.Settings.Tint = 0.0f;
+    Renderer.Settings.Settings.Contrast = HMM_Vec3(1.0f, 1.0f, 1.0f);
+    Renderer.Settings.Settings.LinearMidPoint = HMM_Vec3(0.0f, 0.0f, 0.0f);
+    Renderer.Settings.Settings.Brightness = HMM_Vec3(0.0f, 0.0f, 0.0f);
+    Renderer.Settings.Settings.ColorFilter = HMM_Vec3(0.0f, 0.0f, 0.0f);
+    Renderer.Settings.Settings.ColorFilterIntensity = 1.0f;
+    Renderer.Settings.Settings.Saturation = HMM_Vec3(1.0f, 1.0f, 1.0f);
 
     RendererSettingsInit(&Renderer.Settings);
     ForwardPassInit(&Renderer.Forward);
