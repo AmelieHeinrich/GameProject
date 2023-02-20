@@ -23,7 +23,6 @@ struct tonemapping_pass
     gpu_image LDRImage;
 
     gpu_pipeline Pipeline;
-    gpu_sampler Sampler;
 };
 
 void TonemappingPassInit(tonemapping_pass *Pass, gpu_image *HDRImage);

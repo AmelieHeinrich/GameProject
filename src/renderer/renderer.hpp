@@ -11,6 +11,7 @@
 
 #include "renderer_settings.hpp"
 #include "forward_pass.hpp"
+#include "color_correction_pass.hpp"
 #include "tonemapping_pass.hpp"
 
 void RendererInit();

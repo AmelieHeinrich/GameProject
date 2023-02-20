@@ -13,11 +13,12 @@ xmake run
 ## The plan
 
 - Rendering
-    - Skybox renderer
+    - Environment map renderer
     - Forward+ Renderer
-    - Opaque pass
+    - Transparent objects renderer
     - Shadows
     - Anti-aliasing (FXAA)
+    - Ambient occlusion (SSAO? HBAO?)
     - Color correction
     - Bloom
     - Contrast adaptive sharpness

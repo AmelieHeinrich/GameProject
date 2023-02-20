@@ -16,6 +16,7 @@
 struct renderer_data
 {
     forward_pass Forward;
+    color_correction_pass ColorCorrection;
     tonemapping_pass Tonemapping;
     renderer_settings Settings;
 };
@@ -32,10 +33,15 @@ bool RendererOnKeyPressed(event_type Type, void *Sender, void *Listener, event_d
 bool RendererShaderRecompile(event_type Type, void *Sender, void *Listener, event_data Data)
 {
     GpuWait();
+
     TonemappingPassExit(&Renderer.Tonemapping);
+    ColorCorrectionPassExit(&Renderer.ColorCorrection);
     ForwardPassExit(&Renderer.Forward);
+
     ForwardPassInit(&Renderer.Forward);
-    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
+    ColorCorrectionPassInit(&Renderer.ColorCorrection, &Renderer.Forward.RenderTarget);
+    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.ColorCorrection.OutImage);
+
     return false;
 }
 
@@ -49,7 +55,8 @@ void RendererInit()
 
     RendererSettingsInit(&Renderer.Settings);
     ForwardPassInit(&Renderer.Forward);
-    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
+    ColorCorrectionPassInit(&Renderer.ColorCorrection, &Renderer.Forward.RenderTarget);
+    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.ColorCorrection.OutImage);
 }
 
 void RendererExit()
@@ -68,6 +75,7 @@ void RendererConstructFrame(camera_data *Camera)
 {
     RendererSettingsUpdate(&Renderer.Settings);
     ForwardPassUpdate(&Renderer.Forward, Camera);
+    ColorCorrectionPassUpdate(&Renderer.ColorCorrection, &Renderer.Settings.Buffer);
     TonemappingPassUpdate(&Renderer.Tonemapping, &Renderer.Settings.Buffer);
 
     gpu_command_buffer *Buffer = GpuGetImageCommandBuffer();
@@ -114,7 +122,8 @@ void RendererResize(uint32_t Width, uint32_t Height)
 {
     GpuResize(Width, Height);
     ForwardPassResize(&Renderer.Forward, Width, Height);
-    TonemappingPassResize(&Renderer.Tonemapping, Width, Height, &Renderer.Forward.RenderTarget);
+    ColorCorrectionPassResize(&Renderer.ColorCorrection, Width, Height, &Renderer.Forward.RenderTarget);
+    TonemappingPassResize(&Renderer.Tonemapping, Width, Height, &Renderer.ColorCorrection.OutImage);
 }
 
 void RendererScreenshot()
