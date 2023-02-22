@@ -69,16 +69,22 @@ float Luminance(float3 Color)
     return max(0.00001f, dot(Color, float3(0.2127f, 0.7152f, 0.0722f)));
 }
 
-[numthreads(16, 16, 1)]
+[numthreads(32, 32, 1)]
 void CSMain(uint3 ThreadID : SV_DispatchThreadID)
 {
-    float3 BaseColor = Texture[ThreadID.xy].xyz;
+    uint Width, Height;
+    Texture.GetDimensions(Width, Height);
 
-    BaseColor *= Settings.Exposure;
-    BaseColor = WhiteBalance(BaseColor, Settings.Temperature, Settings.Tint);
-    BaseColor = Settings.Contrast * (BaseColor - Settings.LinearMidPoint) + Settings.LinearMidPoint + Settings.Brightness;
-    BaseColor *= (Settings.ColorFilter * Settings.ColorFilterIntensity);
-    BaseColor *= lerp(Luminance(BaseColor), BaseColor, Settings.Saturation);
+    if (ThreadID.x < Width && ThreadID.y < Height)
+    {
+        float3 BaseColor = Texture[ThreadID.xy].xyz;
 
-    Texture[ThreadID.xy] = float4(BaseColor, 1.0f);
+        BaseColor *= Settings.Exposure;
+        BaseColor = WhiteBalance(BaseColor, Settings.Temperature, Settings.Tint);
+        BaseColor = Settings.Contrast * (BaseColor - Settings.LinearMidPoint) + Settings.LinearMidPoint + Settings.Brightness;
+        BaseColor *= (Settings.ColorFilter * Settings.ColorFilterIntensity);
+        BaseColor *= lerp(Luminance(BaseColor), BaseColor, Settings.Saturation);
+
+        Texture[ThreadID.xy] = float4(BaseColor, 1.0f);
+    }
 }

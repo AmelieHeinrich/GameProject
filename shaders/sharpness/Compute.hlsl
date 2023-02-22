@@ -30,28 +30,34 @@ ConstantBuffer<RendererSettings> Settings : register(b1);
 [numthreads(16, 16, 1)]
 void CSMain(uint3 ThreadID : SV_DispatchThreadID)
 {
-    float2 Offsets[9] = {
-        float2(0.0f, 0.0f),
-        float2(0.0f, 1.0f),
-        float2(0.0f, -1.0f),  
-        float2(1.0f, 0.0f),
-        float2(-1.0f, 0.0f),
-        float2(-1.0f, 1.0f),
-        float2(-1.0f, -1.0f),
-        float2(1.0f, -1.0f),
-        float2(1.0f, -1.0f)
-    };
+    uint Width, Height;
+    Texture.GetDimensions(Width, Height);
 
-    float Kernel[9] = {
-        1.0f / 16.0f , 2.0f / 16.0f, 1.0f / 16.0f,
-        2.0f / 16.0f , 4.0f / 16.0f, 2.0f / 16.0f,
-        1.0f / 16.0f , 2.0f / 16.0f, 1.0f / 16.0f
-    };
+    if (ThreadID.x < Width && ThreadID.y < Height)
+    {
+        float2 Offsets[9] = {
+            float2(0.0f, 0.0f),
+            float2(0.0f, 1.0f),
+            float2(0.0f, -1.0f),  
+            float2(1.0f, 0.0f),
+            float2(-1.0f, 0.0f),
+            float2(-1.0f, 1.0f),
+            float2(-1.0f, -1.0f),
+            float2(1.0f, -1.0f),
+            float2(1.0f, -1.0f)
+        };
 
-    float3 Color = float3(0.0f, 0.0f, 0.0f);
-    for (int i = 0; i < 9; i++) {
-        Color += Texture[ThreadID.xy + Offsets[i]].rgb * Kernel[i] * max(1.0f, Settings.SharpnessStrength);
+        float Kernel[9] = {
+            1.0f / 16.0f , 2.0f / 16.0f, 1.0f / 16.0f,
+            2.0f / 16.0f , 4.0f / 16.0f, 2.0f / 16.0f,
+            1.0f / 16.0f , 2.0f / 16.0f, 1.0f / 16.0f
+        };
+
+        float3 Color = float3(0.0f, 0.0f, 0.0f);
+        for (int i = 0; i < 9; i++) {
+            Color += Texture[ThreadID.xy + Offsets[i]].rgb * Kernel[i] * max(1.0f, Settings.SharpnessStrength);
+        }
+
+        Texture[ThreadID.xy] = float4(Color, 1.0);
     }
-
-    Texture[ThreadID.xy] = float4(Color, 1.0);
 }

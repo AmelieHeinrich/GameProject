@@ -40,7 +40,7 @@ void SharpnessPassUpdate(sharpness_pass *Pass, gpu_buffer *Settings)
     GpuCommandBufferBindPipeline(Buffer, &Pass->Pipeline);
     GpuCommandBufferBindStorageImage(Buffer, gpu_pipeline_type::Compute, Pass->Image, 0);
     GpuCommandBufferBindConstantBuffer(Buffer, gpu_pipeline_type::Compute, Settings, 1);
-    GpuCommandBufferDispatch(Buffer, Dimensions.Width / 16, Dimensions.Height / 16, 1);
+    GpuCommandBufferDispatch(Buffer, Dimensions.Width / 15, Dimensions.Height / 15, 1);
 
     GpuCommandBufferEnd(Buffer);
     GpuCommandBufferFlush(Buffer);

@@ -51,23 +51,29 @@ Texture2D<float4> HDRTexture : register(t0);
 RWTexture2D<float4> LDRTexture : register(u1);
 ConstantBuffer<RendererSettings> Settings : register(b2);
 
-[numthreads(16, 16, 1)]
+[numthreads(32, 32, 1)]
 void CSMain(uint3 ThreadID : SV_DispatchThreadID)
 {
-    float4 HDRColor = HDRTexture[ThreadID.xy];
-    float3 MappedColor = HDRColor.xyz;
-    switch (Settings.Tonemapper)
+    uint Width, Height;
+    HDRTexture.GetDimensions(Width, Height);
+
+    if (ThreadID.x < Width && ThreadID.y < Height)
     {
-        case 0:
-            MappedColor = ACESFilm(MappedColor);
-            break;
-        case 1:
-            MappedColor = Filmic(MappedColor);
-            break;
-        case 2:
-            MappedColor = RomBinDaHouse(MappedColor);
-            break;
+        float4 HDRColor = HDRTexture[ThreadID.xy];
+        float3 MappedColor = HDRColor.xyz;
+        switch (Settings.Tonemapper)
+        {
+            case 0:
+                MappedColor = ACESFilm(MappedColor);
+                break;
+            case 1:
+                MappedColor = Filmic(MappedColor);
+                break;
+            case 2:
+                MappedColor = RomBinDaHouse(MappedColor);
+                break;
+        }
+        
+        LDRTexture[ThreadID.xy] = float4(MappedColor, HDRColor.a);
     }
-    
-    LDRTexture[ThreadID.xy] = float4(MappedColor, HDRColor.a);
 }
