@@ -87,12 +87,12 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
     ID3D12ShaderReflection* PixelReflection = nullptr;
     D3D12_SHADER_DESC PixelDesc;
 
-    HRESULT Result = D3DReflect(ShaderPrivate->VertexBlob->GetBufferPointer(), ShaderPrivate->VertexBlob->GetBufferSize(), IID_PPV_ARGS(&VertexReflection));
+    HRESULT Result = D3DReflect(ShaderPrivate->VertexBlob.Data, ShaderPrivate->VertexBlob.Size, IID_PPV_ARGS(&VertexReflection));
     if (FAILED(Result))
         LogError("D3D12: Failed to reflect vertex shader!");
     VertexReflection->GetDesc(&VertexDesc);
 
-    Result = D3DReflect(ShaderPrivate->PixelBlob->GetBufferPointer(), ShaderPrivate->PixelBlob->GetBufferSize(), IID_PPV_ARGS(&PixelReflection));
+    Result = D3DReflect(ShaderPrivate->PixelBlob.Data, ShaderPrivate->PixelBlob.Size, IID_PPV_ARGS(&PixelReflection));
     if (FAILED(Result))
         LogError("D3D12: Failed to reflect pixel shader!");
     PixelReflection->GetDesc(&PixelDesc);
@@ -172,10 +172,10 @@ void GpuPipelineCreateGraphics(gpu_pipeline *Pipeline)
     RootSignatureBlob->Release();
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC Desc = {};
-    Desc.VS.pShaderBytecode = ShaderPrivate->VertexBlob->GetBufferPointer();
-    Desc.VS.BytecodeLength = ShaderPrivate->VertexBlob->GetBufferSize();
-    Desc.PS.pShaderBytecode = ShaderPrivate->PixelBlob->GetBufferPointer();
-    Desc.PS.BytecodeLength = ShaderPrivate->PixelBlob->GetBufferSize();
+    Desc.VS.pShaderBytecode = ShaderPrivate->VertexBlob.Data;
+    Desc.VS.BytecodeLength = ShaderPrivate->VertexBlob.Size;
+    Desc.PS.pShaderBytecode = ShaderPrivate->PixelBlob.Data;
+    Desc.PS.BytecodeLength = ShaderPrivate->PixelBlob.Size;
     for (int RTVIndex = 0; RTVIndex < Pipeline->Info.Formats.size(); RTVIndex++)
     {
         Desc.BlendState.RenderTarget[RTVIndex].SrcBlend = D3D12_BLEND_ONE;
@@ -283,7 +283,7 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline)
     std::array<D3D12_DESCRIPTOR_RANGE, 64> Ranges;
     int RangeCount = 0;
 
-    HRESULT Result = D3DReflect(ShaderPrivate->ComputeBlob->GetBufferPointer(), ShaderPrivate->ComputeBlob->GetBufferSize(), IID_PPV_ARGS(&ComputeReflection));
+    HRESULT Result = D3DReflect(ShaderPrivate->ComputeBlob.Data, ShaderPrivate->ComputeBlob.Size, IID_PPV_ARGS(&ComputeReflection));
     if (FAILED(Result))
         LogError("D3D12: Failed to reflect compute shader!");
     ComputeReflection->GetDesc(&ComputeDesc);
@@ -355,8 +355,8 @@ void GpuPipelineCreateCompute(gpu_pipeline *Pipeline)
     RootSignatureBlob->Release();
 
     D3D12_COMPUTE_PIPELINE_STATE_DESC Desc = {};
-    Desc.CS.pShaderBytecode = ShaderPrivate->ComputeBlob->GetBufferPointer();
-    Desc.CS.BytecodeLength = ShaderPrivate->ComputeBlob->GetBufferSize();
+    Desc.CS.pShaderBytecode = ShaderPrivate->ComputeBlob.Data;
+    Desc.CS.BytecodeLength = ShaderPrivate->ComputeBlob.Size;
     Desc.pRootSignature = PipelinePrivate->Signature;
 
     Result = DX12.Device->CreateComputePipelineState(&Desc, IID_PPV_ARGS(&PipelinePrivate->Pipeline));

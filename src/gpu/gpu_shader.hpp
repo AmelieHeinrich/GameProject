@@ -15,4 +15,7 @@ struct gpu_shader
 void GpuShaderInit(gpu_shader *Shader, const char *V = nullptr,
                                        const char *P = nullptr,
                                        const char *C = nullptr);
+void GpuShaderInitFromEGS(gpu_shader *Shader, const char *V = nullptr,
+                                              const char *P = nullptr,
+                                              const char *C = nullptr);
 void GpuShaderFree(gpu_shader *Shader);

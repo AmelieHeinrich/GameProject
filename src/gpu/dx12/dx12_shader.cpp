@@ -12,6 +12,8 @@
 #include "windows/windows_data.hpp"
 
 #include <string>
+#include <cstdlib>
+#include <cstring>
 
 #include <d3d12.h>
 #include <d3dcompiler.h>
@@ -27,7 +29,7 @@ std::string GetEntryPointFromProfile(const std::string& Profile)
         return "CSMain";
 }
 
-ID3DBlob* CompileBlob(const std::string& Source, const char *Profile)
+dx12_shader_module CompileBlob(const std::string& Source, const char *Profile)
 {
     ID3DBlob* ShaderBlob;
     ID3DBlob* ErrorBlob;
@@ -47,7 +49,13 @@ ID3DBlob* CompileBlob(const std::string& Source, const char *Profile)
         LogError("Shader Error (Profile: %s) : %s", Profile, (char*)ErrorBlob->GetBufferPointer());
         SafeRelease(ErrorBlob);
     }
-    return ShaderBlob;
+    
+    dx12_shader_module Module;
+    Module.Size = ShaderBlob->GetBufferSize();
+    Module.Data = malloc(Module.Size);
+    memcpy(Module.Data, ShaderBlob->GetBufferPointer(), Module.Size);
+    SafeRelease(ShaderBlob);
+    return (Module);
 }
 
 void GpuShaderInit(gpu_shader *Shader, const char *V,
@@ -56,9 +64,7 @@ void GpuShaderInit(gpu_shader *Shader, const char *V,
 {
     Shader->Private = new dx12_shader;
     dx12_shader *Private = (dx12_shader*)(Shader->Private);
-    Private->VertexBlob = nullptr;
-    Private->PixelBlob = nullptr;
-    Private->ComputeBlob = nullptr;
+    memset(Private, 0, sizeof(dx12_shader));
 
     if (V)
         Private->VertexBlob = CompileBlob(FileRead(V), "vs_5_1");
@@ -68,11 +74,41 @@ void GpuShaderInit(gpu_shader *Shader, const char *V,
         Private->ComputeBlob = CompileBlob(FileRead(C), "cs_5_1");
 }
 
+void GpuShaderInitFromEGS(gpu_shader *Shader, const char *V,
+                                              const char *P,
+                                              const char *C)
+{
+    Shader->Private = new dx12_shader;
+    dx12_shader *Private = (dx12_shader*)(Shader->Private);
+
+    if (V) {
+        Private->VertexBlob.Size = FileBufferGetSize(V);
+        Private->VertexBlob.Data = malloc(Private->VertexBlob.Size);
+        const char *Buffer = FileRead(V).c_str();
+        memcpy(Private->VertexBlob.Data, Buffer, Private->VertexBlob.Size);
+    }
+    if (P) {
+        Private->PixelBlob.Size = FileBufferGetSize(V);
+        Private->PixelBlob.Data = malloc(Private->PixelBlob.Size);
+        const char *Buffer = FileRead(V).c_str();
+        memcpy(Private->PixelBlob.Data, Buffer, Private->PixelBlob.Size);
+    }
+    if (C) {
+        Private->ComputeBlob.Size = FileBufferGetSize(V);
+        Private->ComputeBlob.Data = malloc(Private->ComputeBlob.Size);
+        const char *Buffer = FileRead(V).c_str();
+        memcpy(Private->ComputeBlob.Data, Buffer, Private->ComputeBlob.Size);
+    }
+}
+
 void GpuShaderFree(gpu_shader *Shader)
 {
     dx12_shader *Private = (dx12_shader*)(Shader->Private);
-    SafeRelease(Private->VertexBlob);
-    SafeRelease(Private->PixelBlob);
-    SafeRelease(Private->ComputeBlob);
+    if (Private->VertexBlob.Data)
+        free(Private->VertexBlob.Data);
+    if (Private->PixelBlob.Data)
+        free(Private->PixelBlob.Data);
+    if (Private->ComputeBlob.Data)
+        free(Private->ComputeBlob.Data);
     delete Private;
 }

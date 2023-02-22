@@ -8,12 +8,19 @@
 #pragma once
 
 #include <d3d12.h>
+#include <cstdint>
 
 #include "gpu/gpu_shader.hpp"
 
+struct dx12_shader_module
+{
+    void *Data;
+    uint64_t Size;
+};
+
 struct dx12_shader
 {
-    ID3DBlob *VertexBlob;
-    ID3DBlob *PixelBlob;
-    ID3DBlob *ComputeBlob;
+    dx12_shader_module VertexBlob;
+    dx12_shader_module PixelBlob;
+    dx12_shader_module ComputeBlob;
 };
