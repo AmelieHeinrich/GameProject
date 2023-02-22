@@ -10,10 +10,10 @@
 #include <cstdint>
 
 #include "renderer_settings.hpp"
-#include "forward_pass.hpp"
-#include "color_correction_pass.hpp"
-#include "sharpness_pass.hpp"
-#include "tonemapping_pass.hpp"
+#include "passes/forward_pass.hpp"
+#include "passes/color_correction_pass.hpp"
+#include "passes/sharpness_pass.hpp"
+#include "passes/tonemapping_pass.hpp"
 
 void RendererInit();
 void RendererExit();

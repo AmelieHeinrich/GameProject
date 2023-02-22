@@ -12,10 +12,6 @@
 #include "gpu/gpu_sampler.hpp"
 #include "gpu/gpu_shader.hpp"
 #include "gpu/gpu_pipeline.hpp"
-#include "cpu_image.hpp"
-
-#include "scene/scene.hpp"
-#include "mesh.hpp"
 
 struct color_correction_pass
 {

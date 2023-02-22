@@ -13,7 +13,6 @@
 #include "gpu/gpu_sampler.hpp"
 #include "gpu/gpu_shader.hpp"
 #include "gpu/gpu_pipeline.hpp"
-#include "cpu_image.hpp"
 
 struct sharpness_pass
 {

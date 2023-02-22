@@ -12,10 +12,10 @@
 #include "gpu/gpu_sampler.hpp"
 #include "gpu/gpu_shader.hpp"
 #include "gpu/gpu_pipeline.hpp"
-#include "cpu_image.hpp"
+#include "renderer/cpu_image.hpp"
 
 #include "scene/scene.hpp"
-#include "mesh.hpp"
+#include "renderer/mesh.hpp"
 
 struct forward_pass
 {
