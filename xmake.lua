@@ -7,31 +7,9 @@
 
 add_rules("mode.debug", "mode.release")
 
-target("D3D12MA")
-    set_kind("static")
-    add_files("external/D3D12MA/*.cpp")
-    add_headerfiles("external/D3D12MA/*.h")
+includes("external", "tools")
 
-target("stb")
-    set_kind("static")
-    add_files("external/stb/stb.c")
-    add_headerfiles("external/stb/*.h")
-    add_includedirs("external/stb")
-
-target("dr_libs")
-    set_kind("static")
-    add_files("external/dr_libs/*.cpp")
-    add_headerfiles("external/dr_libs/*.h")
-    add_includedirs("external/dr_libs/")
-
-target("ImGui")
-    set_kind("static")
-    add_files("external/ImGui/**.cpp")
-    add_headerfiles("external/ImGui/*.h")
-    add_includedirs("external/ImGui/")
-    add_syslinks("d3dcompiler", "dxgi", "d3d12")
-
-target("Game Project")
+target("Game")
     set_languages("c11", "c++20")
     set_rundir(".")
     add_deps("ImGui", "dr_libs", "stb")
