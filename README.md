@@ -14,15 +14,14 @@ xmake run
 
 - Rendering
     - Environment map renderer
-    - Forward+ Renderer
+    - Forward(+?) Renderer
     - Transparent objects renderer
     - Shadows
+    - Auto exposure in color correction shader
     - Anti-aliasing (FXAA)
-    - Ambient occlusion (SSAO? HBAO?)
+    - Ambient occlusion (SSAO? HBAO? GTAO?)
     - Bloom
     - Contrast adaptive sharpness
-    - Tonemapping (Done)
-    - Auto-exposure
     - 2D (UI, sprites)
     - Blit on back buffer
     - Debug UI
