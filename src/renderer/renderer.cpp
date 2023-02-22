@@ -17,7 +17,9 @@ struct renderer_data
 {
     forward_pass Forward;
     color_correction_pass ColorCorrection;
+    sharpness_pass SharpnessPass;
     tonemapping_pass Tonemapping;
+
     renderer_settings Settings;
 };
 
@@ -35,12 +37,14 @@ bool RendererShaderRecompile(event_type Type, void *Sender, void *Listener, even
     GpuWait();
 
     TonemappingPassExit(&Renderer.Tonemapping);
+    SharpnessPassExit(&Renderer.SharpnessPass);
     ColorCorrectionPassExit(&Renderer.ColorCorrection);
     ForwardPassExit(&Renderer.Forward);
 
     ForwardPassInit(&Renderer.Forward);
     ColorCorrectionPassInit(&Renderer.ColorCorrection, &Renderer.Forward.RenderTarget);
-    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.ColorCorrection.OutImage);
+    SharpnessPassInit(&Renderer.SharpnessPass, &Renderer.Forward.RenderTarget);
+    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
 
     return false;
 }
@@ -50,6 +54,9 @@ void RendererInit()
     EventSystemRegister(event_type::ShaderRecompile, nullptr, RendererShaderRecompile);
     EventSystemRegister(event_type::KeyPressed, nullptr, RendererOnKeyPressed);
  
+    Renderer.Settings.EnableSharpness = true;
+    Renderer.Settings.EnableColorCorrection = true;
+
     Renderer.Settings.Settings.Tonemapper = tonemapping_algorithm::ACES;
     Renderer.Settings.Settings.Exposure = 2.2f;
     Renderer.Settings.Settings.Temperature = 0.0f;
@@ -60,16 +67,20 @@ void RendererInit()
     Renderer.Settings.Settings.ColorFilter = HMM_Vec3(0.0f, 0.0f, 0.0f);
     Renderer.Settings.Settings.ColorFilterIntensity = 1.0f;
     Renderer.Settings.Settings.Saturation = HMM_Vec3(1.0f, 1.0f, 1.0f);
+    Renderer.Settings.Settings.SharpnessStrength = 1.0f;
 
     RendererSettingsInit(&Renderer.Settings);
     ForwardPassInit(&Renderer.Forward);
     ColorCorrectionPassInit(&Renderer.ColorCorrection, &Renderer.Forward.RenderTarget);
-    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.ColorCorrection.OutImage);
+    SharpnessPassInit(&Renderer.SharpnessPass, &Renderer.Forward.RenderTarget);
+    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
 }
 
 void RendererExit()
 {
     ForwardPassExit(&Renderer.Forward);
+    SharpnessPassExit(&Renderer.SharpnessPass);
+    ColorCorrectionPassExit(&Renderer.ColorCorrection);
     TonemappingPassExit(&Renderer.Tonemapping);
     RendererSettingsFree(&Renderer.Settings);
 }
@@ -83,7 +94,10 @@ void RendererConstructFrame(camera_data *Camera)
 {
     RendererSettingsUpdate(&Renderer.Settings);
     ForwardPassUpdate(&Renderer.Forward, Camera);
-    ColorCorrectionPassUpdate(&Renderer.ColorCorrection, &Renderer.Settings.Buffer);
+    if (Renderer.Settings.EnableColorCorrection)
+        ColorCorrectionPassUpdate(&Renderer.ColorCorrection, &Renderer.Settings.Buffer);
+    if (Renderer.Settings.EnableSharpness)
+        SharpnessPassUpdate(&Renderer.SharpnessPass, &Renderer.Settings.Buffer);
     TonemappingPassUpdate(&Renderer.Tonemapping, &Renderer.Settings.Buffer);
 
     gpu_command_buffer *Buffer = GpuGetImageCommandBuffer();
@@ -131,7 +145,8 @@ void RendererResize(uint32_t Width, uint32_t Height)
     GpuResize(Width, Height);
     ForwardPassResize(&Renderer.Forward, Width, Height);
     ColorCorrectionPassResize(&Renderer.ColorCorrection, Width, Height, &Renderer.Forward.RenderTarget);
-    TonemappingPassResize(&Renderer.Tonemapping, Width, Height, &Renderer.ColorCorrection.OutImage);
+    SharpnessPassResize(&Renderer.SharpnessPass, Width, Height, &Renderer.Forward.RenderTarget);
+    TonemappingPassResize(&Renderer.Tonemapping, Width, Height, &Renderer.Forward.RenderTarget);
 }
 
 void RendererScreenshot()

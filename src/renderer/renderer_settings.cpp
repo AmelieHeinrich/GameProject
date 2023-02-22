@@ -11,7 +11,7 @@
 
 void RendererSettingsInit(renderer_settings *Settings)
 {
-    GpuBufferInit(&Settings->Buffer, ALIGN(sizeof(Settings->Settings), 256), 0, gpu_buffer_type::Uniform);
+    GpuBufferInit(&Settings->Buffer, 256, 0, gpu_buffer_type::Uniform);
 }
 
 void RendererSettingsFree(renderer_settings *Settings)
@@ -21,5 +21,5 @@ void RendererSettingsFree(renderer_settings *Settings)
 
 void RendererSettingsUpdate(renderer_settings *Settings)
 {
-    GpuBufferUpload(&Settings->Buffer, &Settings->Settings, ALIGN(sizeof(Settings->Settings), 256));
+    GpuBufferUpload(&Settings->Buffer, &Settings->Settings, sizeof(renderer_settings));
 }

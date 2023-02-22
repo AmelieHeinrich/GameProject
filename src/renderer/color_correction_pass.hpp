@@ -20,8 +20,6 @@
 struct color_correction_pass
 {
     gpu_image *HDRImage;
-    gpu_image OutImage;
-
     gpu_pipeline Pipeline;
 };
 

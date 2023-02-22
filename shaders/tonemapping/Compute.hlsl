@@ -8,7 +8,20 @@
 struct RendererSettings
 {
     int Tonemapper;
+
     float Exposure;
+    float Temperature;
+    float Tint;
+    float3 Contrast;
+    float3 LinearMidPoint;
+    float3 Brightness;
+    float3 ColorFilter;
+    float ColorFilterIntensity;
+    float3 Saturation;
+    
+    float SharpnessStrength;
+
+    float pad[6];
 };
 
 float3 ACESFilm(float3 X)
@@ -41,26 +54,20 @@ ConstantBuffer<RendererSettings> Settings : register(b2);
 [numthreads(16, 16, 1)]
 void CSMain(uint3 ThreadID : SV_DispatchThreadID)
 {
-    uint Width, Height;
-    HDRTexture.GetDimensions(Width, Height);
-
-    if (ThreadID.x < Width && ThreadID.y < Height)
+    float4 HDRColor = HDRTexture[ThreadID.xy];
+    float3 MappedColor = HDRColor.xyz;
+    switch (Settings.Tonemapper)
     {
-        float4 HDRColor = HDRTexture[ThreadID.xy];
-        float3 MappedColor = HDRColor.xyz;
-        switch (Settings.Tonemapper)
-        {
-            case 0:
-                MappedColor = ACESFilm(MappedColor);
-                break;
-            case 1:
-                MappedColor = Filmic(MappedColor);
-                break;
-            case 2:
-                MappedColor = RomBinDaHouse(MappedColor);
-                break;
-        }
-        
-        LDRTexture[ThreadID.xy] = float4(MappedColor, HDRColor.a);
+        case 0:
+            MappedColor = ACESFilm(MappedColor);
+            break;
+        case 1:
+            MappedColor = Filmic(MappedColor);
+            break;
+        case 2:
+            MappedColor = RomBinDaHouse(MappedColor);
+            break;
     }
+    
+    LDRTexture[ThreadID.xy] = float4(MappedColor, HDRColor.a);
 }

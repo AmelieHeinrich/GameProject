@@ -17,11 +17,13 @@ struct RendererSettings
     float3 ColorFilter;
     float ColorFilterIntensity;
     float3 Saturation;
+    float SharpnessStrength;
+
+    float pad[6];
 };
 
-Texture2D<float4> HDRTexture : register(t0);
-RWTexture2D<float4> LDRTexture : register(u1);
-ConstantBuffer<RendererSettings> Settings : register(b2);
+RWTexture2D<float4> Texture : register(u0);
+ConstantBuffer<RendererSettings> Settings : register(b1);
 
 float3 WhiteBalance(float3 col, float temp, float tint) 
 {
@@ -70,19 +72,13 @@ float Luminance(float3 Color)
 [numthreads(16, 16, 1)]
 void CSMain(uint3 ThreadID : SV_DispatchThreadID)
 {
-    uint Width, Height;
-    HDRTexture.GetDimensions(Width, Height);
+    float3 BaseColor = Texture[ThreadID.xy].xyz;
 
-    if (ThreadID.x < Width && ThreadID.y < Height)
-    {
-        float3 BaseColor = HDRTexture[ThreadID.xy].xyz;
+    BaseColor *= Settings.Exposure;
+    BaseColor = WhiteBalance(BaseColor, Settings.Temperature, Settings.Tint);
+    BaseColor = Settings.Contrast * (BaseColor - Settings.LinearMidPoint) + Settings.LinearMidPoint + Settings.Brightness;
+    BaseColor *= (Settings.ColorFilter * Settings.ColorFilterIntensity);
+    BaseColor *= lerp(Luminance(BaseColor), BaseColor, Settings.Saturation);
 
-        BaseColor *= Settings.Exposure;
-        BaseColor = WhiteBalance(BaseColor, Settings.Temperature, Settings.Tint);
-        BaseColor = Settings.Contrast * (BaseColor - Settings.LinearMidPoint) + Settings.LinearMidPoint + Settings.Brightness;
-        BaseColor *= (Settings.ColorFilter * Settings.ColorFilterIntensity);
-        BaseColor *= lerp(Luminance(BaseColor), BaseColor, Settings.Saturation);
-
-        LDRTexture[ThreadID.xy] = float4(BaseColor, 1.0f);
-    }
+    Texture[ThreadID.xy] = float4(BaseColor, 1.0f);
 }

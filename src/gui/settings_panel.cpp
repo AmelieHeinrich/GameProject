@@ -25,14 +25,17 @@ void SettingsDrawGraphics()
 {
     renderer_settings *Settings = RendererGetSettings();
 
-    if (ImGui::TreeNode("Graphics"))
+    if (ImGui::TreeNodeEx("Graphics", ImGuiTreeNodeFlags_Framed))
     {
         bool VerticalSync = EgcB32(EgcFile, "vsync");
         ImGui::Checkbox("Vertical Sync", &VerticalSync);
         EgcB32(EgcFile, "vsync") = VerticalSync;
 
-        if (ImGui::TreeNode("Color Correction"))
+        if (ImGui::TreeNodeEx("Color Correction", ImGuiTreeNodeFlags_Framed))
         {
+            ImGui::Checkbox("Enable", &Settings->EnableColorCorrection);
+            ImGui::Separator();
+
             ImGui::SliderFloat("Exposure", &Settings->Settings.Exposure, 0.1f, 5.0f, "%.1f");
             ImGui::SliderFloat("Temperature", &Settings->Settings.Temperature, 0.0f, 1.0f, "%.1f");
             ImGui::SliderFloat("Tint", &Settings->Settings.Tint, 0.0f, 1.0f, "%.1f");
@@ -46,10 +49,20 @@ void SettingsDrawGraphics()
             ImGui::TreePop();
         }
 
-        if (ImGui::TreeNode("Tonemapping"))
+        if (ImGui::TreeNodeEx("Tonemapping", ImGuiTreeNodeFlags_Framed))
         {
             static const char* Tonemappers[] = { "ACES", "Filmic", "Rom Bin Da House" };
             ImGui::Combo("Tonemapper", (int*)&Settings->Settings.Tonemapper, Tonemappers, 3);
+
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNodeEx("Sharpness", ImGuiTreeNodeFlags_Framed))
+        {
+            ImGui::Checkbox("Enable", &Settings->EnableSharpness);
+            ImGui::Separator();
+
+            ImGui::SliderFloat("Sharpness Strength", &Settings->Settings.SharpnessStrength, 0.0f, 5.0f, "%.1f");
 
             ImGui::TreePop();
         }
@@ -60,7 +73,7 @@ void SettingsDrawGraphics()
 
 void SettingsDrawMouse()
 {
-    if (ImGui::TreeNode("Mouse"))
+    if (ImGui::TreeNodeEx("Mouse", ImGuiTreeNodeFlags_Framed))
     {
         float Sensitivity = EgcF32(EgcFile, "mouse_sensitivity");
         ImGui::SliderFloat("Sensitivity", &Sensitivity, 0.1f, 8.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
@@ -72,7 +85,7 @@ void SettingsDrawMouse()
 
 void SettingsDrawAudio()
 {
-    if (ImGui::TreeNode("Sound"))
+    if (ImGui::TreeNodeEx("Sound", ImGuiTreeNodeFlags_Framed))
     {
         float Music = EgcF32(EgcFile, "music_volume");
         float Sound = EgcF32(EgcFile, "sound_volume");
