@@ -54,10 +54,11 @@ void RendererInit()
     EventSystemRegister(event_type::ShaderRecompile, nullptr, RendererShaderRecompile);
     EventSystemRegister(event_type::KeyPressed, nullptr, RendererOnKeyPressed);
  
-    Renderer.Settings.EnableSharpness = true;
+    Renderer.Settings.Wireframe = false;
+    Renderer.Settings.EnableSharpness = false;
     Renderer.Settings.EnableColorCorrection = true;
 
-    Renderer.Settings.Settings.Tonemapper = tonemapping_algorithm::ACES;
+    Renderer.Settings.Settings.Tonemapper = tonemapping_algorithm::Filmic;
     Renderer.Settings.Settings.Exposure = 2.2f;
     Renderer.Settings.Settings.Temperature = 0.0f;
     Renderer.Settings.Settings.Tint = 0.0f;
@@ -93,7 +94,7 @@ void RendererStartSync()
 void RendererConstructFrame(camera_data *Camera)
 {
     RendererSettingsUpdate(&Renderer.Settings);
-    ForwardPassUpdate(&Renderer.Forward, Camera);
+    ForwardPassUpdate(&Renderer.Forward, Camera, Renderer.Settings.Wireframe);
     if (Renderer.Settings.EnableColorCorrection)
         ColorCorrectionPassUpdate(&Renderer.ColorCorrection, &Renderer.Settings.Buffer);
     if (Renderer.Settings.EnableSharpness)

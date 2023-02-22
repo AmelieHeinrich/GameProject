@@ -31,6 +31,13 @@ void SettingsDrawGraphics()
         ImGui::Checkbox("Vertical Sync", &VerticalSync);
         EgcB32(EgcFile, "vsync") = VerticalSync;
 
+        if (ImGui::TreeNodeEx("Geometry Pass", ImGuiTreeNodeFlags_Framed))
+        {
+            ImGui::Checkbox("Wireframe", &Settings->Wireframe);
+
+            ImGui::TreePop();
+        }
+
         if (ImGui::TreeNodeEx("Color Correction", ImGuiTreeNodeFlags_Framed))
         {
             ImGui::Checkbox("Enable", &Settings->EnableColorCorrection);

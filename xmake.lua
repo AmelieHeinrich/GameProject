@@ -32,7 +32,7 @@ target("ImGui")
     add_syslinks("d3dcompiler", "dxgi", "d3d12")
 
 target("Game Project")
-    set_languages("c11", "c++17")
+    set_languages("c11", "c++20")
     set_rundir(".")
     add_deps("ImGui", "dr_libs", "stb")
     add_files("src/*.cpp", "src/cameras/*.cpp", "src/gui/*.cpp", "src/renderer/*.cpp", "src/renderer/passes/*.cpp", "src/scene/*.cpp", "src/systems/*.cpp")

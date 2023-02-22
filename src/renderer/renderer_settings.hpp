@@ -39,6 +39,7 @@ struct renderer_settings
 {
     gpu_buffer Buffer;
 
+    bool Wireframe;
     bool EnableSharpness;
     bool EnableColorCorrection;
 

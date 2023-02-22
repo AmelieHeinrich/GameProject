@@ -17,7 +17,7 @@ mesh ProcessMesh(loaded_model *Model, aiMesh *Mesh, const aiScene *Scene, aiMatr
 {
     mesh Out;
 
-    Out.Transform = HMM_Rotate(90.0f, HMM_Vec3(1.0f, 0.0f, 0.0f));
+    Out.Transform = HMM_Mat4d(1.0f);
 
     std::vector<mesh_vertex> Vertices;
     std::vector<uint32_t> Indices;
