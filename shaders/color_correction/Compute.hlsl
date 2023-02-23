@@ -8,18 +8,23 @@
 struct RendererSettings
 {
     int Tonemapper;
+    uint _Padding1;
+    uint _Padding2;
+    uint _Padding3;
     float Exposure;
     float Temperature;
     float Tint;
+    uint _Padding4;
     float3 Contrast;
+    uint _Padding5;
     float3 LinearMidPoint;
+    uint _Padding6;
     float3 Brightness;
+    uint _Padding7;
     float3 ColorFilter;
+    uint _Padding8;
     float ColorFilterIntensity;
     float3 Saturation;
-    float SharpnessStrength;
-
-    float pad[6];
 };
 
 RWTexture2D<float4> Texture : register(u0);

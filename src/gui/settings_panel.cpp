@@ -64,16 +64,6 @@ void SettingsDrawGraphics()
             ImGui::TreePop();
         }
 
-        if (ImGui::TreeNodeEx("Sharpness", ImGuiTreeNodeFlags_Framed))
-        {
-            ImGui::Checkbox("Enable", &Settings->EnableSharpness);
-            ImGui::Separator();
-
-            ImGui::SliderFloat("Sharpness Strength", &Settings->Settings.SharpnessStrength, 0.0f, 5.0f, "%.1f");
-
-            ImGui::TreePop();
-        }
-
         ImGui::TreePop();
     }
 }

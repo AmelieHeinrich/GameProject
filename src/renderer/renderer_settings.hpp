@@ -11,6 +11,8 @@
 
 #include "math_types.hpp"
 
+#include <cstdint>
+
 enum class tonemapping_algorithm : int
 {
     ACES = 0,
@@ -21,18 +23,23 @@ enum class tonemapping_algorithm : int
 struct settings_value
 {
     tonemapping_algorithm Tonemapper;
+    uint32_t _Padding1;
+    uint32_t _Padding2;
+    uint32_t _Padding3;
     float Exposure;
     float Temperature;
     float Tint;
+    uint32_t _Padding4;
     V3 Contrast;
+    uint32_t _Padding5;
     V3 LinearMidPoint;
+    uint32_t _Padding6;
     V3 Brightness;
+    uint32_t _Padding7;
     V3 ColorFilter;
+    uint32_t _Padding8;
     float ColorFilterIntensity;
     V3 Saturation;
-    float SharpnessStrength;
-
-    float pad[6];
 };
 
 struct renderer_settings
@@ -40,7 +47,6 @@ struct renderer_settings
     gpu_buffer Buffer;
 
     bool Wireframe;
-    bool EnableSharpness;
     bool EnableColorCorrection;
 
     settings_value Settings;
