@@ -1,4 +1,4 @@
-# Game Project : A gift to my girlfriend Ellie
+# Game Project : A gift to my girlfriend Kai
 
 ## How to run
 
