@@ -513,4 +513,6 @@ void GpuCommandBufferScreenshot(gpu_command_buffer *Command, gpu_image *Image, g
 
     stbi_write_png(String.c_str(), Image->Width, Image->Height, 4, Result, Image->Width * 4);
     LogInfo("Saved screenshot at path %s", String.c_str());
+
+    delete Result;
 }
