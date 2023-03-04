@@ -80,7 +80,7 @@ void ForwardPassUpdate(forward_pass *Pass, camera_data *Camera, bool Wireframe)
         GpuCommandBufferBindPipeline(Buffer, &Pass->Pipeline);
     GpuCommandBufferBindConstantBuffer(Buffer, gpu_pipeline_type::Graphics, &Pass->CameraBuffer, 0);
     if (!Wireframe)
-        GpuCommandBufferBindSampler(Buffer, gpu_pipeline_type::Graphics, &Pass->Sampler, 2);
+        GpuCommandBufferBindSampler(Buffer, gpu_pipeline_type::Graphics, &Pass->Sampler, 3);
     for (auto Mesh : Pass->Model.Meshes)
     {
         hmm_mat4 UploadMatrices[3] = { Camera->View, Camera->Projection, Mesh.Transform };
@@ -90,6 +90,8 @@ void ForwardPassUpdate(forward_pass *Pass, camera_data *Camera, bool Wireframe)
         GpuCommandBufferBindBuffer(Buffer, &Mesh.IndexBuffer);
         if (!Wireframe)
             GpuCommandBufferBindShaderResource(Buffer, gpu_pipeline_type::Graphics, &Mesh.Albedo, 1);
+        if (!Wireframe)
+            GpuCommandBufferBindShaderResource(Buffer, gpu_pipeline_type::Graphics, &Mesh.Normal, 2);
         GpuCommandBufferDrawIndexed(Buffer, Mesh.IndexCount);
     }
     GpuCommandBufferEnd(Buffer);

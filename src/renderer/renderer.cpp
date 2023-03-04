@@ -10,6 +10,7 @@
 #include "gpu/gpu_context.hpp"
 #include "systems/event_system.hpp"
 #include "systems/input_types.hpp"
+#include "systems/shader_system.hpp"
 
 #include <stdlib.h>
 
@@ -35,13 +36,26 @@ bool RendererShaderRecompile(event_type Type, void *Sender, void *Listener, even
 {
     GpuWait();
 
-    TonemappingPassExit(&Renderer.Tonemapping);
-    ColorCorrectionPassExit(&Renderer.ColorCorrection);
-    ForwardPassExit(&Renderer.Forward);
+    if (Data.data.u32[0] == ShaderLibraryGetID("Forward") || Data.data.u32[0] == ShaderLibraryGetID("Wireframe"))
+    {
+        ForwardPassExit(&Renderer.Forward);
+        ForwardPassInit(&Renderer.Forward);
+        return false;
+    }
 
-    ForwardPassInit(&Renderer.Forward);
-    ColorCorrectionPassInit(&Renderer.ColorCorrection, &Renderer.Forward.RenderTarget);
-    TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
+    if (Data.data.u32[0] == ShaderLibraryGetID("Color Correction"))
+    {
+        ColorCorrectionPassExit(&Renderer.ColorCorrection);
+        ColorCorrectionPassInit(&Renderer.ColorCorrection, &Renderer.Forward.RenderTarget);
+        return false;
+    }
+
+    if (Data.data.u32[0] == ShaderLibraryGetID("Tonemapping"))
+    {
+        TonemappingPassExit(&Renderer.Tonemapping);
+        TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
+        return false;
+    }
 
     return false;
 }

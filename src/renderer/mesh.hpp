@@ -29,6 +29,7 @@ struct mesh
     int IndexCount;
 
     gpu_image Albedo;
+    gpu_image Normal;
     hmm_mat4 Transform;
 };
 

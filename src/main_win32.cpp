@@ -18,8 +18,11 @@
 #include "systems/event_system.hpp"
 #include "systems/input_system.hpp"
 #include "windows/windows_data.hpp"
+#include "systems/rng_system.hpp"
 
 #include <cstdint>
+#include <cstdlib>
+#include <ctime>
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_win32.h>
 
@@ -130,6 +133,7 @@ void WindowExit()
 
 int main(int argc, char *argv[])
 {
+    RngInit(time(NULL));
     EgcParseFile("config.egc", &EgcFile);
     EgcParseFile("cvars.egc", &CVars);
     EventSystemInit();

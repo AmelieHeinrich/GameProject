@@ -31,7 +31,7 @@ void ApuSourceInitPCM(apu_source *Source, int SampleRate, int Channels, int Samp
     
     DSBUFFERDESC BufferDesc = {};
     BufferDesc.dwSize = sizeof(DSBUFFERDESC);
-    BufferDesc.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFX;
+    BufferDesc.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFX | DSBCAPS_GLOBALFOCUS;
     BufferDesc.dwBufferBytes = (DWORD)SampleCount * WaveFormat.nChannels * sizeof(short);
     BufferDesc.lpwfxFormat = &WaveFormat;
     BufferDesc.guid3DAlgorithm = GUID_NULL;

@@ -13,10 +13,13 @@ struct FragmentIn
 };
 
 Texture2D Texture : register(t1);
-SamplerState Sampler : register(s2);
+Texture2D NormalTexture : register(t2);
+SamplerState Sampler : register(s3);
 
 float4 PSMain(FragmentIn Input) : SV_TARGET
 {
+    float3 Normal = NormalTexture.Sample(Sampler, Input.TextureCoords).xyz;
     float4 Albedo = Texture.Sample(Sampler, Input.TextureCoords);
+    Albedo.xyz *= normalize(Normal);
     return Albedo;
 }

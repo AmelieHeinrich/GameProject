@@ -17,6 +17,7 @@ struct shader_entry
     std::string VS;
     std::string PS;
     std::string CS;
+    double ID;
     gpu_shader Shader;
 };
 
@@ -31,4 +32,5 @@ void ShaderLibraryErase(const std::string& ShaderName);
 void ShaderLibraryFree();
 void ShaderLibraryRecompile(const std::string& ShaderName);
 void ShaderLibraryRecompileAll();
+int ShaderLibraryGetID(const std::string& Name);
 gpu_shader *ShaderLibraryGet(const std::string& Name);

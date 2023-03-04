@@ -49,7 +49,7 @@ void SettingsDrawGraphics()
             ImGui::SliderFloat3("Contrast", Settings->Settings.Contrast.Elements, 0.0f, 5.0f, "%.1f");
             ImGui::SliderFloat3("Linear Mid Point", Settings->Settings.LinearMidPoint.Elements, 0.0f, 5.0f, "%.1f");
             ImGui::SliderFloat3("Brightness", Settings->Settings.Brightness.Elements, 0.0f, 5.0f, "%.1f");
-            ImGui::ColorPicker3("Color Filter", Settings->Settings.ColorFilter.Elements, ImGuiColorEditFlags_InputRGB);
+            ImGui::ColorPicker3("Color Filter", Settings->Settings.ColorFilter.Elements);
             ImGui::SliderFloat("Color Filter Intensity", &Settings->Settings.ColorFilterIntensity, 0.0f, 5.0f, "%.1f");
             ImGui::SliderFloat3("Saturation", Settings->Settings.Saturation.Elements, 0.0f, 5.0f, "%.1f");
 
