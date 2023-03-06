@@ -12,6 +12,8 @@ xmake run
 
 ## The plan
 
+- RHI
+    - VULKAN BACKEND lol
 - Rendering
     - Environment map renderer
     - Forward(+?) Renderer
