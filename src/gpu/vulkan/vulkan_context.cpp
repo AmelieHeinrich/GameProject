@@ -7,6 +7,13 @@
 
 #include "vulkan_context.hpp"
 
+vulkan_context VK;
+
+gpu_backend GpuGetBackend()
+{
+    return gpu_backend::Vulkan;
+}
+
 void GpuInit()
 {
 
@@ -44,15 +51,15 @@ void GpuWait()
 
 hmm_v2 GpuGetDimensions()
 {
-
+    return HMM_Vec2(VK.Width, VK.Height);
 }
 
 gpu_command_buffer* GpuGetImageCommandBuffer()
 {
-
+    return nullptr;
 }
 
 gpu_image* GpuGetSwapChainImage()
 {
-    
+    return nullptr;   
 }

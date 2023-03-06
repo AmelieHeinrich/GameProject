@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "gpu/gpu_context.hpp"
+
 #include <vulkan/vulkan.h>
 #include <cstdint>
 

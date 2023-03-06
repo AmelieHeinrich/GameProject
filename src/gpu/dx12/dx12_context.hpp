@@ -17,6 +17,7 @@
 #include "dx12_fence.hpp"
 #include "math_types.hpp"
 #include "gpu/gpu_command_buffer.hpp"
+#include "gpu/gpu_context.hpp"
 
 #include <D3D12MA/D3D12MemAlloc.h>
 

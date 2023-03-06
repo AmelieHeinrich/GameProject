@@ -37,7 +37,8 @@ target("Game")
         add_syslinks("d3d12", "d3dcompiler", "dxgi")
         add_files("src/gpu/dx12/*.cpp", "src/gui/dx12/*.cpp")
     elseif get_config("rhi") == "vulkan" then
-        add_linkdirs("$(VULKAN_SDK)/Lib")
+        add_includedirs(os.getenv("VULKAN_SDK") .. "/Include")
+        add_linkdirs(os.getenv("VULKAN_SDK") .. "/Lib")
         add_syslinks("vulkan-1")
         add_files("src/gpu/vulkan/*.cpp", "src/gui/vulkan/*.cpp")
     end

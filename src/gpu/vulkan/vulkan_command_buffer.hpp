@@ -6,3 +6,5 @@
  */
 
 #pragma once
+
+#include "gpu/gpu_command_buffer.hpp"

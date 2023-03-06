@@ -14,6 +14,14 @@
 #include "gpu_image.hpp"
 #include "math_types.hpp"
 
+enum class gpu_backend
+{
+    DirectX12,
+    Vulkan
+};
+
+gpu_backend GpuGetBackend();
+
 void GpuInit();
 void GpuExit();
 void GpuBeginFrame();

@@ -120,7 +120,21 @@ void WindowInit(void)
     Win32.WindowClass.lpfnWndProc = WindowProc;
     RegisterClassA(&Win32.WindowClass);
 
-    Win32.Window = CreateWindowA(Win32.WindowClass.lpszClassName, "Game Project | <Direct3D 12>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, nullptr, nullptr, Win32.Instance, nullptr);
+    const char *Title;
+    switch (GpuGetBackend())
+    {
+        case gpu_backend::Vulkan:
+            Title = "Game Project | <Vulkan>";
+            break;
+        case gpu_backend::DirectX12:
+            Title = "Game Project | <Direct3D 12>";
+            break;
+        default:
+            Title = "Game Project | <NULL API>";
+            break;
+    }
+
+    Win32.Window = CreateWindowA(Win32.WindowClass.lpszClassName, Title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, Width, Height, nullptr, nullptr, Win32.Instance, nullptr);
     ShowWindow(Win32.Window, SW_SHOWMAXIMIZED);
     SetWindowLong(Win32.Window, GWL_STYLE, GetWindowLong(Win32.Window, GWL_STYLE) & ~WS_MINIMIZEBOX); 
 }

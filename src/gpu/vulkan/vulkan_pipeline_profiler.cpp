@@ -6,3 +6,14 @@
  */
 
 #include "vulkan_pipeline_profiler.hpp"
+
+void GpuPipelineProfilerInit(gpu_pipeline_profiler *Profiler)
+{
+
+}
+
+void GpuPipelineProfilerFree(gpu_pipeline_profiler *Profiler)
+{
+
+}
+

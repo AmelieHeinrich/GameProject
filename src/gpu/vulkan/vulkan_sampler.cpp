@@ -6,3 +6,13 @@
  */
 
 #include "vulkan_sampler.hpp"
+
+void GpuSamplerInit(gpu_sampler *Sampler, gpu_texture_address Address, gpu_texture_filter Filter)
+{
+
+}
+
+void GpuSamplerFree(gpu_sampler *Sampler)
+{
+    
+}

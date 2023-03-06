@@ -21,6 +21,11 @@ extern "C"
 
 dx12_context DX12;
 
+gpu_backend GpuGetBackend()
+{
+    return gpu_backend::DirectX12;
+}
+
 void GetHardwareAdapter(IDXGIFactory3 *Factory, IDXGIAdapter1 **RetAdapter, bool HighPerf)
 {
     *RetAdapter = nullptr;
