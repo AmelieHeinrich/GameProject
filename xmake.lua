@@ -9,6 +9,9 @@ add_rules("mode.debug", "mode.release")
 
 includes("external", "tools")
 
+option("rhi")
+    set_default("d3d12")
+
 target("Game")
     set_languages("c11", "c++20")
     set_rundir(".")
@@ -29,10 +32,19 @@ target("Game")
         set_strip("all")
     end
 
-    if is_plat("windows") then
+    if get_config("rhi") == "d3d12" then
         add_deps("D3D12MA")
-        add_syslinks("user32", "dsound", "gdi32", "kernel32", "d3d12", "d3dcompiler", "dxgi", "assimp-vc143-mtd")
-        add_files("src/apu/dsound/*.cpp", "src/gpu/dx12/*.cpp", "src/gui/dx12/*.cpp", "src/systems/windows/*.cpp", "src/windows/*.cpp")
+        add_syslinks("d3d12", "d3dcompiler", "dxgi")
+        add_files("src/gpu/dx12/*.cpp", "src/gui/dx12/*.cpp")
+    elseif get_config("rhi") == "vulkan" then
+        add_linkdirs("$(VULKAN_SDK)/Lib")
+        add_syslinks("vulkan-1")
+        add_files("src/gpu/vulkan/*.cpp", "src/gui/vulkan/*.cpp")
+    end
+
+    if is_plat("windows") then
+        add_syslinks("user32", "dsound", "gdi32", "kernel32", "assimp-vc143-mtd")
+        add_files("src/apu/dsound/*.cpp", "src/systems/windows/*.cpp", "src/windows/*.cpp")
         add_files("src/main_win32.cpp")
     end
     -- TODO(amelie.h): MacOS
