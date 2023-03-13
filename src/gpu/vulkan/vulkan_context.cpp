@@ -20,11 +20,34 @@ static const char *VulkanInstanceExtensions[] = {
     ENGINE_VK_SURFACE_EXTENSION
 };
 
+static const char *VulkanExtensions[] = {
+    "VK_KHR_swapchain"
+};
+
 vulkan_context VK;
 
 gpu_backend GpuGetBackend()
 {
     return gpu_backend::Vulkan;
+}
+
+uint64_t GetPhysicalDeviceScore(VkPhysicalDevice Device)
+{
+    uint64_t Score = 0;
+
+    VkPhysicalDeviceFeatures Features;
+    vkGetPhysicalDeviceFeatures(Device, &Features);
+    VkPhysicalDeviceProperties Properties;
+    vkGetPhysicalDeviceProperties(Device, &Properties);
+
+    Score += Properties.limits.maxComputeSharedMemorySize * 30;
+    Score += Properties.limits.maxBoundDescriptorSets * 20;
+    Score += Features.fillModeNonSolid ? 1000 : 0;
+    Score += Features.samplerAnisotropy ? 1000 : 0;
+    Score += Features.pipelineStatisticsQuery ? 1000 : 0;
+    Score += Properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ? 1000000 : 0;
+    
+    return Score;
 }
 
 void GpuInit()
@@ -38,8 +61,6 @@ void GpuInit()
     ApplicationInfo.pEngineName = "Cheese Toast Engine";
     ApplicationInfo.engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0);
     ApplicationInfo.apiVersion = VK_API_VERSION_1_3;
-
-    // TODO(amelie.h): Pick instance layers and extensions
 
     VkInstanceCreateInfo CreateInfo = {};
     CreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -56,7 +77,27 @@ void GpuInit()
         LogError("VULKAN: Failed to create instance!");
     }
 
-    // TODO(amelie.h): Pick physical device
+    uint32_t DeviceCount = 0;
+    vkEnumeratePhysicalDevices(VK.Instance, &DeviceCount, nullptr);
+    if (DeviceCount == 0) {
+        LogError("VULKAN: No GPU found!");
+    }
+    std::vector<VkPhysicalDevice> Devices(DeviceCount);
+    vkEnumeratePhysicalDevices(VK.Instance, &DeviceCount, Devices.data());
+
+    uint64_t PreviousScore = 0;
+    for (auto Device : Devices) {
+        uint64_t Score = GetPhysicalDeviceScore(Device);
+        if (Score > PreviousScore) {
+            PreviousScore = Score;
+            VK.PhysicalDevice = Device;
+        }
+    }
+
+    VkPhysicalDeviceProperties Properties;
+    vkGetPhysicalDeviceProperties(VK.PhysicalDevice, &Properties);
+    LogInfo("VULKAN: Using GPU %s", Properties.deviceName);
+
     // TODO(amelie.h): Create logical device
     // TODO(amelie.h): Create command queues
 }

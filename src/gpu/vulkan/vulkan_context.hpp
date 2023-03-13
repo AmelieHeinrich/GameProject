@@ -23,6 +23,7 @@ struct vulkan_context
     uint32_t Height;
 
     VkInstance Instance;
+    VkSurfaceKHR Surface;
     VkPhysicalDevice PhysicalDevice;
     VkDevice Device;
 
