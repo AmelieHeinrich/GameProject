@@ -30,9 +30,10 @@ target("ImGui")
     
     if get_config("rhi") == "d3d12" then
         add_syslinks("d3dcompiler", "dxgi", "d3d12")
+        remove_files("ImGui/imgui_impl_vulkan.cpp", "ImGui/imgui_impl_vulkan.h")
     elseif get_config("rhi") == "vulkan" then
         add_includedirs(os.getenv("VULKAN_SDK") .. "/Include")
         add_linkdirs(os.getenv("VULKAN_SDK") .. "/Lib")
         add_syslinks("vulkan-1")
-        remove_files("ImGui/imgui_impl_dx12.cpp", "ImGui/imgui_impl_dx12.h", "ImGui/imgui_impl_dx11.cpp", "ImGui/imgui_impl_dx11.h")
+        remove_files("ImGui/imgui_impl_dx12.cpp", "ImGui/imgui_impl_dx12.h")
     end
