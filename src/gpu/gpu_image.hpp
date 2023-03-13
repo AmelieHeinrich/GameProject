@@ -10,6 +10,7 @@
 #include <cstdint>
 
 #include "renderer/cpu_image.hpp"
+#include "util/uuid.hpp"
 
 enum class gpu_image_format
 {
@@ -45,6 +46,7 @@ enum class gpu_image_usage
 
 struct gpu_image
 {
+    uuid ID;
     uint32_t Width;
     uint32_t Height;
     gpu_image_format Format;

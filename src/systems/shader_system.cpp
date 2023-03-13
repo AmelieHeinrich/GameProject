@@ -19,7 +19,7 @@ void ShaderLibraryPush(const std::string& ShaderName, const std::string& VS, con
     TimerInit(&Timer);
 
     shader_entry* Entry = &Library.Entries[ShaderName];
-    Entry->ID = RngGenerate() * 10000000;
+    Entry->ID = NewUUID();
     const char* V = VS.empty() ? nullptr : VS.c_str();
     const char* P = PS.empty() ? nullptr : PS.c_str();
     const char* C = CS.empty() ? nullptr : CS.c_str();
@@ -71,7 +71,7 @@ void ShaderLibraryRecompile(const std::string& ShaderName)
     GpuShaderInit(&Entry->Shader, VS, PS, CS);
 
     event_data Data = {};
-    Data.data.u32[0] = Entry->ID;
+    Data.data.u64[0] = Entry->ID;
     EventSystemFire(event_type::ShaderRecompile, nullptr, Data);
 
     LogInfo("Recompiled shader %s in %f seconds", ShaderName.c_str(), ToSeconds(TimerGetElapsed(&Timer)));
@@ -88,7 +88,7 @@ void ShaderLibraryRecompileAll()
     LogInfo("Recompiled all shaders in %f seconds", ToSeconds(TimerGetElapsed(&Timer)));
 }
 
-int ShaderLibraryGetID(const std::string& Name)
+uint64_t ShaderLibraryGetID(const std::string& Name)
 {
     return Library.Entries[Name].ID;
 }

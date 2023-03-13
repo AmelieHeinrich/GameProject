@@ -11,13 +11,14 @@
 #include <string>
 #include <vector>
 #include "gpu/gpu_shader.hpp"
+#include "util/uuid.hpp"
 
 struct shader_entry
 {
     std::string VS;
     std::string PS;
     std::string CS;
-    double ID;
+    uuid ID;
     gpu_shader Shader;
 };
 
@@ -32,5 +33,5 @@ void ShaderLibraryErase(const std::string& ShaderName);
 void ShaderLibraryFree();
 void ShaderLibraryRecompile(const std::string& ShaderName);
 void ShaderLibraryRecompileAll();
-int ShaderLibraryGetID(const std::string& Name);
+uint64_t ShaderLibraryGetID(const std::string& Name);
 gpu_shader *ShaderLibraryGet(const std::string& Name);

@@ -45,6 +45,7 @@ D3D12_RESOURCE_FLAGS GetResourceFlag(gpu_image_usage Usage)
 
 void GpuImageInit(gpu_image *Image, uint32_t Width, uint32_t Height, gpu_image_format Format, gpu_image_usage Usage)
 {
+    Image->ID = NewUUID();
     Image->Width = Width;
     Image->Height = Height;
     Image->Format = Format;

@@ -27,7 +27,7 @@ renderer_data Renderer;
 
 bool RendererOnKeyPressed(event_type Type, void *Sender, void *Listener, event_data Data)
 {   
-    if (Data.data.u32[0] == (uint32_t)keyboard_key::F2)
+    if (Data.data.u32[0] == (uint32_t)keyboard_key::F12)
         RendererScreenshot();
     return false;
 }
@@ -36,21 +36,21 @@ bool RendererShaderRecompile(event_type Type, void *Sender, void *Listener, even
 {
     GpuWait();
 
-    if (Data.data.u32[0] == ShaderLibraryGetID("Forward") || Data.data.u32[0] == ShaderLibraryGetID("Wireframe"))
+    if (Data.data.u64[0] == ShaderLibraryGetID("Forward") || Data.data.u64[0] == ShaderLibraryGetID("Wireframe"))
     {
         ForwardPassExit(&Renderer.Forward);
         ForwardPassInit(&Renderer.Forward);
         return false;
     }
 
-    if (Data.data.u32[0] == ShaderLibraryGetID("Color Correction"))
+    if (Data.data.u64[0] == ShaderLibraryGetID("Color Correction"))
     {
         ColorCorrectionPassExit(&Renderer.ColorCorrection);
         ColorCorrectionPassInit(&Renderer.ColorCorrection, &Renderer.Forward.RenderTarget);
         return false;
     }
 
-    if (Data.data.u32[0] == ShaderLibraryGetID("Tonemapping"))
+    if (Data.data.u64[0] == ShaderLibraryGetID("Tonemapping"))
     {
         TonemappingPassExit(&Renderer.Tonemapping);
         TonemappingPassInit(&Renderer.Tonemapping, &Renderer.Forward.RenderTarget);
