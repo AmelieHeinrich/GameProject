@@ -9,8 +9,10 @@
 
 #include "gpu/gpu_context.hpp"
 
+#define VK_USE_PLATFORM_WIN32_KHR 1
 #include <vulkan/vulkan.h>
 #include <cstdint>
+#include <vector>
 
 #include "math_types.hpp"
 #include "gpu/gpu_command_buffer.hpp"
@@ -19,6 +21,22 @@ struct vulkan_context
 {
     uint32_t Width;
     uint32_t Height;
+
+    VkInstance Instance;
+    VkPhysicalDevice PhysicalDevice;
+    VkDevice Device;
+
+    uint32_t GraphicsQueueFamily;
+    VkQueue GraphicsQueue;
+    VkCommandPool GraphicsPool;
+
+    uint32_t ComputeQueueFamily;
+    VkQueue ComputeQueue;
+    VkCommandPool ComputePool;
+
+    uint32_t UploadQueueFamily;
+    VkQueue UploadQueue;
+    VkCommandPool UploadPool;
 };
 
 extern vulkan_context VK;

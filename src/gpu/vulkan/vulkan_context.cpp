@@ -16,7 +16,10 @@ gpu_backend GpuGetBackend()
 
 void GpuInit()
 {
-
+    // TODO(amelie.h): Initialise instance
+    // TODO(amelie.h): Pick physical device
+    // TODO(amelie.h): Create logical device
+    // TODO(amelie.h): Create command queues
 }
 
 void GpuExit()

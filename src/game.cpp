@@ -74,7 +74,7 @@ void GameInit()
     EventSystemRegister(event_type::Resize, nullptr, GameResize);
     DevTerminalInit();
 
-    //RendererInit();
+    RendererInit();
     TimerInit(&GameState.Timer);
     NoClipCameraInit(&GameState.Camera);
 
@@ -101,29 +101,28 @@ void GameUpdate()
     Data.Projection = GameState.Camera.Projection;
     Data.Position = GameState.Camera.Position;
 
-    //RendererStartSync();
-//
-    //RendererConstructFrame(&Data);
-//
-    //RendererStartRender();
-    //GuiBeginFrame();
-//
-    //if (GameState.TerminalOpen)
-    //    DevTerminalDraw(&GameState.TerminalOpen, &GameState.TerminalFocus);
-    //if (GameState.SettingsOpen)
-    //    SettingsPanelDraw(&GameState.SettingsOpen, &GameState.SettingsFocus);
-    //
-    //
-    //GuiEndFrame(GpuGetImageCommandBuffer());
-    //RendererEndRender();
-//
-    //GpuPresent();
-    //RendererEndSync();
+    RendererStartSync();
+
+    RendererConstructFrame(&Data);
+    
+    RendererStartRender();
+    GuiBeginFrame();
+    
+    if (GameState.TerminalOpen)
+        DevTerminalDraw(&GameState.TerminalOpen, &GameState.TerminalFocus);
+    if (GameState.SettingsOpen)
+        SettingsPanelDraw(&GameState.SettingsOpen, &GameState.SettingsFocus);
+    
+    GuiEndFrame(GpuGetImageCommandBuffer());
+    RendererEndRender();
+    
+    GpuPresent();
+    RendererEndSync();
 }
 
 void GameExit()
 {
     ApuSourceFree(&GameState.Source);
     DevTerminalShutdown();
-    //RendererExit();
+    RendererExit();
 }
