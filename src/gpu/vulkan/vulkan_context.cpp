@@ -7,6 +7,17 @@
 
 #include "vulkan_context.hpp"
 
+#include "platform_detection.hpp"
+
+static const char *VulkanInstanceLayers[] = {
+    "VK_LAYER_KHRONOS_validation"
+};
+
+static const char *VulkanInstanceExtensions[] = {
+    "VK_KHR_surface",
+    ENGINE_VK_SURFACE_EXTENSION
+};
+
 vulkan_context VK;
 
 gpu_backend GpuGetBackend()
