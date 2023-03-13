@@ -7,7 +7,7 @@
 
 #include "game.hpp"
 
-#include "timer.hpp"
+#include "util/timer.hpp"
 #include "apu/apu_source.hpp"
 #include "cameras/noclip_camera.hpp"
 #include "gpu/gpu_context.hpp"

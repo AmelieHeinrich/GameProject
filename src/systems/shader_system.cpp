@@ -8,8 +8,8 @@
 #include "shader_system.hpp"
 #include "log_system.hpp"
 #include "event_system.hpp"
-#include "timer.hpp"
 #include "rng_system.hpp"
+#include "util/timer.hpp"
 
 shader_library Library;
 
@@ -19,7 +19,7 @@ void ShaderLibraryPush(const std::string& ShaderName, const std::string& VS, con
     TimerInit(&Timer);
 
     shader_entry* Entry = &Library.Entries[ShaderName];
-    Entry->ID = RngGenerate() * 100000;
+    Entry->ID = RngGenerate() * 10000000;
     const char* V = VS.empty() ? nullptr : VS.c_str();
     const char* P = PS.empty() ? nullptr : PS.c_str();
     const char* C = CS.empty() ? nullptr : CS.c_str();
