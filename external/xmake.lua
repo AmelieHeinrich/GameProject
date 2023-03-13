@@ -34,5 +34,5 @@ target("ImGui")
         add_includedirs(os.getenv("VULKAN_SDK") .. "/Include")
         add_linkdirs(os.getenv("VULKAN_SDK") .. "/Lib")
         add_syslinks("vulkan-1")
-        remove_files("ImGui/imgui_impl_dx12.cpp", "ImGui/imgui_impl_dx12.h")
+        remove_files("ImGui/imgui_impl_dx12.cpp", "ImGui/imgui_impl_dx12.h", "ImGui/imgui_impl_dx11.cpp", "ImGui/imgui_impl_dx11.h")
     end
