@@ -7,6 +7,7 @@
 
 #include "vulkan_context.hpp"
 
+#include "game_data.hpp"
 #include "platform_detection.hpp"
 #include "systems/log_system.hpp"
 
@@ -28,6 +29,8 @@ gpu_backend GpuGetBackend()
 
 void GpuInit()
 {
+    bool Debug = EgcB32(EgcFile, "debug_enabled");
+
     VkApplicationInfo ApplicationInfo = {};
     ApplicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     ApplicationInfo.pApplicationName = "Game Project";
@@ -41,6 +44,12 @@ void GpuInit()
     VkInstanceCreateInfo CreateInfo = {};
     CreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     CreateInfo.pApplicationInfo = &ApplicationInfo;
+    CreateInfo.ppEnabledExtensionNames = VulkanInstanceExtensions;
+    CreateInfo.enabledExtensionCount = 2;
+    if (Debug) {
+        CreateInfo.ppEnabledLayerNames = VulkanInstanceLayers;
+        CreateInfo.enabledLayerCount = 1;
+    }
 
     VkResult Result = vkCreateInstance(&CreateInfo, nullptr, &VK.Instance);
     if (Result != VK_SUCCESS) {
