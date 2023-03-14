@@ -98,6 +98,9 @@ void GpuInit()
     vkGetPhysicalDeviceProperties(VK.PhysicalDevice, &Properties);
     LogInfo("VULKAN: Using GPU %s", Properties.deviceName);
 
+    VK.GraphicsQueueFamily = -1;
+    VK.ComputeQueueFamily = -1;
+    VK.UploadQueueFamily = -1;
     uint32_t QueueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(VK.PhysicalDevice, &QueueFamilyCount, nullptr);
     if (QueueFamilyCount == 0) {
@@ -107,15 +110,17 @@ void GpuInit()
     vkGetPhysicalDeviceQueueFamilyProperties(VK.PhysicalDevice, &QueueFamilyCount, QueueFamilies.data());
     for (int QueueIterator = 0; QueueIterator < QueueFamilies.size(); QueueIterator++) {
         auto Family = QueueFamilies[QueueIterator];
-        if (Family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+        if (Family.queueFlags & VK_QUEUE_GRAPHICS_BIT)
             VK.GraphicsQueueFamily = QueueIterator;
-        }
-        if (Family.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+        if (Family.queueFlags & VK_QUEUE_COMPUTE_BIT)
             VK.ComputeQueueFamily = QueueIterator;
-        }
-        if (VK.GraphicsQueueFamily && VK.ComputeQueueFamily)
+        if (Family.queueFlags & VK_QUEUE_TRANSFER_BIT)
+            VK.UploadQueueFamily = QueueIterator;
+        if (VK.GraphicsQueueFamily != -1 && VK.ComputeQueueFamily != -1 && VK.UploadQueueFamily != -1)
             break;
     }
+    if (VK.GraphicsQueueFamily != -1 && VK.ComputeQueueFamily != -1 && VK.UploadQueueFamily != -1)
+        LogInfo("VULKAN: Found graphics, compute and transfer queue");
 
     // TODO(amelie.h): Create logical device
     // TODO(amelie.h): Create command queues
