@@ -98,6 +98,25 @@ void GpuInit()
     vkGetPhysicalDeviceProperties(VK.PhysicalDevice, &Properties);
     LogInfo("VULKAN: Using GPU %s", Properties.deviceName);
 
+    uint32_t QueueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(VK.PhysicalDevice, &QueueFamilyCount, nullptr);
+    if (QueueFamilyCount == 0) {
+        LogError("VULKAN: No queue families found!");
+    }
+    std::vector<VkQueueFamilyProperties> QueueFamilies(QueueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(VK.PhysicalDevice, &QueueFamilyCount, QueueFamilies.data());
+    for (int QueueIterator = 0; QueueIterator < QueueFamilies.size(); QueueIterator++) {
+        auto Family = QueueFamilies[QueueIterator];
+        if (Family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            VK.GraphicsQueueFamily = QueueIterator;
+        }
+        if (Family.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+            VK.ComputeQueueFamily = QueueIterator;
+        }
+        if (VK.GraphicsQueueFamily && VK.ComputeQueueFamily)
+            break;
+    }
+
     // TODO(amelie.h): Create logical device
     // TODO(amelie.h): Create command queues
 }
