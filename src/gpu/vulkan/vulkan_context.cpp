@@ -143,12 +143,16 @@ void GpuInit()
     if (VK.GraphicsQueueFamily != VK.UploadQueueFamily)
         QueueCount++;
 
+    VkPhysicalDeviceFeatures Features;
+    vkGetPhysicalDeviceFeatures(VK.PhysicalDevice, &Features);
+
     VkDeviceCreateInfo DeviceInfo = {};
     DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     DeviceInfo.enabledExtensionCount = 1;
     DeviceInfo.ppEnabledExtensionNames = VulkanExtensions;
     DeviceInfo.pQueueCreateInfos = QueueInfos.data();
     DeviceInfo.queueCreateInfoCount = QueueCount;
+    DeviceInfo.pEnabledFeatures = &Features;
 
     Result = vkCreateDevice(VK.PhysicalDevice, &DeviceInfo, nullptr, &VK.Device);
     if (Result != VK_SUCCESS) {
@@ -160,10 +164,29 @@ void GpuInit()
     vkGetDeviceQueue(VK.Device, VK.UploadQueueFamily, 0, &VK.UploadQueue);
 
     // TODO(amelie.h): Create command queues
+    VkCommandPoolCreateInfo PoolInfo = {};
+    PoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    PoolInfo.queueFamilyIndex = VK.GraphicsQueueFamily;
+    PoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+    Result = vkCreateCommandPool(VK.Device, &PoolInfo, nullptr, &VK.GraphicsPool);
+    if (Result != VK_SUCCESS)
+        LogError("VULKAN: Failed to create graphics command pool!");
+    PoolInfo.queueFamilyIndex = VK.ComputeQueueFamily;
+    Result = vkCreateCommandPool(VK.Device, &PoolInfo, nullptr, &VK.ComputePool);
+    if (Result != VK_SUCCESS)
+        LogError("VULKAN: Failed to create compute command pool!");
+    PoolInfo.queueFamilyIndex = VK.UploadQueueFamily;
+    Result = vkCreateCommandPool(VK.Device, &PoolInfo, nullptr, &VK.UploadPool);
+    if (Result != VK_SUCCESS)
+        LogError("VULKAN: Failed to create upload command pool!");
 }
 
 void GpuExit()
 {
+    vkDestroyCommandPool(VK.Device, VK.UploadPool, nullptr);
+    vkDestroyCommandPool(VK.Device, VK.ComputePool, nullptr);
+    vkDestroyCommandPool(VK.Device, VK.GraphicsPool, nullptr);
     vkDestroyDevice(VK.Device, nullptr);
     vkDestroyInstance(VK.Instance, nullptr);
 }
