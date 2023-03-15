@@ -122,12 +122,49 @@ void GpuInit()
     if (VK.GraphicsQueueFamily != -1 && VK.ComputeQueueFamily != -1 && VK.UploadQueueFamily != -1)
         LogInfo("VULKAN: Found graphics, compute and transfer queue");
 
-    // TODO(amelie.h): Create logical device
+    int QueueCount = 1;
+    float QueuePriority = 1.0f;
+    std::vector<VkDeviceQueueCreateInfo> QueueInfos(3);
+    QueueInfos[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    QueueInfos[0].pQueuePriorities = &QueuePriority;
+    QueueInfos[0].queueCount = 1;
+    QueueInfos[0].queueFamilyIndex = VK.GraphicsQueueFamily;
+    QueueInfos[1].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    QueueInfos[1].pQueuePriorities = &QueuePriority;
+    QueueInfos[1].queueCount = 1;
+    QueueInfos[1].queueFamilyIndex = VK.ComputeQueueFamily;
+    QueueInfos[2].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    QueueInfos[2].pQueuePriorities = &QueuePriority;
+    QueueInfos[2].queueCount = 1;
+    QueueInfos[2].queueFamilyIndex = VK.UploadQueueFamily;
+
+    if (VK.GraphicsQueueFamily != VK.ComputeQueueFamily)
+        QueueCount++;
+    if (VK.GraphicsQueueFamily != VK.UploadQueueFamily)
+        QueueCount++;
+
+    VkDeviceCreateInfo DeviceInfo = {};
+    DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    DeviceInfo.enabledExtensionCount = 1;
+    DeviceInfo.ppEnabledExtensionNames = VulkanExtensions;
+    DeviceInfo.pQueueCreateInfos = QueueInfos.data();
+    DeviceInfo.queueCreateInfoCount = QueueCount;
+
+    Result = vkCreateDevice(VK.PhysicalDevice, &DeviceInfo, nullptr, &VK.Device);
+    if (Result != VK_SUCCESS) {
+        LogError("VULKAN: Failed to create device!");
+    }
+
+    vkGetDeviceQueue(VK.Device, VK.GraphicsQueueFamily, 0, &VK.GraphicsQueue);
+    vkGetDeviceQueue(VK.Device, VK.ComputeQueueFamily, 0, &VK.ComputeQueue);
+    vkGetDeviceQueue(VK.Device, VK.UploadQueueFamily, 0, &VK.UploadQueue);
+
     // TODO(amelie.h): Create command queues
 }
 
 void GpuExit()
 {
+    vkDestroyDevice(VK.Device, nullptr);
     vkDestroyInstance(VK.Instance, nullptr);
 }
 
