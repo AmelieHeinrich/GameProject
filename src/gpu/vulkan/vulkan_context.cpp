@@ -180,10 +180,28 @@ void GpuInit()
     Result = vkCreateCommandPool(VK.Device, &PoolInfo, nullptr, &VK.UploadPool);
     if (Result != VK_SUCCESS)
         LogError("VULKAN: Failed to create upload command pool!");
+
+    VkFenceCreateInfo FenceInfo = {};
+    FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    
+    Result = vkCreateFence(VK.Device, &FenceInfo, nullptr, &VK.GraphicsFence);
+    if (Result != VK_SUCCESS)
+        LogError("VULKAN: Failed to create graphics queue fence!");
+    Result = vkCreateFence(VK.Device, &FenceInfo, nullptr, &VK.ComputeFence);
+    if (Result != VK_SUCCESS)
+        LogError("VULKAN: Failed to create compute queue fence!");
+    Result = vkCreateFence(VK.Device, &FenceInfo, nullptr, &VK.UploadFence);
+    if (Result != VK_SUCCESS)
+        LogError("VULKAN: Failed to create upload queue fence!");
 }
 
 void GpuExit()
 {
+    vkDeviceWaitIdle(VK.Device);
+
+    vkDestroyFence(VK.Device, VK.GraphicsFence, nullptr);
+    vkDestroyFence(VK.Device, VK.ComputeFence, nullptr);
+    vkDestroyFence(VK.Device, VK.UploadFence, nullptr);
     vkDestroyCommandPool(VK.Device, VK.UploadPool, nullptr);
     vkDestroyCommandPool(VK.Device, VK.ComputePool, nullptr);
     vkDestroyCommandPool(VK.Device, VK.GraphicsPool, nullptr);

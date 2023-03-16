@@ -30,14 +30,17 @@ struct vulkan_context
     uint32_t GraphicsQueueFamily;
     VkQueue GraphicsQueue;
     VkCommandPool GraphicsPool;
+    VkFence GraphicsFence;
 
     uint32_t ComputeQueueFamily;
     VkQueue ComputeQueue;
     VkCommandPool ComputePool;
+    VkFence ComputeFence;
 
     uint32_t UploadQueueFamily;
     VkQueue UploadQueue;
     VkCommandPool UploadPool;
+    VkFence UploadFence;
 };
 
 extern vulkan_context VK;
