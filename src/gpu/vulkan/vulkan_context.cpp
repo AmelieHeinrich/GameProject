@@ -77,6 +77,10 @@ void GpuInit()
         LogError("VULKAN: Failed to create instance!");
     }
 
+    Result = CreateSurface(VK.Instance, &VK.Surface);
+    if (Result != VK_SUCCESS)
+        LogError("VULKAN: Failed to create window surface!");
+
     uint32_t DeviceCount = 0;
     vkEnumeratePhysicalDevices(VK.Instance, &DeviceCount, nullptr);
     if (DeviceCount == 0) {
@@ -119,8 +123,6 @@ void GpuInit()
         if (VK.GraphicsQueueFamily != -1 && VK.ComputeQueueFamily != -1 && VK.UploadQueueFamily != -1)
             break;
     }
-    if (VK.GraphicsQueueFamily != -1 && VK.ComputeQueueFamily != -1 && VK.UploadQueueFamily != -1)
-        LogInfo("VULKAN: Found graphics, compute and transfer queue");
 
     int QueueCount = 1;
     float QueuePriority = 1.0f;
@@ -206,6 +208,7 @@ void GpuExit()
     vkDestroyCommandPool(VK.Device, VK.ComputePool, nullptr);
     vkDestroyCommandPool(VK.Device, VK.GraphicsPool, nullptr);
     vkDestroyDevice(VK.Device, nullptr);
+    vkDestroySurfaceKHR(VK.Instance, VK.Surface, nullptr);
     vkDestroyInstance(VK.Instance, nullptr);
 }
 

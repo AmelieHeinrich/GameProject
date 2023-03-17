@@ -7,8 +7,11 @@
 
 target("D3D12MA")
     set_kind("static")
-    add_files("D3D12MA/*.cpp")
-    add_headerfiles("D3D12MA/*.h")
+
+    if get_config("rhi") == "d3d12" then
+        add_files("D3D12MA/*.cpp")
+        add_headerfiles("D3D12MA/*.h")
+    end
 
 target("stb")
     set_kind("static")

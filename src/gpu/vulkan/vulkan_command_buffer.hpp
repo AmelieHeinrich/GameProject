@@ -8,3 +8,10 @@
 #pragma once
 
 #include "gpu/gpu_command_buffer.hpp"
+
+#include <vulkan/vulkan.h>
+
+struct vulkan_command_buffer
+{
+    VkCommandBuffer CommandBuffer;
+};

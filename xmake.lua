@@ -16,7 +16,14 @@ target("Game")
     set_languages("c11", "c++20")
     set_rundir(".")
     add_deps("ImGui", "dr_libs", "stb")
-    add_files("src/*.cpp", "src/cameras/*.cpp", "src/gui/*.cpp", "src/renderer/*.cpp", "src/renderer/passes/*.cpp", "src/scene/*.cpp", "src/systems/*.cpp", "src/util/*.cpp")
+    add_files("src/*.cpp",
+              "src/cameras/*.cpp",
+              "src/gui/*.cpp",
+              "src/renderer/*.cpp",
+              "src/renderer/passes/*.cpp",
+              "src/scene/*.cpp",
+              "src/systems/*.cpp",
+              "src/util/*.cpp")
     add_headerfiles("src/**.hpp")
     add_includedirs("src", "external", { public = true })
     add_linkdirs("bin/")
@@ -41,6 +48,9 @@ target("Game")
         add_linkdirs(os.getenv("VULKAN_SDK") .. "/Lib")
         add_syslinks("vulkan-1")
         add_files("src/gpu/vulkan/*.cpp", "src/gui/vulkan/*.cpp")
+        if is_plat("windows") then
+            add_files("src/gpu/vulkan/windows/*.cpp")
+        end
     end
 
     if is_plat("windows") then

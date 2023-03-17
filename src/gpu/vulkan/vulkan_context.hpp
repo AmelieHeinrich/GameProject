@@ -44,3 +44,5 @@ struct vulkan_context
 };
 
 extern vulkan_context VK;
+
+VkResult CreateSurface(VkInstance Instance, VkSurfaceKHR *Surface);
