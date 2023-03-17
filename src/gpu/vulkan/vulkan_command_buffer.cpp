@@ -69,22 +69,45 @@ void GpuCommandBufferClearDepth(gpu_command_buffer *Command, gpu_image *Image, f
 
 void GpuCommandBufferSetViewport(gpu_command_buffer *Command, float Width, float Height, float X, float Y)
 {
+    vulkan_command_buffer *Buffer = (vulkan_command_buffer*)Command->Private;
 
+    VkViewport Viewport = {};
+    Viewport.width = Width;
+    Viewport.height = Height;
+    Viewport.minDepth = 0.0f;
+    Viewport.maxDepth = 1.0f;
+    Viewport.x = X;
+    Viewport.y = Y;
+
+    VkRect2D Scissor = {};
+    Scissor.extent.width = Width;
+    Scissor.extent.height = Height;
+    Scissor.offset.x = X;
+    Scissor.offset.y = Y;
+
+    vkCmdSetViewport(Buffer->CommandBuffer, 0, 1, &Viewport);
+    vkCmdSetScissor(Buffer->CommandBuffer, 0, 1, &Scissor);
 }
 
 void GpuCommandBufferDraw(gpu_command_buffer *Command, int VertexCount)
 {
-
+    vulkan_command_buffer *Buffer = (vulkan_command_buffer*)Command->Private;
+    
+    vkCmdDraw(Buffer->CommandBuffer, VertexCount, 1, 0, 0);
 }
 
 void GpuCommandBufferDrawIndexed(gpu_command_buffer *Command, int IndexCount)
 {
+    vulkan_command_buffer *Buffer = (vulkan_command_buffer*)Command->Private;
 
+    vkCmdDrawIndexed(Buffer->CommandBuffer, IndexCount, 1, 0, 0, 0);
 }
 
 void GpuCommandBufferDispatch(gpu_command_buffer *Command, int X, int Y, int Z)
 {
+    vulkan_command_buffer *Buffer = (vulkan_command_buffer*)Command->Private;
 
+    vkCmdDispatch(Buffer->CommandBuffer, X, Y, Z);
 }
 
 void GpuCommandBufferBeginPipelineStatistics(gpu_command_buffer *Command, gpu_pipeline_profiler *Profiler)
