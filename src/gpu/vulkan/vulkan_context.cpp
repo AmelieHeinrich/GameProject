@@ -165,7 +165,6 @@ void GpuInit()
     vkGetDeviceQueue(VK.Device, VK.ComputeQueueFamily, 0, &VK.ComputeQueue);
     vkGetDeviceQueue(VK.Device, VK.UploadQueueFamily, 0, &VK.UploadQueue);
 
-    // TODO(amelie.h): Create command queues
     VkCommandPoolCreateInfo PoolInfo = {};
     PoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     PoolInfo.queueFamilyIndex = VK.GraphicsQueueFamily;

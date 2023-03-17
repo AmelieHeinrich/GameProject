@@ -13,6 +13,17 @@ target("D3D12MA")
         add_headerfiles("D3D12MA/*.h")
     end
 
+target("VMA")
+    set_kind("static")
+
+    if get_config("rhi") == "vulkan" then
+        add_includedirs(os.getenv("VULKAN_SDK") .. "/Include")
+        add_linkdirs(os.getenv("VULKAN_SDK") .. "/Lib")
+        add_syslinks("vulkan-1")
+        add_files("VMA/*.cpp")
+        add_headerfiles("VMA/*.h")
+    end
+
 target("stb")
     set_kind("static")
     add_files("stb/stb.c")

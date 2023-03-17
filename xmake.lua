@@ -44,6 +44,7 @@ target("Game")
         add_syslinks("d3d12", "d3dcompiler", "dxgi")
         add_files("src/gpu/dx12/*.cpp", "src/gui/dx12/*.cpp")
     elseif get_config("rhi") == "vulkan" then
+        add_deps("VMA")
         add_includedirs(os.getenv("VULKAN_SDK") .. "/Include")
         add_linkdirs(os.getenv("VULKAN_SDK") .. "/Lib")
         add_syslinks("vulkan-1")
