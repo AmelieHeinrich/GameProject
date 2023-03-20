@@ -194,12 +194,24 @@ void GpuInit()
     Result = vkCreateFence(VK.Device, &FenceInfo, nullptr, &VK.UploadFence);
     if (Result != VK_SUCCESS)
         LogError("VULKAN: Failed to create upload queue fence!");
+
+    VmaAllocatorCreateInfo AllocatorInfo = {};
+    AllocatorInfo.device = VK.Device;
+    AllocatorInfo.instance = VK.Instance;
+    AllocatorInfo.physicalDevice = VK.PhysicalDevice;
+    AllocatorInfo.vulkanApiVersion = VK_API_VERSION_1_3;
+    AllocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
+
+    Result = vmaCreateAllocator(&AllocatorInfo, &VK.Allocator);
+    if (Result != VK_SUCCESS)
+        LogError("VULKAN: Failed to create Vulkan memory allocator!");
 }
 
 void GpuExit()
 {
     vkDeviceWaitIdle(VK.Device);
 
+    vmaDestroyAllocator(VK.Allocator);
     vkDestroyFence(VK.Device, VK.GraphicsFence, nullptr);
     vkDestroyFence(VK.Device, VK.ComputeFence, nullptr);
     vkDestroyFence(VK.Device, VK.UploadFence, nullptr);

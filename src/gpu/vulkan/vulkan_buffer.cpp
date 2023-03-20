@@ -7,9 +7,11 @@
 
 #include "vulkan_buffer.hpp"
 
+#include "vulkan_context.hpp"
+
 void GpuBufferInit(gpu_buffer *Buffer, uint64_t Size, uint64_t Stride, gpu_buffer_type Type)
 {
-
+    
 }
 
 void GpuBufferInitForUpload(gpu_buffer *Buffer, uint64_t Size)
